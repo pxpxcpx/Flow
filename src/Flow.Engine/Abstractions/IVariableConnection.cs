@@ -9,9 +9,9 @@ namespace Flow.Engine.Abstractions;
 
 public interface IVariableConnection
 {
-    VariblePosition From { get; set; }
+    VariablePosition From { get; set; }
 
-    VariblePosition To { get; set; }
+    VariablePosition To { get; set; }
 
     Type VariableType { get; set; }
 

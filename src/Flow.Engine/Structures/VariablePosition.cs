@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Flow.Engine.Structures;
 
-public record struct VariblePosition
+public record struct VariablePosition
 {
     public int Position { get; set; }
 

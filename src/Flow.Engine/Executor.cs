@@ -22,7 +22,6 @@ public class Executor
 
     public void Execute()
     {
-        Script.Initialize();
-        Script.StartNode.Execute();
+        Script.Entry.Execute();
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Flow.API;
+﻿namespace Flow.API.Node;
 
 /// <summary>
 /// 定义单个节点的接口

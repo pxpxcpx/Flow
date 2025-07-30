@@ -1,11 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36105.17 d17.14
+VisualStudioVersion = 17.14.36105.17
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.Engine", "src\Flow.Engine\Flow.Engine.csproj", "{23A220CC-4805-4CF5-B094-528EAF95694F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.API", "src\Flow.API\Flow.API.csproj", "{A9AF617A-4F29-481F-A5B5-4E7E96F6EA01}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{E7153054-017B-4A29-B7B1-5846FC66B53F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D6CD1356-46CE-4EFC-9790-4D0E8807B25E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.Plugins.BuiltIn.Nodes", "plugins\Flow.Plugins.BuiltIn.Nodes\Flow.Plugins.BuiltIn.Nodes.csproj", "{976D084D-2631-4456-9127-65DDC34007C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +27,16 @@ Global
 		{A9AF617A-4F29-481F-A5B5-4E7E96F6EA01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9AF617A-4F29-481F-A5B5-4E7E96F6EA01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9AF617A-4F29-481F-A5B5-4E7E96F6EA01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{976D084D-2631-4456-9127-65DDC34007C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{976D084D-2631-4456-9127-65DDC34007C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{976D084D-2631-4456-9127-65DDC34007C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{976D084D-2631-4456-9127-65DDC34007C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{976D084D-2631-4456-9127-65DDC34007C4} = {E7153054-017B-4A29-B7B1-5846FC66B53F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD440637-9CE6-47FE-B948-6B7A74E6BB87}
