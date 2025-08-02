@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Flow.PDK.Node.Internal;
 
 namespace Flow.Engine.Abstractions;
 
@@ -24,12 +25,12 @@ public interface IScript
     /// Entry point of the script, which is the starting node
     /// (Maybe removed in the next version)
     /// </summary>
-    INode Entry { get; set; }
+    IInternalNode Entry { get; set; }
 
     /// <summary>
     /// Collection of nodes in the script
     /// </summary>
-    IEnumerable<INode> Nodes { get; set; }
+    IEnumerable<IInternalNode> Nodes { get; set; }
 
     /// <summary>
     /// Collection of process controlling connections in the script

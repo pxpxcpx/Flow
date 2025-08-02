@@ -1,17 +1,12 @@
-﻿using Flow.API;
-using Flow.Engine.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Flow.API.Node;
+﻿using Flow.PDK.Node;
+using Flow.PDK.Node.Internal;
 
-namespace Flow.Engine.Abstractions;
+namespace Flow.Engine.Structures;
 
-internal class Node : INode
+internal class InternalNode : IInternalNode
 {
     public Guid Id { get; init; }
+    public Guid RuntimeId { get; init; }
     public string Description { get; set; }
     public string Name { get; set; }
     
@@ -22,11 +17,11 @@ internal class Node : INode
     
     public IExecutable Executable { get; set; }
 
-    public Node():this(string.Empty)
+    public InternalNode() : this(string.Empty)
     {
     }
 
-    public Node(string description)
+    public InternalNode(string description)
     {
         Id = Guid.NewGuid();
         Description = description;

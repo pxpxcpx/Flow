@@ -1,27 +1,28 @@
 ﻿using Flow.Engine.Abstractions;
+using Flow.PDK.Node.Internal;
 
 namespace Flow.Engine;
 
 public class Executor
 {
-    private INode _current;
-    private List<INode> _nodes = new List<INode>();
+    private IInternalNode _current;
+    private List<IInternalNode> _nodes = new();
 
     public IScript Script { get; set; }
 
     public Executor(IScript script)
     {
         Script = script ?? throw new ArgumentNullException(nameof(script));
-        _nodes = (List<INode>)Script.Nodes ?? throw new ArgumentNullException(nameof(Script.Nodes));
+        _nodes = (List<IInternalNode>)Script.Nodes ?? throw new ArgumentNullException(nameof(Script.Nodes));
     }
 
-    private INode GetNext()
+    private IInternalNode GetNext()
     {
         throw new NotImplementedException();
     }
 
     public void Execute()
     {
-        Script.Entry.Execute();
+        throw new NotImplementedException();
     }
 }

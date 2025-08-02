@@ -1,11 +1,12 @@
-﻿using Flow.API.Node;
-using Flow.API.Node.Attributes;
+﻿using Flow.PDK.Node;
+using Flow.PDK.Node.Attributes;
 
 namespace Flow.Plugins.BuiltIn.Nodes.Math;
 
 [Node]
 public class Addition : INode
 {
+    public Guid Id { get; init; }
     public string Name => "Addition";
     public string Description => "Adds two integers together.";
 
