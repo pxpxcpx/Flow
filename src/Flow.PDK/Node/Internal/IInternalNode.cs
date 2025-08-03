@@ -1,4 +1,6 @@
-﻿namespace Flow.PDK.Node.Internal;
+﻿using Flow.PDK.Node.Internal.Enums;
+
+namespace Flow.PDK.Node.Internal;
 
 public interface IInternalNode : INode
 {

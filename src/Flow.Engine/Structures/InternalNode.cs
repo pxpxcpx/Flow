@@ -1,5 +1,6 @@
 ﻿using Flow.PDK.Node;
 using Flow.PDK.Node.Internal;
+using Flow.PDK.Node.Internal.Enums;
 
 namespace Flow.Engine.Structures;
 

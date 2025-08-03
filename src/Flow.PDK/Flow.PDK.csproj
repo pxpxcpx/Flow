@@ -4,10 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!--EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules-->
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Flow.PDK\Flow.PDK.csproj" />
+    <PackageReference Include="Microsoft.Build" Version="17.14.8" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.14.0" />
   </ItemGroup>
 
 </Project>
