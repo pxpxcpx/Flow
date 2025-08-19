@@ -1,4 +1,6 @@
-﻿namespace Flow.PDK.Context.Attributes;
+﻿using Flow.PDK.Context.Enums;
+
+namespace Flow.PDK.Context.Attributes;
 
 /// <summary>
 /// Tag the required context objects, which will be managed and stored in the ContextManager

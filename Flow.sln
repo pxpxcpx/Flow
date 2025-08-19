@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.Plugins.BuiltIn.Nodes"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.Core", "src\Flow.Core\Flow.Core.csproj", "{5817F8D9-A1C4-41BA-A357-BAD869BC473A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.Automation", "src\Flow.Automation\Flow.Automation.csproj", "{E64ACE95-CF9C-44F2-B317-7C8583B193A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{5817F8D9-A1C4-41BA-A357-BAD869BC473A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5817F8D9-A1C4-41BA-A357-BAD869BC473A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5817F8D9-A1C4-41BA-A357-BAD869BC473A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E64ACE95-CF9C-44F2-B317-7C8583B193A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E64ACE95-CF9C-44F2-B317-7C8583B193A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E64ACE95-CF9C-44F2-B317-7C8583B193A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E64ACE95-CF9C-44F2-B317-7C8583B193A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

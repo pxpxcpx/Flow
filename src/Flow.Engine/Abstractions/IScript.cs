@@ -27,6 +27,8 @@ public interface IScript
     /// </summary>
     IInternalNode Entry { get; set; }
 
+    Dictionary<Guid, IInternalNode> Graph { get; }
+    
     /// <summary>
     /// Collection of nodes in the script
     /// </summary>
@@ -41,4 +43,6 @@ public interface IScript
     /// Collection of variable connections in the script
     /// </summary>
     IEnumerable<IVariableConnection> VariableConnections { get; set; }
+
+    void InitializeGraph();
 }
