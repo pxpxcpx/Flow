@@ -15,8 +15,7 @@ public class Executor
     public object? Result { get; private set; }
 
     public Executor(IScript script,
-                    ContextManager<Guid>? contextManager = null,
-                    bool positiveOrder = true)
+                    ContextManager<Guid>? contextManager = null)
     {
         _contextManager = contextManager ?? new ContextManager<Guid>();
         Script = script ?? throw new ArgumentNullException(nameof(script));

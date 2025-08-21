@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Condition\" />
     <Folder Include="Filter\" />
     <Folder Include="Trigger\" />
   </ItemGroup>
