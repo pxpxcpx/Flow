@@ -1,13 +1,11 @@
 ﻿
-using Flow.Automation.Decisioning.Abstractions;
-
-namespace Flow.Automation.Decisioning;
+namespace Flow.Automation.Decisioning.Abstractions;
 
 public abstract class Specification<T>(T obj, params object[]? args) : ISpecification
 {
     public T Obj { get; init; } = obj;
 
-    public object[]? Args { get; set; } = args;
+    public object[]? Args { get; init; } = args;
 
     public virtual bool Result => IsSatisfiedBy();
 
