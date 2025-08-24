@@ -2,12 +2,12 @@
 
 /// <summary>
 /// Used to form conditional groups and perform logical operations,
-/// only caring about the result
+/// only caring about the result.
 /// </summary>
 public interface ISpecification
 {
     /// <summary>
-    /// The result of the instance
+    /// The result of the instance.
     /// </summary>
     bool Result { get; }
 }

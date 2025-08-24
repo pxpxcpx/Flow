@@ -1,20 +1,16 @@
 ﻿using Flow.Automation.Decisioning.Abstractions;
 
-namespace Flow.Automation.Decisioning;
+namespace Flow.Automation.Decisioning.Specifications;
 
 /// <summary>
 /// Specifications represents <see cref="bool"/> values: true or false
 /// </summary>
 public static class BooleanSpecification
 {
-    /// <summary>
-    /// <see cref="TrueSpecification"/>
-    /// </summary>
+    /// <inheritdoc cref="TrueSpecification"/>
     public static TrueSpecification True => TrueSpecification.Instance;
     
-    /// <summary>
-    /// <see cref="FalseSpecification"/>
-    /// </summary>
+    /// <inheritdoc cref="FalseSpecification"/>
     public static FalseSpecification False => FalseSpecification.Instance;
     
     /// <summary>
