@@ -13,7 +13,7 @@ public sealed class LogicalSpecification(ISpecification a, ISpecification b, Log
     public bool Result => Evaluate(a, b, @operator);
 
     /// <summary>
-    /// Evaluate two boolean value with <see cref="LogicalOperator"/>.
+    /// Evaluate two boolean values with <see cref="LogicalOperator"/>.
     /// </summary>
     /// <param name="a">Value a</param>
     /// <param name="b">Value b</param>
@@ -25,7 +25,7 @@ public sealed class LogicalSpecification(ISpecification a, ISpecification b, Log
     public static bool Evaluate(bool a, bool b, LogicalOperator op)
     {
         // Reverse if op contains a Not Operator
-        // e.g. Nor (0110) -> Not (0100) + Or (0010), and the part of Or op will be reversed. 
+        // e.g., Nor (0110) -> Not (0100) + Or (0010), and the part of Or op will be reversed. 
         if (op.HasFlag(LogicalOperator.Not))
         {
             var innerOp = op & ~LogicalOperator.Not;
