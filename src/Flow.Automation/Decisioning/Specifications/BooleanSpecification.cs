@@ -3,37 +3,33 @@
 namespace Flow.Automation.Decisioning.Specifications;
 
 /// <summary>
-/// Specifications represents <see cref="bool"/> values: true or false
+/// Specifications represents <see cref="bool"/> values: true or false.
 /// </summary>
 public static class BooleanSpecification
 {
     /// <inheritdoc cref="TrueSpecification"/>
-    public static TrueSpecification True => TrueSpecification.Instance;
+    public static readonly TrueSpecification True = new();
     
     /// <inheritdoc cref="FalseSpecification"/>
-    public static FalseSpecification False => FalseSpecification.Instance;
+    public static readonly FalseSpecification False = new();
     
     /// <summary>
-    /// Always returns true, singleton mode
+    /// Always returns true.
     /// </summary>
     public sealed class TrueSpecification : ISpecification
     {
         public bool Result => true;
         
-        private TrueSpecification() { }
-        private static readonly Lazy<TrueSpecification> Inst = new(() => new TrueSpecification());
-        public static TrueSpecification Instance => Inst.Value;
+        internal TrueSpecification() { }
     }
 
     /// <summary>
-    /// Always returns false, singleton mode
+    /// Always returns false.
     /// </summary>
     public sealed class FalseSpecification : ISpecification
     {
         public bool Result => false;
         
-        private FalseSpecification() { }
-        private static readonly Lazy<FalseSpecification> Inst = new(() => new FalseSpecification());
-        public static FalseSpecification Instance => Inst.Value;
+        internal FalseSpecification() { }
     }
 }
