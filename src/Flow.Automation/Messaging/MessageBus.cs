@@ -32,7 +32,7 @@ public class MessageBus<T> : IObserver<T>, IObservable<T>, IDisposable
     public IDisposable Subscribe(Action<T> onNext, Action<Exception> onError, Action onCompleted)
         => Messages.Subscribe(onNext, onError, onCompleted);
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         _subject.Dispose();
         GC.SuppressFinalize(this);

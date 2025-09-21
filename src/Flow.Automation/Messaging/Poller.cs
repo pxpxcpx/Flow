@@ -1,6 +1,93 @@
-﻿namespace Flow.Automation.Messaging;
+﻿using Flow.Automation.Messaging.Records;
+using Flow.Automation.Messaging.Trigger;
+using Timer = System.Timers.Timer;
 
-public class Poller
+namespace Flow.Automation.Messaging;
+
+/// <summary>
+/// Poller based on a timer that checks a list of triggers at specified intervals
+/// and publishes event messages when triggers are activated.
+/// </summary>
+public class Poller : MessageBus<EventMessage>
 {
+    private readonly List<ITrigger<EventArgs>> _triggers = new();
+
+    private readonly Timer _timer;
     
+    /// <summary>
+    /// Timer's interval in milliseconds.
+    /// </summary>
+    public int Interval { get; init; }
+
+    /// <summary>
+    /// The count of ticks since the poller started.
+    /// </summary>
+    public int Ticks { get; private set; }
+    
+    /// <summary>
+    /// Controls whether to report an empty event message on every tick even if no triggers were activated.
+    /// </summary>
+    public bool ReportEveryTime { get; init; } = false;
+
+    public Poller(int interval, List<ITrigger<EventArgs>>? triggers = null)
+    {
+        if (triggers != null)
+            _triggers = triggers;
+        
+        Interval = interval;
+        _timer = new Timer(interval);
+        _timer.AutoReset = false;
+        _timer.Elapsed += (_, _) => Tick();
+    }
+    
+    /// <summary>
+    /// The handler for the timer's Elapsed event.
+    /// It checks each trigger and publishes an event message if any are activated.
+    /// </summary>
+    private void Tick()
+    {
+        Ticks++;
+        var hasMessage = false;
+        
+        foreach (var trigger in _triggers)
+        {
+            var args = trigger.CheckIfTriggered();
+            
+            if (args is null) continue;
+            
+            hasMessage = true;
+            OnNext(new EventMessage(this, args));
+        }
+        
+        if (!hasMessage && ReportEveryTime)
+            OnNext(EventMessage.Empty);
+    }
+    
+    /// <summary>
+    /// Start the timer and begin polling triggers at the specified interval.
+    /// </summary>
+    public void Start()
+        => _timer.Start();
+    
+    /// <summary>
+    /// Stop the timer and halt polling triggers.
+    /// </summary>
+    public void Stop()
+        => _timer.Stop();
+    
+    public void AddTrigger(ITrigger<EventArgs> trigger)
+        => _triggers.Add(trigger);
+    
+    public void RemoveTrigger(ITrigger<EventArgs> trigger)
+        => _triggers.Remove(trigger);
+    
+    public void ClearTriggers()
+        => _triggers.Clear();
+
+    public override void Dispose()
+    {
+        _timer.Dispose();
+        base.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }
