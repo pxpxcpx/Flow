@@ -75,12 +75,15 @@ public class Poller : MessageBus<EventMessage>
     public void Stop()
         => _timer.Stop();
     
+    /// <inheritdoc cref="List{T}.Add"/>
     public void AddTrigger(ITrigger<EventArgs> trigger)
         => _triggers.Add(trigger);
     
+    /// <inheritdoc cref="List{T}.Remove"/>
     public void RemoveTrigger(ITrigger<EventArgs> trigger)
         => _triggers.Remove(trigger);
     
+    /// <inheritdoc cref="List{T}.Clear"/>
     public void ClearTriggers()
         => _triggers.Clear();
 
