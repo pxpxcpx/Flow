@@ -1,4 +1,4 @@
-﻿namespace Flow.PDK.Node.Attributes;
+﻿namespace Flow.SDK.Plugins.Node.Attributes;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 public class InputAttribute : RecognizableAttributeBase

@@ -1,4 +1,4 @@
-﻿namespace Flow.PDK.Node;
+﻿namespace Flow.SDK.Plugins.Node;
 
 public interface INode : IExecutable, IRecognizable
 {

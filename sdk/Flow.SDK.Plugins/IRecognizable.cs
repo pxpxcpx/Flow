@@ -1,4 +1,4 @@
-﻿namespace Flow.PDK;
+﻿namespace Flow.SDK.Plugins;
 
 public interface IRecognizable
 {

@@ -1,5 +1,5 @@
-﻿using Flow.PDK.Node;
-using Flow.PDK.Node.Attributes;
+﻿using Flow.SDK.Plugins.Node;
+using Flow.SDK.Plugins.Node.Attributes;
 
 namespace Flow.Plugins.BuiltIn.Nodes.Math;
 

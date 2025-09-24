@@ -1,4 +1,4 @@
-﻿namespace Flow.PDK.Node.Internal.Enums;
+﻿namespace Flow.SDK.Plugins.Node.Internal.Enums;
 
 public enum NodeStatus
 {

@@ -1,4 +1,4 @@
-﻿namespace Flow.PDK.Node;
+﻿namespace Flow.SDK.Plugins.Node;
 
 /// <summary>
 /// 定义单个节点的接口

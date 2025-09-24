@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Flow.PDK.Node.Internal;
+using Flow.SDK.Plugins.Node.Internal;
 
 namespace Flow.Engine.Abstractions;
 

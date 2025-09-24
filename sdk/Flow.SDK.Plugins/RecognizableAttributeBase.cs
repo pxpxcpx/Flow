@@ -1,6 +1,6 @@
-﻿using Flow.PDK.Node.Attributes;
+﻿using Flow.SDK.Plugins.Node.Attributes;
 
-namespace Flow.PDK;
+namespace Flow.SDK.Plugins;
 
 /// <summary>
 /// <see cref="InputAttribute"/>, <see cref="OutputAttribute"/>'s Base Class, 

@@ -1,4 +1,4 @@
-﻿namespace Flow.PDK.Node.Attributes;
+﻿namespace Flow.SDK.Plugins.Node.Attributes;
 
 [AttributeUsage(AttributeTargets.Class , Inherited = false)]
 public class NodeAttribute : Attribute

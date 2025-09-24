@@ -1,6 +1,6 @@
-﻿using Flow.PDK.Node;
-using Flow.PDK.Node.Internal;
-using Flow.PDK.Node.Internal.Enums;
+﻿using Flow.SDK.Plugins.Node;
+using Flow.SDK.Plugins.Node.Internal;
+using Flow.SDK.Plugins.Node.Internal.Enums;
 
 namespace Flow.Engine.Structures;
 

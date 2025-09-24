@@ -1,8 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
 
-namespace Flow.PDK.Generators;
+namespace Flow.SDK.Plugins.Generators;
 
-// [Generator]
+[Generator]
 public class InternalNodeGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
