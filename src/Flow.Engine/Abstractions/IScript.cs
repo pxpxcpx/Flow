@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Flow.SDK.Plugins.Node;
 using Flow.SDK.Plugins.Node.Internal;
 
 namespace Flow.Engine.Abstractions;
@@ -25,24 +26,24 @@ public interface IScript
     /// Entry point of the script, which is the starting node
     /// (Maybe removed in the next version)
     /// </summary>
-    IInternalNode Entry { get; set; }
+    INode Entry { get; set; }
 
-    Dictionary<Guid, IInternalNode> Graph { get; }
+    Dictionary<Guid, INode> Graph { get; }
     
     /// <summary>
     /// Collection of nodes in the script
     /// </summary>
-    IEnumerable<IInternalNode> Nodes { get; set; }
+    List<INode> Nodes { get; set; }
 
     /// <summary>
     /// Collection of process controlling connections in the script
     /// </summary>
-    IEnumerable<IProcessConnection> ProcessConnection { get; set; }
+    List<IProcessConnection> ProcessConnection { get; set; }
 
     /// <summary>
     /// Collection of variable connections in the script
     /// </summary>
-    IEnumerable<IVariableConnection> VariableConnections { get; set; }
+    List<IVariableConnection> VariableConnections { get; set; }
 
     void InitializeGraph();
 }

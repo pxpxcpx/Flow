@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\sdk\Flow.SDK.Plugins.Generators\Flow.SDK.Plugins.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\sdk\Flow.SDK.Plugins\Flow.SDK.Plugins.csproj" />
-    <ProjectReference Include="..\..\src\Flow.SDK.Plugins\Flow.SDK.Plugins.csproj" />
   </ItemGroup>
 
 </Project>

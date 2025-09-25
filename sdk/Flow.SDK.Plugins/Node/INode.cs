@@ -2,5 +2,9 @@
 
 public interface INode : IExecutable, IRecognizable
 {
-    Guid Id { get; init; }
+    Guid Guid { get; }
+    
+    Dictionary<string, Type> ParamTypes { get; }
+    
+    void SetValue<T>(string param, T value);
 }

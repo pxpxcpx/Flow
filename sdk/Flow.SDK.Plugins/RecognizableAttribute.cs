@@ -7,13 +7,13 @@ namespace Flow.SDK.Plugins;
 /// The flag will have no effect. Do not apply it to any properties or fields.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public abstract class RecognizableAttributeBase : Attribute, IRecognizable
+public abstract class RecognizableAttribute : Attribute, IRecognizable
 {
     public string Name { get; protected set; } = string.Empty;
     public string Description { get; protected set; } = string.Empty;
 
-    private RecognizableAttributeBase() { }
-    protected RecognizableAttributeBase(string name, string description)
+    private RecognizableAttribute() { }
+    protected RecognizableAttribute(string name, string description)
     {
         Name = name;
         Description = description;

@@ -1,13 +1,14 @@
 ﻿using Flow.Engine.Abstractions;
 using Flow.Engine.ContextManager;
+using Flow.SDK.Plugins.Node;
 using Flow.SDK.Plugins.Node.Internal;
 
 namespace Flow.Engine;
 
 public class Executor
 {
-    private IInternalNode _current;
-    private IEnumerable<IInternalNode> _nodes;
+    private INode _current;
+    private IEnumerable<INode> _nodes;
     private ContextManager<Guid> _contextManager;
 
     public IScript Script { get; set; }
@@ -24,17 +25,17 @@ public class Executor
 
     #region Utilities
 
-    protected IInternalNode GetCurrentNode()
+    protected INode GetCurrentNode()
     {
         throw new NotImplementedException();
     }
     
-    protected IInternalNode GetProcessingNext()
+    protected INode GetProcessingNext()
     {
         throw new NotImplementedException();
     }
     
-    protected IInternalNode GetProcessingPrevious()
+    protected INode GetProcessingPrevious()
     {
         throw new NotImplementedException();
     }

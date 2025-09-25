@@ -6,7 +6,7 @@ namespace Flow.SDK.Plugins.Context.Attributes;
 /// Tag the required context objects, which will be managed and stored in the ContextManager
 /// </summary>
 [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
-public class ContextObject : RecognizableAttributeBase
+public class ContextObject : RecognizableAttribute
 {
     public ContextObjectCreationMode CreationMode { get; set; }
     
