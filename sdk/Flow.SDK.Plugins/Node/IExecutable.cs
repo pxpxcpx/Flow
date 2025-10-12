@@ -1,12 +1,12 @@
 ﻿namespace Flow.SDK.Plugins.Node;
 
 /// <summary>
-/// 定义单个节点的接口
+/// Define the interface for executable objects.
 /// </summary>
 public interface IExecutable
 {
     /// <summary>
-    /// 执行
+    /// Execute the node.
     /// </summary>
     void Execute();
 }

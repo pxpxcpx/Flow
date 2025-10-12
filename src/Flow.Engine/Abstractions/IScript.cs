@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Flow.SDK.Plugins.Node;
-using Flow.SDK.Plugins.Node.Internal;
+﻿using Flow.SDK.Plugins.Node;
 
 namespace Flow.Engine.Abstractions;
 
@@ -12,28 +6,26 @@ namespace Flow.Engine.Abstractions;
 /// Represents a script that defines a logical sequence of nodes, connections, and portals
 /// </summary>
 /// <remarks>
-/// 该接口提供脚本的结构，包括其唯一标识符、起始节点、以及各种联系。
-/// This interface provides the structure of the script, including its unique identifier, starting node, and various connections.
+/// This interface provides the structure of the script,
+/// including its unique identifier, starting node, and various connections.
 /// </remarks>
 public interface IScript
 {
     /// <summary>
     /// Script's unique identifier
     /// </summary>
-    Guid Id { get; init; }
+    Guid RuntimeId { get; init; }
 
     /// <summary>
     /// Entry point of the script, which is the starting node
-    /// (Maybe removed in the next version)
     /// </summary>
     INode Entry { get; set; }
 
-    Dictionary<Guid, INode> Graph { get; }
-    
     /// <summary>
-    /// Collection of nodes in the script
+    /// Contains nodes and their GUID.
+    /// The internal graph of the script.
     /// </summary>
-    List<INode> Nodes { get; set; }
+    Dictionary<Guid, INode> Graph { get; }
 
     /// <summary>
     /// Collection of process controlling connections in the script

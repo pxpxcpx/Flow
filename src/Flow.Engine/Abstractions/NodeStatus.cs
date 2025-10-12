@@ -1,11 +1,12 @@
-﻿namespace Flow.SDK.Plugins.Node.Internal.Enums;
+﻿namespace Flow.Engine.Abstractions;
 
 public enum NodeStatus
 {
-    Ready = 0,
-    Running = 1,
-    Completed = 2,
-    Failed = 4,
-    Skipped = 8,
-    Canceled = 16
+    Ready     = 0b_0000_0000,
+    Running   = 0b_0000_0001,
+    Waiting   = 0b_0000_0010,
+    Completed = 0b_0000_0100,
+    Failed    = 0b_0000_1000,
+    Skipped   = 0b_0001_0000,
+    Canceled  = 0b_0010_0000,
 }
