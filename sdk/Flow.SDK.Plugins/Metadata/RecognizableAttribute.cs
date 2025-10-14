@@ -1,6 +1,6 @@
 ﻿using Flow.SDK.Plugins.Node.Attributes;
 
-namespace Flow.SDK.Plugins;
+namespace Flow.SDK.Plugins.Metadata;
 
 /// <summary>
 /// <see cref="InputAttribute"/>, <see cref="OutputAttribute"/>'s Base Class, 

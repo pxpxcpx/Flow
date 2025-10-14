@@ -1,4 +1,6 @@
-﻿namespace Flow.SDK.Plugins.Node;
+﻿using Flow.SDK.Plugins.Metadata;
+
+namespace Flow.SDK.Plugins.Node;
 
 /// <summary>
 /// The interface of a node to be executed.
@@ -17,9 +19,13 @@ public interface INode : IExecutable, IRecognizable
     /// </summary>
     Dictionary<string, Type> ParamTypes { get; }
     
-    object?[] Inputs { get; set; }
+    ParameterMetadata[] InputVariableMetadata { get; }
     
-    object[]? Outputs { get; set; }
+    ParameterMetadata[] OutputVariableMetadata { get; }
+    
+    object?[] Inputs { get; init; }
+    
+    object[]? Outputs { get; init; }
     
     /// <summary>
     /// Set the value of the node.

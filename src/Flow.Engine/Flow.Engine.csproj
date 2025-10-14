@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\sdk\Flow.SDK.Plugins\Flow.SDK.Plugins.csproj" />
-    <ProjectReference Include="..\Flow.SDK.Plugins\Flow.SDK.Plugins.csproj" />
   </ItemGroup>
 
 </Project>

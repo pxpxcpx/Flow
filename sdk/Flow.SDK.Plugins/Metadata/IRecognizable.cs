@@ -1,5 +1,9 @@
-﻿namespace Flow.SDK.Plugins;
+﻿namespace Flow.SDK.Plugins.Metadata;
 
+/// <summary>
+/// Represents an identifier's interface. Immutable identifier used within a variable.
+/// Used for object representation or for metadata.
+/// </summary>
 public interface IRecognizable
 {
     /// <summary>
