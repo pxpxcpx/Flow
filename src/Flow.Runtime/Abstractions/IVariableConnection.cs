@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Flow.Engine.Models;
+using Flow.Runtime.Models;
 
-namespace Flow.Engine.Abstractions;
+namespace Flow.Runtime.Abstractions;
 
 public interface IVariableConnection
 {

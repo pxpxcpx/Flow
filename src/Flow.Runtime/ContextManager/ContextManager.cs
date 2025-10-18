@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Flow.Engine.ContextManager;
+namespace Flow.Runtime.ContextManager;
 
 public class ContextManager<TKey> where TKey : IEquatable<TKey>
 {
@@ -36,7 +36,7 @@ public class ContextManager<TKey> where TKey : IEquatable<TKey>
         return Contexts.TryAdd(key, contextItem);
     }
 
-    /// <inheritdoc cref="TryAddContext(TKey,Flow.Engine.ContextManager.ContextItem?,bool)"/>
+    /// <inheritdoc cref="TryAddContext(TKey,ContextItem?,bool)"/>
     public bool TryAddContext(TKey key, Type contextType, object contextValue, bool force = false)
     {
         var contextItem = new ContextItem(contextType, contextValue);
@@ -88,7 +88,7 @@ public class ContextManager<TKey> where TKey : IEquatable<TKey>
         return Contexts.TryUpdate(key, newItem, oldItem);
     }
 
-    /// <inheritdoc cref="UpdateContent(TKey,Flow.Engine.ContextManager.ContextItem?)"/>
+    /// <inheritdoc cref="UpdateContent(TKey,ContextItem?)"/>
     public bool UpdateContent(TKey key, Type type, object value)
     {
         var newItem = new ContextItem(type, value);

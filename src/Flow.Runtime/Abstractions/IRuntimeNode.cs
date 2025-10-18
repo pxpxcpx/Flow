@@ -1,6 +1,6 @@
 ﻿using Flow.SDK.Plugins.Node;
 
-namespace Flow.Engine.Abstractions;
+namespace Flow.Runtime.Abstractions;
 
 /// <summary>
 /// Provides node runtime properties.

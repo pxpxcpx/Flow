@@ -1,6 +1,6 @@
 ﻿using Flow.SDK.Plugins.Node;
 
-namespace Flow.Engine.Abstractions;
+namespace Flow.Runtime.Abstractions;
 
 /// <summary>
 /// Represents a script that defines a logical sequence of nodes, connections, and portals

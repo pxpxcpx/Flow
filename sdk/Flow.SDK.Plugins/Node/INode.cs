@@ -5,33 +5,30 @@ namespace Flow.SDK.Plugins.Node;
 /// <summary>
 /// The interface of a node to be executed.
 /// </summary>
-public interface INode : IExecutable, IRecognizable
+public interface INode : IExecutable
 {
     /// <summary>
-    /// ID of the node, used to distinguish between different nodes.
-    /// Determined during development, not changed at runtime.
+    /// Metadata of the node. Includes name, description, GUID of this node. 
     /// </summary>
-    /// <remarks> Note the distinction from the runtime GUID. </remarks>
-    Guid Guid { get; }
+    NodeMetadata Metadata { get; }
     
     /// <summary>
-    /// A dictionary that includes parameters and their corresponding types.
+    /// Metadata of the input variables.
     /// </summary>
-    Dictionary<string, Type> ParamTypes { get; }
-    
     ParameterMetadata[] InputVariableMetadata { get; }
     
+    /// <summary>
+    /// Metadata of the output variables.
+    /// </summary>
     ParameterMetadata[] OutputVariableMetadata { get; }
     
+    /// <summary>
+    /// Data of the Inputs (arguments).
+    /// </summary>
     object?[] Inputs { get; init; }
     
-    object[]? Outputs { get; init; }
-    
     /// <summary>
-    /// Set the value of the node.
+    /// Data of the outputs.
     /// </summary>
-    /// <param name="param">Parameter name.</param>
-    /// <param name="value">Value to be set.</param>
-    /// <typeparam name="T">Type of the parameter.</typeparam>
-    void SetValue<T>(string param, T value);
+    object[]? Outputs { get; init; }
 }
