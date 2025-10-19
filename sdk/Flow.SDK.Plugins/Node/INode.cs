@@ -15,20 +15,20 @@ public interface INode : IExecutable
     /// <summary>
     /// Metadata of the input variables.
     /// </summary>
-    ParameterMetadata[] InputVariableMetadata { get; }
+    ParameterMetadata[]? InputVariableMetadata { get; }
     
     /// <summary>
     /// Metadata of the output variables.
     /// </summary>
-    ParameterMetadata[] OutputVariableMetadata { get; }
+    ParameterMetadata[]? OutputVariableMetadata { get; }
     
     /// <summary>
-    /// Data of the Inputs (arguments).
+    /// Data of the Inputs (arguments). Can be null if there's no input.
     /// </summary>
-    object?[] Inputs { get; init; }
+    object?[]? Inputs { get; init; }
     
     /// <summary>
-    /// Data of the outputs.
+    /// Data of the outputs. Can be null if there's no output.
     /// </summary>
-    object[]? Outputs { get; init; }
+    object?[]? Outputs { get; init; }
 }

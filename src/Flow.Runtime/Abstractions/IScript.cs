@@ -17,9 +17,10 @@ public interface IScript
     Guid RuntimeId { get; init; }
 
     /// <summary>
-    /// Entry point of the script, which is the starting node
+    /// Entry point of the script, which is the starting node.
     /// </summary>
-    INode Entry { get; set; }
+    /// <remarks>Can be null if the script is empty.</remarks>
+    INode? Entry { get; set; }
 
     /// <summary>
     /// Contains nodes and their GUID.
