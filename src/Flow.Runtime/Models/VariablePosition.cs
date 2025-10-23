@@ -2,7 +2,7 @@
 
 public record struct VariablePosition
 {
-    public int Position { get; set; }
+    public int Index { get; set; }
 
     public Guid Node { get; set; }
 }

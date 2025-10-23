@@ -70,12 +70,12 @@ public static class ScriptHelper
     }
 
     /// <summary>
-    /// Get next variables requiring value transfer.
+    /// Get the next variables.
     /// </summary>
     /// <param name="currentRuntimeId">Runtime GUID of the current node.</param>
     /// <param name="script">Script containing this node.</param>
     /// <returns><see cref="VariablePosition"/></returns>
-    public static VariablePosition[]? GetVariableNext(this Guid currentRuntimeId, IScript script)
+    public static VariablePosition[]? GetVariableTarget(this Guid currentRuntimeId, IScript script)
     {
         if (script.Graph.Count == 0 || !script.Graph.ContainsKey(currentRuntimeId))
             return null;
@@ -83,6 +83,23 @@ public static class ScriptHelper
         return script.VariableConnections
             .Where(x => x.From.Node == currentRuntimeId)
             .Select(x => x.To)
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Get the source of a variable connection.
+    /// </summary>
+    /// <param name="currentRuntimeId"></param>
+    /// <param name="script"></param>
+    /// <returns></returns>
+    public static VariablePosition[]? GetVariableSource(this Guid currentRuntimeId, IScript script)
+    {
+        if (script.Graph.Count == 0 || !script.Graph.ContainsKey(currentRuntimeId))
+            return null;
+
+        return script.VariableConnections
+            .Where(x => x.To.Node == currentRuntimeId)
+            .Select(x => x.From)
             .ToArray();
     }
 

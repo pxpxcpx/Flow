@@ -16,5 +16,5 @@ public interface IRuntimeNode : INode
     /// <summary>
     /// Node status during the runtime.
     /// </summary>
-    NodeStatus Status { get; }
+    NodeStatus Status { get; set; }
 }

@@ -1,6 +1,7 @@
 ﻿using Flow.Runtime.Utils;
 using Flow.Runtime.Abstractions;
 using Flow.Runtime.ContextManager;
+using Flow.Runtime.Models;
 using Flow.SDK.Plugins.Node;
 
 namespace Flow.Runtime;
@@ -61,9 +62,15 @@ public class Executor
     /// <param name="node">Single node to be invoked.</param>
     private void InvokeSingle(INode node)
     {
-        // Pass arguments to the node.
-        if (node.GetUnfilledRequiredValues() is not { } unfilled)
-            TryGetValueFromConnection(node);
+        // If the node has unfilled values:
+        if (node.GetUnfilledRequiredValues().Any())
+        {
+            if (!TryPassValueFromSource(node))
+            {
+                ((IRuntimeNode)node).Status = NodeStatus.Waiting;
+                return;
+            }
+        }
 
         node.Execute();
 
@@ -71,25 +78,66 @@ public class Executor
     }
 
     /// <summary>
+    /// Used to actively attempt to invoke nodes
+    /// marked as <see cref="NodeStatus.Waiting"/> after parameters have been passed.
+    /// </summary>
+    /// <param name="node"></param>
+    private void CallIfNodeIsWaiting(INode node)
+    {
+        if (((IRuntimeNode)node).Status != NodeStatus.Waiting)
+            return;
+        
+        InvokeSingle(node);
+    }
+
+    private Guid[]? MoveNext(INode node)
+        => node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
+    
+    /// <summary>
     /// Get results from a node, and pass them according to connections. (Actively pass values)
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
     private bool PassResults(INode node)
     {
-        throw new NotImplementedException();
+        if (node.GetRuntimeGuid(Script) is not { } rt) return false;
+        if (rt.GetVariableTarget(Script) is not { } targets) return false;
+
+        var succeed = true;
+        foreach (var p in targets)
+        {
+            var targetNode = p.Node.GetNode(Script);
+            var value = node.GetOutput(p.Index);
+            if (!targetNode.Assign(p.Index, value))
+            {
+                succeed = false;
+                continue;
+            }
+            CallIfNodeIsWaiting(targetNode);
+        }
+
+        return succeed;
     }
 
     /// <summary>
-    /// Get a value from a related connection. (Passive value retrieval)
+    /// Get a result from a related value source. (Passive value retrieval)
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    private bool TryGetValueFromConnection(INode node)
+    private bool TryPassValueFromSource(INode node)
     {
-        throw new NotImplementedException();
-    }
+        if (node.GetRuntimeGuid(Script) is not { } rt) return false;
+        if (rt.GetVariableSource(Script) is not { } sources) return false;
 
-    private Guid[]? MoveNext(INode node)
-        => node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
+        var succeed = true;
+        foreach (var p in sources)
+        {
+            var targetNode = p.Node.GetNode(Script);
+            var value = node.GetOutput(p.Index);
+            if (!targetNode.Assign(p.Index, value))
+                succeed = false;
+        }
+        
+        return succeed;
+    }
 }
