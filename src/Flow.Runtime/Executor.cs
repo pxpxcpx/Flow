@@ -1,7 +1,6 @@
 ﻿using Flow.Runtime.Utils;
 using Flow.Runtime.Abstractions;
 using Flow.Runtime.ContextManager;
-using Flow.Runtime.Models;
 using Flow.SDK.Plugins.Node;
 
 namespace Flow.Runtime;
@@ -31,28 +30,38 @@ public class Executor
         if (Script.Entry is null)
             return;
 
-        InvokeRecursively(Script.Entry);
+        ExecuteIteratively(Script.Entry);
     }
 
     /// <summary>
     /// Invoke a node and its subsequent nodes recursively.
     /// </summary>
     /// <param name="node"></param>
-    private void InvokeRecursively(INode node)
+    private void ExecuteIteratively(INode node)
     {
+        // Process the entry.
         _current = node;
-
-        InvokeSingle(node);
+        var q = new Queue<INode>();
+        q.Enqueue(node);
         
-        // If the node does not have a subsequent node (or the executor reaches to the end), return.
-        var nextIds = MoveNext(node);
-        if (nextIds is null || nextIds.Length == 0) return;
+        ExecuteSingle(node);
         
-        // Get subsequent nodes and recursively invoke them.
-        foreach (var n in nextIds)
+        while (q.Count > 0)
         {
-            var next = n.GetNode(Script);
-            InvokeRecursively(next);
+            var n = q.Dequeue();
+            _current = n;
+            ExecuteSingle(n);
+            
+            // If the node does not have a subsequent node (or the executor reaches to the end), return.
+            var nextIds = MoveNext(node);
+            if (nextIds is null || nextIds.Length == 0) return;
+        
+            // Get subsequent nodes and recursively invoke them.
+            foreach (var nextId in nextIds)
+            {
+                var next = nextId.GetNode(Script);
+                q.Enqueue(next);
+            }
         }
     }
 
@@ -60,7 +69,7 @@ public class Executor
     /// Pass the arguments and invoke a single node.
     /// </summary>
     /// <param name="node">Single node to be invoked.</param>
-    private void InvokeSingle(INode node)
+    private void ExecuteSingle(INode node)
     {
         // If the node has unfilled values:
         if (node.GetUnfilledRequiredValues().Any())
@@ -72,7 +81,15 @@ public class Executor
             }
         }
 
-        node.Execute();
+        try
+        {
+            node.Execute();
+        }
+        catch (Exception ex)
+        {
+            // TODO: Exception handle.
+            return;
+        }
 
         PassResults(node);
     }
@@ -87,16 +104,21 @@ public class Executor
         if (((IRuntimeNode)node).Status != NodeStatus.Waiting)
             return;
         
-        InvokeSingle(node);
+        ExecuteSingle(node);
     }
 
+    /// <summary>
+    /// Move to the next nodes.
+    /// </summary>
+    /// <param name="node">Current node</param>
+    /// <returns></returns>
     private Guid[]? MoveNext(INode node)
         => node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
     
     /// <summary>
     /// Get results from a node, and pass them according to connections. (Actively pass values)
     /// </summary>
-    /// <param name="node"></param>
+    /// <param name="node">The node has completed processing and is ready to transmit the results to the next node</param>
     /// <returns></returns>
     private bool PassResults(INode node)
     {
@@ -122,7 +144,7 @@ public class Executor
     /// <summary>
     /// Get a result from a related value source. (Passive value retrieval)
     /// </summary>
-    /// <param name="node"></param>
+    /// <param name="node">Value source node</param>
     /// <returns></returns>
     private bool TryPassValueFromSource(INode node)
     {
