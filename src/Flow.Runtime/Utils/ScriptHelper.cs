@@ -1,6 +1,6 @@
 ﻿using Flow.Runtime.Abstractions;
 using Flow.Runtime.Models;
-using Flow.SDK.Plugins.Node;
+using Flow.Shared.Abstractions;
 
 namespace Flow.Runtime.Utils;
 

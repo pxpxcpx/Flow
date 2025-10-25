@@ -1,4 +1,4 @@
-﻿namespace Flow.SDK.Plugins.Metadata;
+﻿namespace Flow.Shared.Abstractions;
 
 /// <summary>
 /// Represents an identifier's interface. Immutable identifier used within a variable.

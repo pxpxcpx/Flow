@@ -1,4 +1,4 @@
-﻿namespace Flow.SDK.Plugins.Node;
+﻿namespace Flow.Shared.Abstractions;
 
 /// <summary>
 /// Define the interface for executable objects.

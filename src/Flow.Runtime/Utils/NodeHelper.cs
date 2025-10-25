@@ -1,5 +1,5 @@
-﻿using Flow.SDK.Plugins.Metadata;
-using Flow.SDK.Plugins.Node;
+﻿using Flow.Shared.Abstractions;
+using Flow.Shared.Metadata;
 
 namespace Flow.Runtime.Utils;
 

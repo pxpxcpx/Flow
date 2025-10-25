@@ -1,4 +1,6 @@
-﻿namespace Flow.SDK.Plugins.Metadata;
+﻿using Flow.Shared.Abstractions;
+
+namespace Flow.Shared.Metadata;
 
 /// <summary>
 /// Represents a parameter or an output in the node.

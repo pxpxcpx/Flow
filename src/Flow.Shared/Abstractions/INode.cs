@@ -1,6 +1,6 @@
-﻿using Flow.SDK.Plugins.Metadata;
+﻿using Flow.Shared.Metadata;
 
-namespace Flow.SDK.Plugins.Node;
+namespace Flow.Shared.Abstractions;
 
 /// <summary>
 /// The interface of a node to be executed.
@@ -31,4 +31,6 @@ public interface INode : IExecutable
     /// Data of the outputs. Can be null if there's no output.
     /// </summary>
     object?[]? Outputs { get; init; }
+    
+    // Result Result { get; }
 }

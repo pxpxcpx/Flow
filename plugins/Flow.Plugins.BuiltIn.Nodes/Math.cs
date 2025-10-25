@@ -1,4 +1,4 @@
-﻿using Flow.SDK.Plugins.Node.Attributes;
+﻿using Flow.SDK.Plugins.Attributes;
 
 namespace Flow.Plugins.BuiltIn.Nodes;
 

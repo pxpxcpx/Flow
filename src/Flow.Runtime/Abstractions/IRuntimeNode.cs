@@ -1,4 +1,4 @@
-﻿using Flow.SDK.Plugins.Node;
+﻿using Flow.Shared.Abstractions;
 
 namespace Flow.Runtime.Abstractions;
 

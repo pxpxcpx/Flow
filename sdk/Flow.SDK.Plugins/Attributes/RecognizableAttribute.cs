@@ -1,6 +1,6 @@
-﻿using Flow.SDK.Plugins.Node.Attributes;
+﻿using Flow.Shared.Abstractions;
 
-namespace Flow.SDK.Plugins.Metadata;
+namespace Flow.SDK.Plugins.Attributes;
 
 /// <summary>
 /// <see cref="InputAttribute"/>, <see cref="OutputAttribute"/>'s Base Class, 

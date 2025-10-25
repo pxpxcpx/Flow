@@ -1,7 +1,7 @@
 ﻿using Flow.Runtime.Utils;
 using Flow.Runtime.Abstractions;
 using Flow.Runtime.ContextManager;
-using Flow.SDK.Plugins.Node;
+using Flow.Shared.Abstractions;
 
 namespace Flow.Runtime;
 

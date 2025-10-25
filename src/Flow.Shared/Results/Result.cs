@@ -1,4 +1,4 @@
-﻿namespace Flow.Runtime.Results;
+﻿namespace Flow.Shared.Results;
 
 /// <summary>
 /// An error-handling method used as an alternative to throwing exceptions,

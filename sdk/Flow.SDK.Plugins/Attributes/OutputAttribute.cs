@@ -1,4 +1,4 @@
-﻿namespace Flow.SDK.Plugins.Node.Attributes;
+﻿namespace Flow.SDK.Plugins.Attributes;
 
 [AttributeUsage(AttributeTargets.Parameter)]
 public class OutputAttribute : Attribute;

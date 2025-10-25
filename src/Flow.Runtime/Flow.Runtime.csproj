@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\sdk\Flow.SDK.Plugins\Flow.SDK.Plugins.csproj" />
+    <ProjectReference Include="..\Flow.Shared\Flow.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Results\" />
   </ItemGroup>
 
 </Project>

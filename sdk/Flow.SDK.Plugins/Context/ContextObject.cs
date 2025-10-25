@@ -1,7 +1,6 @@
-﻿using Flow.SDK.Plugins.Context.Enums;
-using Flow.SDK.Plugins.Metadata;
+﻿using Flow.SDK.Plugins.Attributes;
 
-namespace Flow.SDK.Plugins.Context.Attributes;
+namespace Flow.SDK.Plugins.Context;
 
 /// <summary>
 /// Tag the required context objects, which will be managed and stored in the ContextManager
