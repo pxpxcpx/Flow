@@ -1,4 +1,5 @@
 ﻿using Flow.Shared.Metadata;
+using Flow.Shared.Results;
 
 namespace Flow.Shared.Abstractions;
 
@@ -32,5 +33,8 @@ public interface INode : IExecutable
     /// </summary>
     object?[]? Outputs { get; init; }
     
-    // Result Result { get; }
+    /// <summary>
+    /// Used as an alternative to throwing exceptions.
+    /// </summary>
+    Result Result { get; }
 }

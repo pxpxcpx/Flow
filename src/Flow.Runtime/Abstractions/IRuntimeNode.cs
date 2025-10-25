@@ -1,4 +1,5 @@
 ﻿using Flow.Shared.Abstractions;
+using Flow.Shared.Metadata;
 
 namespace Flow.Runtime.Abstractions;
 
@@ -10,7 +11,7 @@ public interface IRuntimeNode : INode
     /// <summary>
     /// ID during the runtime.
     /// </summary>
-    /// <remarks> Note the distinction from the <see cref="INode.Guid"/> </remarks>
+    /// <remarks> Note the distinction from the <see cref="NodeMetadata.Id"/> </remarks>
     Guid RuntimeId { get; }
     
     /// <summary>

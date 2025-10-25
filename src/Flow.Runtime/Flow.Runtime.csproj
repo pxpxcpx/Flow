@@ -11,8 +11,4 @@
     <ProjectReference Include="..\Flow.Shared\Flow.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Results\" />
-  </ItemGroup>
-
 </Project>

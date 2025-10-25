@@ -1,7 +1,9 @@
-﻿using Flow.Runtime.Utils;
+﻿using System.Diagnostics;
+using Flow.Runtime.Utils;
 using Flow.Runtime.Abstractions;
 using Flow.Runtime.ContextManager;
 using Flow.Shared.Abstractions;
+using Flow.Shared.Results;
 
 namespace Flow.Runtime;
 
@@ -13,7 +15,7 @@ public class Executor
 
     public IScript Script { get; set; }
 
-    public object? Result { get; private set; }
+    public Result? Result { get; private set; }
 
     public Executor(IScript script, ContextManager<Guid>? contextManager = null)
     {
@@ -87,7 +89,8 @@ public class Executor
         }
         catch (Exception ex)
         {
-            // TODO: Exception handle.
+            var result = node.Result;
+            Debug.WriteLine($"Exception detected: {ex.Message}, result: {result}");
             return;
         }
 
