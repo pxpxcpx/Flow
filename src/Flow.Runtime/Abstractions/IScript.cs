@@ -1,6 +1,4 @@
-﻿using Flow.Shared.Abstractions;
-
-namespace Flow.Runtime.Abstractions;
+﻿namespace Flow.Runtime.Abstractions;
 
 /// <summary>
 /// Represents a script that defines a logical sequence of nodes, connections, and portals
@@ -20,13 +18,13 @@ public interface IScript
     /// Entry point of the script, which is the starting node.
     /// </summary>
     /// <remarks>Can be null if the script is empty.</remarks>
-    INode? Entry { get; set; }
+    IRuntimeNode? Entry { get; set; }
 
     /// <summary>
     /// Contains nodes and their GUID.
     /// The internal graph of the script.
     /// </summary>
-    Dictionary<Guid, INode> Graph { get; }
+    List<IRuntimeNode> Nodes { get; }
 
     /// <summary>
     /// Collection of process controlling connections in the script

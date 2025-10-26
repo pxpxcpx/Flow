@@ -1,6 +1,5 @@
 ﻿using Flow.Runtime.Abstractions;
 using Flow.Runtime.Models;
-using Flow.Shared.Abstractions;
 
 namespace Flow.Runtime.Utils;
 
@@ -15,8 +14,8 @@ public static class ScriptHelper
     /// <param name="guid">Runtime GUID of the node.</param>
     /// <param name="script">Script containing this node.</param>
     /// <returns></returns>
-    public static INode GetNode(this Guid guid, IScript script)
-        => script.Graph[guid];
+    public static IRuntimeNode GetNode(this Guid guid, IScript script)
+        => script.Nodes.FirstOrDefault(n => n.RuntimeId == guid) ?? throw new KeyNotFoundException();
 
     /// <summary>
     /// Get the runtime GUID of the node.
@@ -24,15 +23,12 @@ public static class ScriptHelper
     /// <param name="node"></param>
     /// <param name="script">Script containing this node.</param>
     /// <returns></returns>
-    public static Guid? GetRuntimeGuid(this INode node, IScript script)
+    public static Guid? GetRuntimeGuid(this IRuntimeNode node, IScript script)
     {
-        if (script.Graph.Count == 0 || !script.Graph.ContainsValue(node))
+        if (script.Nodes.Count == 0 || script.Nodes.All(n => n.RuntimeId != node.RuntimeId))
             return null;
         
-        return script.Graph
-            .Where(i => i.Value == node)
-            .Select(x => x.Key)
-            .FirstOrDefault();
+        return script.Nodes.FirstOrDefault(n => n.RuntimeId == node.RuntimeId)?.RuntimeId ;
     }
 
     /// <summary>
@@ -43,7 +39,7 @@ public static class ScriptHelper
     /// <returns></returns>
     public static Guid[]? GetPreviousProgressNodes(this Guid currentRuntimeId, IScript script)
     {
-        if (script.Graph.Count == 0 || !script.Graph.ContainsKey(currentRuntimeId))
+        if (script.Nodes.Count == 0 || script.Nodes.All(n => n.RuntimeId != currentRuntimeId))
             return null;
 
         return script.ProcessConnection
@@ -60,7 +56,7 @@ public static class ScriptHelper
     /// <returns></returns>
     public static Guid[]? GetNextProgressNodes(this Guid currentRuntimeId, IScript script)
     {
-        if (script.Graph.Count == 0 || !script.Graph.ContainsKey(currentRuntimeId))
+        if (script.Nodes.Count == 0 || script.Nodes.All(n => n.RuntimeId != currentRuntimeId))
             return null;
         
         return script.ProcessConnection
@@ -77,7 +73,7 @@ public static class ScriptHelper
     /// <returns><see cref="VariablePosition"/></returns>
     public static VariablePosition[]? GetVariableTarget(this Guid currentRuntimeId, IScript script)
     {
-        if (script.Graph.Count == 0 || !script.Graph.ContainsKey(currentRuntimeId))
+        if (script.Nodes.Count == 0 || script.Nodes.All(n => n.RuntimeId != currentRuntimeId))
             return null;
 
         return script.VariableConnections
@@ -94,7 +90,7 @@ public static class ScriptHelper
     /// <returns></returns>
     public static VariablePosition[]? GetVariableSource(this Guid currentRuntimeId, IScript script)
     {
-        if (script.Graph.Count == 0 || !script.Graph.ContainsKey(currentRuntimeId))
+        if (script.Nodes.Count == 0 || script.Nodes.All(n => n.RuntimeId != currentRuntimeId))
             return null;
 
         return script.VariableConnections
@@ -108,11 +104,11 @@ public static class ScriptHelper
     /// </summary>
     /// <param name="script"></param>
     /// <returns></returns>
-    public static INode GetEntry(this IScript script)
+    public static IRuntimeNode? GetEntry(this IScript script)
     {
         var dict = new Dictionary<Guid, int>();
-        foreach (var n in script.Graph)
-            dict.Add(n.Key, 0);
+        foreach (var n in script.Nodes)
+            dict.Add(n.RuntimeId, 0);
         
         foreach (var c in script.ProcessConnection)
             dict[c.To.Position]++;
