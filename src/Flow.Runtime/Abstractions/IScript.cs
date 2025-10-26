@@ -26,6 +26,7 @@ public interface IScript
     /// </summary>
     List<IRuntimeNode> Nodes { get; }
 
+    // TODO: Standalone graph data structure
     /// <summary>
     /// Collection of process controlling connections in the script
     /// </summary>
