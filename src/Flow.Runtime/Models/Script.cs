@@ -1,10 +1,12 @@
 ﻿using Flow.Runtime.Abstractions;
+using Flow.SDK.Plugins;
 
 namespace Flow.Runtime.Models;
 
 public class Script : IScript
 {
     public Guid RuntimeId { get; init; }
+    public PluginMetadata[] Dependencies { get; init; }
     public IRuntimeNode? Entry { get; set; }
     public Dictionary<Guid, IRuntimeNode> Graph { get; } = new();
     public Dictionary<IRuntimeNode, int> ProcessConnectionsGraph { get; } = new();

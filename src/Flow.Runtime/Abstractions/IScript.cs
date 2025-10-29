@@ -1,4 +1,6 @@
-﻿namespace Flow.Runtime.Abstractions;
+﻿using Flow.SDK.Plugins;
+
+namespace Flow.Runtime.Abstractions;
 
 /// <summary>
 /// Represents a script that defines a logical sequence of nodes, connections, and portals
@@ -14,6 +16,11 @@ public interface IScript
     /// </summary>
     Guid RuntimeId { get; init; }
 
+    /// <summary>
+    /// Plugins that the script depends on.
+    /// </summary>
+    PluginMetadata[] Dependencies { get; init; }
+    
     /// <summary>
     /// Entry point of the script, which is the starting node.
     /// </summary>

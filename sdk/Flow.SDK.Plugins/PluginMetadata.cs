@@ -70,6 +70,11 @@ public record PluginMetadata : IRecognizable
     public string Author { get; set; } = string.Empty;
     
     /// <summary>
+    /// Plugins that the plugin required and depends on.
+    /// </summary>
+    public required PluginMetadata[] Dependencies { get; set; }
+    
+    /// <summary>
     /// Dictionary to pair a node and its GUID.
     /// </summary>
     public required Dictionary<Guid, NodeMetadata> Nodes { get; set; } = new();
