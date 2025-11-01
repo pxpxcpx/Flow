@@ -1,6 +1,6 @@
 ﻿using Flow.SDK.Plugins.Attributes;
 
-namespace Flow.Plugins.BuiltIn.Nodes;
+namespace Flow.BuiltIn.Nodes;
 
 public class Math
 {
