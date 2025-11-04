@@ -14,6 +14,11 @@ public interface INode : IExecutable
     NodeMetadata Metadata { get; }
     
     /// <summary>
+    /// 
+    /// </summary>
+    object? RequiredInstance { get; set; }
+    
+    /// <summary>
     /// Metadata of the input variables.
     /// </summary>
     ParameterMetadata[]? InputVariableMetadata { get; }

@@ -25,6 +25,8 @@ public readonly record struct NodeMetadata(
     /// </summary>
     public required string Description { get; init; } = Description;
 
+    public Type? InstanceType { get; init; } = null;
+
     /// <summary>
     /// Metadata of the input parameters.
     /// </summary>
