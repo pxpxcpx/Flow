@@ -1,7 +1,6 @@
 ﻿using Flow.Shared.Abstractions;
-using Flow.Shared.Metadata;
 
-namespace Flow.SDK.Plugins;
+namespace Flow.Shared.Metadata;
 
 /// <summary>
 /// Metadata of the plugin.

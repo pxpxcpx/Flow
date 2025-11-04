@@ -1,4 +1,5 @@
 ﻿using Flow.SDK.Plugins.Attributes;
+using Flow.Shared.Metadata;
 
 namespace Flow.SDK.Plugins.Context;
 
@@ -6,7 +7,7 @@ namespace Flow.SDK.Plugins.Context;
 /// Tag the required context objects, which will be managed and stored in the ContextManager
 /// </summary>
 [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
-public class ContextObject : RecognizableAttribute
+public class ContextObjectAttribute : RecognizableAttribute
 {
     public ContextObjectCreationMode CreationMode { get; set; }
     
@@ -14,7 +15,7 @@ public class ContextObject : RecognizableAttribute
     
     public Type Type { get; set; }
     
-    public ContextObject(string name, string description, Type type, ContextObjectCreationMode creationMode = ContextObjectCreationMode.NewInstance)
+    public ContextObjectAttribute(string name, string description, Type type, ContextObjectCreationMode creationMode = ContextObjectCreationMode.NewInstance)
         : base(name, description)
     {
         Type = type;

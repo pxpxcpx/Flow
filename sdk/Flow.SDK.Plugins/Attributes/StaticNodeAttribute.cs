@@ -1,4 +1,6 @@
-﻿namespace Flow.SDK.Plugins.Attributes;
+﻿using Flow.Shared.Metadata;
+
+namespace Flow.SDK.Plugins.Attributes;
 
 [AttributeUsage(AttributeTargets.Method , Inherited = false)]
-public class StaticNodeAttribute : Attribute;
+public class StaticNodeAttribute(string name, string description) : RecognizableAttribute(name, description);

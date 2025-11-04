@@ -1,6 +1,5 @@
-﻿namespace Flow.SDK.Plugins.Attributes;
+﻿using Flow.Shared.Metadata;
 
-public class ProcessControlAttribute
-{
-    
-}
+namespace Flow.SDK.Plugins.Attributes;
+
+public class ProcessControlAttribute(string name, string description) : RecognizableAttribute(name, description);

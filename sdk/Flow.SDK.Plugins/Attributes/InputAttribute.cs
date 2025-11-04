@@ -1,4 +1,6 @@
-﻿namespace Flow.SDK.Plugins.Attributes;
+﻿using Flow.Shared.Metadata;
+
+namespace Flow.SDK.Plugins.Attributes;
 
 [AttributeUsage(AttributeTargets.Parameter)]
-public class InputAttribute : Attribute;
+public class InputAttribute(string name, string description) : RecognizableAttribute(name, description);

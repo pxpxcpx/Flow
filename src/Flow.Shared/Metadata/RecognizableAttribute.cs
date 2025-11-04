@@ -1,9 +1,8 @@
 ﻿using Flow.Shared.Abstractions;
 
-namespace Flow.SDK.Plugins.Attributes;
+namespace Flow.Shared.Metadata;
 
 /// <summary>
-/// <see cref="InputAttribute"/>, <see cref="OutputAttribute"/>'s Base Class, 
 /// The flag will have no effect. Do not apply it to any properties or fields.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
