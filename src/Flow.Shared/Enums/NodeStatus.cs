@@ -1,4 +1,4 @@
-﻿namespace Flow.Runtime.Abstractions;
+﻿namespace Flow.Shared.Enums;
 
 public enum NodeStatus
 {

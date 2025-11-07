@@ -1,5 +1,6 @@
 ﻿using Flow.Automation.Decisioning.Abstractions;
 using Flow.Shared.Abstractions;
+using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
 
@@ -19,7 +20,10 @@ public class IfStatement : INode, IControlStatement, IInstanceRequired
     
     /// <inheritdoc />
     public NodeMetadata Metadata => NodeMetadata;
-    
+
+    public Guid RuntimeId { get; }
+    public NodeStatus Status { get; set; }
+
     /// <inheritdoc />
     public Type InstanceType => typeof(ISpecification);
     

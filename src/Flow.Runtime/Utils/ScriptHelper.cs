@@ -1,5 +1,6 @@
 ﻿using Flow.Runtime.Abstractions;
 using Flow.Runtime.Models;
+using Flow.Shared.Abstractions;
 
 namespace Flow.Runtime.Utils;
 
@@ -14,7 +15,7 @@ public static class ScriptHelper
     /// <param name="guid">Runtime GUID of the node.</param>
     /// <param name="script">Script containing this node.</param>
     /// <returns></returns>
-    public static IRuntimeNode GetNode(this Guid guid, IScript script)
+    public static INode GetNode(this Guid guid, IScript script)
         => script.Nodes.FirstOrDefault(n => n.RuntimeId == guid) ?? throw new KeyNotFoundException();
 
     /// <summary>
@@ -23,7 +24,7 @@ public static class ScriptHelper
     /// <param name="node"></param>
     /// <param name="script">Script containing this node.</param>
     /// <returns></returns>
-    public static Guid? GetRuntimeGuid(this IRuntimeNode node, IScript script)
+    public static Guid? GetRuntimeGuid(this INode node, IScript script)
     {
         if (script.Nodes.Count == 0 || script.Nodes.All(n => n.RuntimeId != node.RuntimeId))
             return null;
@@ -104,7 +105,7 @@ public static class ScriptHelper
     /// </summary>
     /// <param name="script"></param>
     /// <returns></returns>
-    public static IRuntimeNode? GetEntry(this IScript script)
+    public static INode? GetEntry(this IScript script)
     {
         var dict = new Dictionary<Guid, int>();
         foreach (var n in script.Nodes)

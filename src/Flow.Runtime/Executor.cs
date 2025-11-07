@@ -2,13 +2,15 @@
 using Flow.Runtime.Utils;
 using Flow.Runtime.Abstractions;
 using Flow.Runtime.ContextManager;
+using Flow.Shared.Abstractions;
+using Flow.Shared.Enums;
 using Flow.Shared.Results;
 
 namespace Flow.Runtime;
 
 public class Executor
 {
-    private IRuntimeNode _current;
+    private INode _current;
 
     private ContextManager<Guid> _contextManager;
 
@@ -38,11 +40,11 @@ public class Executor
     /// Invoke a node and its subsequent nodes recursively.
     /// </summary>
     /// <param name="node"></param>
-    private void ExecuteIteratively(IRuntimeNode node)
+    private void ExecuteIteratively(INode node)
     {
         // Process the entry.
         _current = node;
-        var q = new Queue<IRuntimeNode>();
+        var q = new Queue<INode>();
         q.Enqueue(node);
         
         ExecuteSingle(node);
@@ -70,7 +72,7 @@ public class Executor
     /// Pass the arguments and invoke a single node.
     /// </summary>
     /// <param name="node">Single node to be invoked.</param>
-    private void ExecuteSingle(IRuntimeNode node)
+    private void ExecuteSingle(INode node)
     {
         // If the node has unfilled values:
         if (node.GetUnfilledRequiredValues().Any())
@@ -80,6 +82,11 @@ public class Executor
                 node.Status = NodeStatus.Waiting;
                 return;
             }
+        }
+
+        if (node is IInstanceRequired instanceRequiredNode)
+        {
+            
         }
 
         try
@@ -101,7 +108,7 @@ public class Executor
     /// marked as <see cref="NodeStatus.Waiting"/> after parameters have been passed.
     /// </summary>
     /// <param name="node"></param>
-    private void CallIfNodeIsWaiting(IRuntimeNode node)
+    private void CallIfNodeIsWaiting(INode node)
     {
         if (node.Status != NodeStatus.Waiting)
             return;
@@ -114,7 +121,7 @@ public class Executor
     /// </summary>
     /// <param name="node">Current node</param>
     /// <returns></returns>
-    private Guid[]? MoveNext(IRuntimeNode node)
+    private Guid[]? MoveNext(INode node)
         => node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
     
     /// <summary>
@@ -122,7 +129,7 @@ public class Executor
     /// </summary>
     /// <param name="node">The node has completed processing and is ready to transmit the results to the next node</param>
     /// <returns></returns>
-    private bool PassResults(IRuntimeNode node)
+    private bool PassResults(INode node)
     {
         if (node.GetRuntimeGuid(Script) is not { } rt) return false;
         if (rt.GetVariableTarget(Script) is not { } targets) return false;
@@ -148,7 +155,7 @@ public class Executor
     /// </summary>
     /// <param name="node">Value source node</param>
     /// <returns></returns>
-    private bool TryPassValueFromSource(IRuntimeNode node)
+    private bool TryPassValueFromSource(INode node)
     {
         if (node.GetRuntimeGuid(Script) is not { } rt) return false;
         if (rt.GetVariableSource(Script) is not { } sources) return false;

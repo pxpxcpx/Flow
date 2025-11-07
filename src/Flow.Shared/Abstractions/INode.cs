@@ -1,10 +1,11 @@
-﻿using Flow.Shared.Metadata;
+﻿using Flow.Shared.Enums;
+using Flow.Shared.Metadata;
 using Flow.Shared.Results;
 
 namespace Flow.Shared.Abstractions;
 
 /// <summary>
-/// The interface of a node to be executed.
+/// The interface of a node to be executed. And provides node runtime properties.
 /// </summary>
 public interface INode : IExecutable
 {
@@ -12,6 +13,17 @@ public interface INode : IExecutable
     /// Metadata of the node. Includes name, description, GUID of this node. 
     /// </summary>
     NodeMetadata Metadata { get; }
+    
+    /// <summary>
+    /// ID during the runtime.
+    /// </summary>
+    /// <remarks> Note the distinction from the <see cref="NodeMetadata.Id"/> </remarks>
+    Guid RuntimeId { get; }
+    
+    /// <summary>
+    /// Node status during the runtime.
+    /// </summary>
+    NodeStatus Status { get; set; }
     
     /// <summary>
     /// Metadata of the input variables.

@@ -1,4 +1,5 @@
-﻿using Flow.Shared.Metadata;
+﻿using Flow.Shared.Abstractions;
+using Flow.Shared.Metadata;
 
 namespace Flow.Runtime.Abstractions;
 
@@ -25,13 +26,13 @@ public interface IScript
     /// Entry point of the script, which is the starting node.
     /// </summary>
     /// <remarks>Can be null if the script is empty.</remarks>
-    IRuntimeNode? Entry { get; set; }
+    INode? Entry { get; set; }
 
     /// <summary>
     /// Contains nodes and their GUID.
     /// The internal graph of the script.
     /// </summary>
-    List<IRuntimeNode> Nodes { get; }
+    List<INode> Nodes { get; }
 
     // TODO: Standalone graph data structure
     /// <summary>
