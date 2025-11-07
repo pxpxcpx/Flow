@@ -5,8 +5,7 @@ namespace Flow.Shared.Metadata;
 /// <summary>
 /// Represents a node's metadata.
 /// </summary>
-public readonly record struct NodeMetadata(
-    string Name, string Description, ParameterMetadata[]? Inputs, ParameterMetadata[]? Outputs)
+public readonly record struct NodeMetadata()
     : IRecognizable
 {
     /// <summary>
@@ -18,22 +17,10 @@ public readonly record struct NodeMetadata(
     /// <summary>
     /// Name of the node.
     /// </summary>
-    public required string Name { get; init; } = Name;
+    public required string Name { get; init; }
 
     /// <summary>
     /// Description of the node.
     /// </summary>
-    public required string Description { get; init; } = Description;
-
-    public Type? InstanceType { get; init; } = null;
-
-    /// <summary>
-    /// Metadata of the input parameters.
-    /// </summary>
-    public required ParameterMetadata[]? Inputs { get; init; } = Inputs;
-
-    /// <summary>
-    /// Metadata of the output results.
-    /// </summary>
-    public required ParameterMetadata[]? Outputs { get; init; } = Outputs;
+    public required string Description { get; init; }
 }

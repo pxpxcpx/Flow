@@ -164,4 +164,23 @@ public class Executor
         
         return succeed;
     }
+
+    #region Process Control
+
+    private void Pause()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void Resume()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void Stop()
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
 }
