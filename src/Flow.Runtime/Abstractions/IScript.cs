@@ -1,4 +1,5 @@
-﻿using Flow.Shared.Abstractions;
+﻿using Flow.Runtime.ContextManager;
+using Flow.Shared.Abstractions;
 using Flow.Shared.Metadata;
 
 namespace Flow.Runtime.Abstractions;
@@ -44,6 +45,16 @@ public interface IScript
     /// Collection of variable connections in the script
     /// </summary>
     List<IVariableConnection> VariableConnections { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    List<InstanceConnection> InstanceConnections { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    ContextManager<Guid> ContextManager { get; set; }
 
     void InitializeGraph();
 }

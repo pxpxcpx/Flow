@@ -21,7 +21,10 @@ public class IfStatement : INode, IControlStatement, IInstanceRequired
     /// <inheritdoc />
     public NodeMetadata Metadata => NodeMetadata;
 
-    public Guid RuntimeId { get; }
+    /// <inheritdoc />
+    public Guid RuntimeId { get; init; }
+    
+    /// <inheritdoc />
     public NodeStatus Status { get; set; }
 
     /// <inheritdoc />

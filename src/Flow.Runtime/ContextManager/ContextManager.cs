@@ -9,7 +9,7 @@ public class ContextManager<TKey> where TKey : IEquatable<TKey>
     /// </summary>
     /// <remarks>
     /// Key: Instance of <see cref="TKey"/>,
-    /// value: Dictionary of <see cref="Object">context object</see> and its <see cref="Type"/>
+    /// Value: Dictionary of <see cref="Object">context object</see> and its <see cref="Type"/>
     /// </remarks>
     public ConcurrentDictionary<TKey, ContextItem?> Contexts { get; }
 
