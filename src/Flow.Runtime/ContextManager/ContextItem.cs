@@ -1,10 +1,22 @@
-﻿using Flow.Shared.Abstractions;
-
-namespace Flow.Runtime.ContextManager;
+﻿namespace Flow.Runtime.ContextManager;
 
 /// <summary>
-/// Item in the <see cref="ContextManager{TKey}"/>.
+/// Storages an instance in a domain.
 /// </summary>
+/// <example>
+/// The following can all be packaged as instances:
+/// <code>
+/// string, int, double, List, Dictionary, object, etc.
+/// </code>
+/// However, <b>DO NOT</b> pass an abstract class or interface as a value:
+/// <code>
+/// ...
+/// interface IFoo { ... }
+/// class Foo : IFoo { ... }
+/// ...
+/// var contextItem = new ContextItem(IFoo, Foo);
+/// </code>
+/// </example>
 public sealed record ContextItem
 {
     /// <summary>

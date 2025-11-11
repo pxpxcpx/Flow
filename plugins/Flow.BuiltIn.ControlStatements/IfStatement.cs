@@ -28,7 +28,7 @@ public class IfStatement : INode, IControlStatement, IInstanceRequired
     public NodeStatus Status { get; set; }
 
     /// <inheritdoc />
-    public Type InstanceType => typeof(ISpecification);
+    public Type InstanceType => typeof(bool);
     
     /// <inheritdoc />
     public object? Instance { get; set; }
@@ -67,7 +67,7 @@ public class IfStatement : INode, IControlStatement, IInstanceRequired
         
         try
         {
-            result = ((ISpecification)Instance!).Result;
+            result = (bool)Instance!;
         }
         catch(Exception ex)
         {

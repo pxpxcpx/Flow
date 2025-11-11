@@ -1,11 +1,9 @@
-﻿using Flow.Runtime.ContextManager;
-using Flow.Runtime.Models;
-using Flow.Shared.Abstractions;
+﻿using Flow.Runtime.Models;
 
 namespace Flow.Runtime.Abstractions;
 
 /// <summary>
-/// Record the connections between <see cref="ContextItem"/> items and <see cref="IInstanceRequired"/>.
+/// Record the connection between <see cref="ContextItem"/> items and <see cref="IInstanceRequired"/>.
 /// </summary>
 public record InstanceConnection
 {

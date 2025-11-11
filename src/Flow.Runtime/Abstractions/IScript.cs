@@ -47,12 +47,13 @@ public interface IScript
     List<IVariableConnection> VariableConnections { get; set; }
     
     /// <summary>
-    /// 
+    /// Connection between <see cref="ContextItem"/> items
+    /// and <see cref="IInstanceRequired"/> in the script.
     /// </summary>
     List<InstanceConnection> InstanceConnections { get; set; }
     
     /// <summary>
-    /// 
+    /// Manager of the instances in the script.
     /// </summary>
     ContextManager<Guid> ContextManager { get; set; }
 
