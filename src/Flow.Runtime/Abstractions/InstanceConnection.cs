@@ -3,7 +3,7 @@
 namespace Flow.Runtime.Abstractions;
 
 /// <summary>
-/// Record the connection between <see cref="ContextItem"/> items and <see cref="IInstanceRequired"/>.
+/// Record the connection between context items and IInstanceRequired nodes.
 /// </summary>
 public record InstanceConnection
 {

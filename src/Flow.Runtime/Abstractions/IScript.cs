@@ -57,5 +57,8 @@ public interface IScript
     /// </summary>
     ContextManager<Guid> ContextManager { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     void InitializeGraph();
 }
