@@ -123,8 +123,16 @@ public class Executor
     /// <param name="node">Current node</param>
     /// <returns></returns>
     private Guid[]? MoveNext(INode node)
-        => node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
-    
+    {
+        if (node is IControlStatement csn)
+        {
+            var i = csn.ReturnIndex;
+            return node.GetRuntimeGuid(Script) is not { } id1 ? null : id1.GetNextProgressNodes(Script, i);
+        }
+        
+        return node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
+    }
+
     /// <summary>
     /// Get results from a node, and pass them according to connections. (Actively pass values)
     /// </summary>
