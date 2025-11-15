@@ -1,8 +1,8 @@
 ﻿namespace Flow.Runtime.Models;
 
-public record struct NodePosition
+public record struct NodePosition(Guid NodeId, int? Index)
 {
-    public Guid Position { get; set; }
-    
-    public int Index { get; set; }
+    public Guid NodeId { get; set; } = NodeId;
+
+    public int? Index { get; set; } = Index ?? 0;
 }

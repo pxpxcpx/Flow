@@ -44,25 +44,26 @@ public static class ScriptHelper
             return null;
 
         return script.ProcessConnection
-            .Where(x => x.To.Position == currentRuntimeId)
-            .Select(x => x.From.Position)
+            .Where(x => x.To.NodeId == currentRuntimeId)
+            .Select(x => x.From.NodeId)
             .ToArray();
     }
-    
+
     /// <summary>
     /// Get the next node in the process.
     /// </summary>
     /// <param name="currentRuntimeId">Runtime GUID of the current node.</param>
     /// <param name="script">Script containing this node.</param>
+    /// <param name="index">Process connection index of the <see cref="IControlStatement"/></param>
     /// <returns></returns>
-    public static Guid[]? GetNextProgressNodes(this Guid currentRuntimeId, IScript script)
+    public static Guid[]? GetNextProgressNodes(this Guid currentRuntimeId, IScript script, int? index = 0)
     {
         if (script.Nodes.Count == 0 || script.Nodes.All(n => n.RuntimeId != currentRuntimeId))
             return null;
         
         return script.ProcessConnection
-            .Where(x => x.From.Position == currentRuntimeId)
-            .Select(x => x.To.Position)
+            .Where(x => x.From.NodeId == currentRuntimeId && x.From.Index == index)
+            .Select(x => x.To.NodeId)
             .ToArray();
     }
 
@@ -112,7 +113,7 @@ public static class ScriptHelper
             dict.Add(n.RuntimeId, 0);
         
         foreach (var c in script.ProcessConnection)
-            dict[c.To.Position]++;
+            dict[c.To.NodeId]++;
         
         var entryRtId = dict.FirstOrDefault(x => x.Value == 0).Key;
         return GetNode(entryRtId, script);
