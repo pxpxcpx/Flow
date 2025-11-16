@@ -46,7 +46,6 @@ public class Executor
         _current = node;
         var q = new Queue<INode>();
         q.Enqueue(node);
-        
         ExecuteSingle(node);
         
         while (q.Count > 0)
@@ -88,6 +87,7 @@ public class Executor
         if (node is IInstanceRequired instanceRequiredNode)
         {
              // TODO
+             // var c = 
         }
 
         try

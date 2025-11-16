@@ -1,4 +1,5 @@
 ﻿using Flow.Runtime.Abstractions;
+using Flow.Runtime.ContextManager;
 using Flow.Runtime.Models;
 using Flow.Shared.Abstractions;
 
@@ -106,7 +107,7 @@ public static class ScriptHelper
     /// </summary>
     /// <param name="script"></param>
     /// <returns></returns>
-    public static INode? GetEntry(this IScript script)
+    public static INode? FindEntry(this IScript script)
     {
         var dict = new Dictionary<Guid, int>();
         foreach (var n in script.Nodes)
@@ -118,4 +119,29 @@ public static class ScriptHelper
         var entryRtId = dict.FirstOrDefault(x => x.Value == 0).Key;
         return GetNode(entryRtId, script);
     }
+
+    public static Guid? GetRelatedContext(this Guid contextRequiredNodeId, IScript script)
+    {
+        if (script.Nodes.Count == 0 || script.Nodes.All(n => n.RuntimeId != contextRequiredNodeId))
+            return null;
+
+        return script.InstanceConnections
+            .Where(x => x.Node.NodeId == contextRequiredNodeId)
+            .Select(x => x.InstanceId)
+            .FirstOrDefault();
+    }
+
+    public static Guid[]? GetRelatedNodes(this Guid contextId, IScript script)
+    {
+        if (script.ContextManager.ContainsKey(contextId))
+            return null;
+        
+        return script.InstanceConnections
+            .Where(x=>x.InstanceId == contextId)
+            .Select(x => x.InstanceId)
+            .ToArray();
+    }
+
+    public static ContextItem? GetContextItem(this Guid id, IScript script)
+        => script.ContextManager.TryFindContextItem(id);
 }

@@ -42,6 +42,22 @@ public class ContextManager<TKey> where TKey : IEquatable<TKey>
         var contextItem = new ContextItem(contextType, contextValue);
         return TryAddContext(key, contextItem, force);
     }
+
+    /// <summary>
+    /// Determine whether the manager contains the key.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>True: contains, False: doesn't contain.</returns>
+    public bool ContainsKey(TKey key)
+        => Contexts.ContainsKey(key);
+
+    /// <summary>
+    /// Determine whether the manager contains the context item.
+    /// </summary>
+    /// <param name="contextItem"></param>
+    /// <returns>True: contains, False: doesn't contain.</returns>
+    public bool ContainsContext(ContextItem? contextItem)
+        => Contexts.Any(kv => kv.Value == contextItem);
     
     /// <summary>
     /// Find a <see cref="ContextItem"/> by its key.
