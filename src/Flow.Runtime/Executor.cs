@@ -92,18 +92,40 @@ public class Executor
                 return;
             }
         }
-
-        try
+        
+        // Attention:
+        // If the same node implements both synchronous and asynchronous interfaces,
+        // only the synchronous method will be executed.
+        switch (node)
         {
-            node.Execute();
-        }
-        catch (Exception ex)
-        {
-            var result = node.Result;
-            Debug.WriteLine($"Exception detected: {ex.Message}, result: {result}");
-            return;
-        }
+            // If possible, execute this method on the node.
+            case IExecutableNode en:
+            {
+                try
+                {
+                    en.Execute();
+                }
+                catch (Exception ex)
+                {
+                    var result = node.Result;
+                    Debug.WriteLine($"Exception detected: {ex.Message}, result: {result}");
+                    return;
+                }
+                break;
+            }
 
+            // Execute asynchronously if the node implements the IAsyncExecutableNode.
+            case IAsyncExecutableNode aen:
+            {
+                // TODO
+                aen.ExecuteAsync();
+                break;
+            }
+            
+            default:
+                return;
+        }
+        
         PassResults(node);
     }
 

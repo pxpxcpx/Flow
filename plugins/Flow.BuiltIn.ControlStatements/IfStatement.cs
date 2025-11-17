@@ -8,7 +8,7 @@ namespace Flow.BuiltIn.ControlStatements;
 /// <summary>
 /// “If” conditional statement node.
 /// </summary>
-public class IfStatement : INode, IControlStatement
+public class IfStatement : IExecutableNode, IControlStatement
 {
     #region Metadata
 
