@@ -78,16 +78,19 @@ public class Executor
         {
             if (!TryPassValueFromSource(node))
             {
-                node.Status = NodeStatus.Waiting;
+                node.MarkAs(NodeStatus.Waiting);
                 return;
             }
         }
 
         // If the node requires an instance.
-        if (node is IInstanceRequired instanceRequiredNode)
+        if (node is IInstanceRequired)
         {
-             // TODO
-             // var c = 
+            if (!TryPassContextToNode(node))
+            {
+                node.MarkAs(NodeStatus.Waiting);
+                return;
+            }
         }
 
         try
@@ -133,6 +136,8 @@ public class Executor
         return node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
     }
 
+    #region Variable Utils
+    
     /// <summary>
     /// Get results from a node, and pass them according to connections. (Actively pass values)
     /// </summary>
@@ -180,6 +185,30 @@ public class Executor
         
         return succeed;
     }
+
+    /// <summary>
+    /// Try to get a context from the ContextManager, and pass it to the node.
+    /// <remarks>The node must implements <see cref="IInstanceRequired"/>.</remarks>
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
+    private bool TryPassContextToNode(INode node)
+    {
+        if (node.GetRuntimeGuid(Script) is not { } rt) return false;
+        if (rt.GetRelatedContext(Script) is not { } rc) return false;
+
+        try
+        {
+            ((IInstanceRequired)node).Instance = Script.ContextManager.TryFindContextObject(rc);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+    
+    #endregion
 
     #region Process Control
 

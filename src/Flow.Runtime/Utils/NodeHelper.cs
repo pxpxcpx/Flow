@@ -1,4 +1,5 @@
 ﻿using Flow.Shared.Abstractions;
+using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 
 namespace Flow.Runtime.Utils;
@@ -87,4 +88,7 @@ public static class NodeHelper
                 yield return metadata;
         }
     }
+
+    public static void MarkAs(this INode node, NodeStatus status)
+        => node.Status = status;
 }
