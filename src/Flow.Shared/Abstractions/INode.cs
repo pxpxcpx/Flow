@@ -5,9 +5,12 @@ using Flow.Shared.Results;
 namespace Flow.Shared.Abstractions;
 
 /// <summary>
-/// The interface of a node to be executed. And provides node runtime properties.
+/// An interface providing basic node composition and runtime information.
+/// <remarks>
+/// To implement the node, simply inherit from <see cref="IExecutableNode"/>/<see cref="IAsyncExecutableNode"/>.
+/// </remarks>
 /// </summary>
-public interface INode : IExecutable
+public interface INode
 {
     /// <summary>
     /// Metadata of the node. Includes name, description, GUID of this node. 
@@ -17,7 +20,7 @@ public interface INode : IExecutable
     /// <summary>
     /// ID during the runtime.
     /// </summary>
-    /// <remarks> Note the distinction from the <see cref="NodeMetadata.Id"/> </remarks>
+    /// <remarks>Note the distinction from the <see cref="NodeMetadata.Id"/></remarks>
     Guid RuntimeId { get; }
     
     /// <summary>

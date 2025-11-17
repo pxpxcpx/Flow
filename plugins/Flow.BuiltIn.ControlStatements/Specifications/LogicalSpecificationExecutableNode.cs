@@ -7,7 +7,7 @@ using Flow.Shared.Results;
 
 namespace Flow.BuiltIn.ControlStatements.Specifications;
 
-public class LogicalSpecificationNode : INode
+public class LogicalSpecificationNode : IExecutableNode
 {
     #region Metadata
 

@@ -92,19 +92,48 @@ public class Executor
                 return;
             }
         }
+        
+        var succeed = true;
+        // Attention:
+        // If the same node implements both synchronous and asynchronous interfaces,
+        // only the synchronous method will be executed.
+        switch (node)
+        {
+            // If possible, execute this method on the node.
+            case IExecutableNode en:
+            {
+                try
+                {
+                    en.Execute();
+                }
+                catch (Exception ex)
+                {
+                    OnError(ex);
+                }
+                break;
+            }
 
-        try
-        {
-            node.Execute();
+            // Execute asynchronously if the node implements the IAsyncExecutableNode.
+            case IAsyncExecutableNode aen:
+            {
+                aen.ExecuteAsync().Await(OnError);
+                break;
+            }
+            
+            default:
+                return;
         }
-        catch (Exception ex)
+        
+        if (succeed) return;
+        PassResults(node);
+        return;
+
+        void OnError(Exception ex)
         {
+            succeed = false;
             var result = node.Result;
             Debug.WriteLine($"Exception detected: {ex.Message}, result: {result}");
-            return;
         }
-
-        PassResults(node);
     }
 
     /// <summary>
@@ -130,7 +159,7 @@ public class Executor
         if (node is IControlStatement csn)
         {
             var i = csn.ReturnIndex;
-            return node.GetRuntimeGuid(Script) is not { } id1 ? null : id1.GetNextProgressNodes(Script, i);
+            return node.GetRuntimeGuid(Script) is not { } cid ? null : cid.GetNextProgressNodes(Script, i);
         }
         
         return node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
