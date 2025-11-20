@@ -8,4 +8,9 @@
     <UseVSTest>true</UseVSTest>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\sdk\Flow.SDK.Plugins\Flow.SDK.Plugins.csproj" />
+    <ProjectReference Include="..\..\src\Flow.Shared\Flow.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

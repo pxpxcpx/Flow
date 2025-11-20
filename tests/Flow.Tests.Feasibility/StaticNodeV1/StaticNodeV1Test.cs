@@ -1,7 +1,7 @@
-﻿namespace Flow.Tests.Feasibility.StaticNode;
+﻿namespace Flow.Tests.Feasibility.StaticNodeV1;
 
 [TestClass]
-public class StaticNodeTest
+public class StaticNodeV1Test
 {
     [TestMethod]
     [DataRow(1, 1, 2)]

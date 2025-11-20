@@ -20,7 +20,7 @@ public class InternalNodeGenerator : IIncrementalGenerator
 // - Flow.Shared
 
 using Flow.SDK.Plugins;
-using Flow.SDK.Plugins.Node.Attributes;
+using Flow.SDK.Plugins.Attributes;
 using Flow.Shared;
 
 #nullable enable
@@ -28,6 +28,14 @@ using Flow.Shared;
     
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
+        
+        context.RegisterPostInitializationOutput(Generate);
+        return;
+        
+        void Generate(IncrementalGeneratorPostInitializationContext c)
+        {
+            c.AddSource("Flow.GeneratorTest.g.cs", Header);
+        }
     }
 }
