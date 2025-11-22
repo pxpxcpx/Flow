@@ -1,4 +1,4 @@
-﻿namespace Flow.Tests.Feasibility.StaticNodeV1;
+using Flow.Tests.FeasibilityTest.StaticNodeV1;
 
 [TestClass]
 public class StaticNodeV1Test

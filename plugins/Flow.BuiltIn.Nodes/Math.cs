@@ -2,7 +2,7 @@
 
 namespace Flow.BuiltIn.Nodes;
 
-public class Math
+public partial class Math
 {
     [StaticNode("", "")]
     public static int Add(

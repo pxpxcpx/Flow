@@ -1,4 +1,4 @@
-﻿namespace Flow.Tests.Feasibility.StaticNodeV1;
+﻿namespace Flow.Tests.FeasibilityTest.StaticNodeV1;
 
 public class AddNode
 {

@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SDK", "SDK", "{2110D23C-AB6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.SDK.Plugins.Generators", "sdk\Flow.SDK.Plugins.Generators\Flow.SDK.Plugins.Generators.csproj", "{89F7D2B3-2DD0-4A6C-85B1-FFB6627C1C0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.Tests.Feasibility", "tests\Flow.Tests.Feasibility\Flow.Tests.Feasibility.csproj", "{64F0C2A7-276B-4F48-925E-7280AD0092E9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.Tests.FeasibilityTest", "tests\Flow.Tests.FeasibilityTest\Flow.Tests.FeasibilityTest.csproj", "{64F0C2A7-276B-4F48-925E-7280AD0092E9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.SDK.Plugins", "sdk\Flow.SDK.Plugins\Flow.SDK.Plugins.csproj", "{465CA725-57F1-4803-8EB5-54055DC86635}"
 EndProject
