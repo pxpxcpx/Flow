@@ -1,4 +1,7 @@
-﻿namespace Flow.Tests.Feasibility.StaticNodeV1;
+﻿using System;
+using System.Collections.Generic;
+
+namespace Flow.Tests.Feasibility.StaticNodeV1;
 
 public class AddNode
 {

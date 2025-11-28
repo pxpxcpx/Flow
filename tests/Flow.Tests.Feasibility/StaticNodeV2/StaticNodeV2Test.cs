@@ -1,4 +1,6 @@
-﻿namespace Flow.Tests.Feasibility.StaticNodeV2;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Flow.Tests.Feasibility.StaticNodeV2;
 
 [TestClass]
 public class StaticNodeV2Test
