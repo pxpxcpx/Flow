@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.Shared", "src\Flow.Sha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.BuiltIn.ControlStatements", "plugins\Flow.BuiltIn.ControlStatements\Flow.BuiltIn.ControlStatements.csproj", "{F3C76442-B550-454D-8649-387CBB2785F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flow.Tests.GenerationTest", "tests\Flow.Tests.GeneratingTest\Flow.Tests.GenerationTest.csproj", "{38A7C9C5-48C3-4FC2-B915-264601E2841E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{F3C76442-B550-454D-8649-387CBB2785F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3C76442-B550-454D-8649-387CBB2785F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3C76442-B550-454D-8649-387CBB2785F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38A7C9C5-48C3-4FC2-B915-264601E2841E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38A7C9C5-48C3-4FC2-B915-264601E2841E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38A7C9C5-48C3-4FC2-B915-264601E2841E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38A7C9C5-48C3-4FC2-B915-264601E2841E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,6 +85,7 @@ Global
 		{64F0C2A7-276B-4F48-925E-7280AD0092E9} = {D6CD1356-46CE-4EFC-9790-4D0E8807B25E}
 		{465CA725-57F1-4803-8EB5-54055DC86635} = {2110D23C-AB67-4671-A166-E673A5EDF9A6}
 		{F3C76442-B550-454D-8649-387CBB2785F1} = {E7153054-017B-4A29-B7B1-5846FC66B53F}
+		{38A7C9C5-48C3-4FC2-B915-264601E2841E} = {D6CD1356-46CE-4EFC-9790-4D0E8807B25E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD440637-9CE6-47FE-B948-6B7A74E6BB87}
