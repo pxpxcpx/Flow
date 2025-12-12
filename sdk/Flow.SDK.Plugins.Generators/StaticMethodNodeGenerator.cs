@@ -1,4 +1,6 @@
-﻿using System;
+﻿// #define ROSLYN_DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -18,21 +20,26 @@ namespace Flow.SDK.Plugins.Generators;
 /// </summary>
 /// <remarks>Extensive use of AI-generated code.</remarks>
 // #pragma warning disable RS1038
-// #pragma warning restore RS1038
 [Generator(LanguageNames.CSharp)]
-public class InternalNodeGenerator : IIncrementalGenerator
+// #pragma warning restore RS1038
+public class StaticMethodNodeGenerator : IIncrementalGenerator
 {
+    /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // throw new NotImplementedException();
-        
+#if ROSLYN_DEBUG
+        System.Diagnostics.Debugger.Launch();
+#endif
+
         context.RegisterPostInitializationOutput(Generate);
+        // context.RegisterPostInitializationOutput(initializationContext =>
+        // {
+        //     initializationContext.AddSource("GeneratedCode.cs", Constants.Header);
+        // });
         return;
 
         void Generate(IncrementalGeneratorPostInitializationContext c)
         {
-            // c.AddSource("Flow.GeneratorTest.g.cs", Constants.Header);
-
             var methodsDeclarations = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: static (sn, _) => IsSyntaxTargetForGeneration(sn),
@@ -41,7 +48,7 @@ public class InternalNodeGenerator : IIncrementalGenerator
             
             var compilation = context.CompilationProvider.Combine(methodsDeclarations.Collect());
             
-            context.RegisterSourceOutput(compilation, static (spc, source) => Execute(source.Left, source.Right, spc));
+            context.RegisterSourceOutput(compilation, (spc, source) => Execute(source.Left, source.Right, spc));
         }
     }
 
@@ -70,8 +77,7 @@ public class InternalNodeGenerator : IIncrementalGenerator
         return null;
     }
 
-    private static void Execute(
-        Compilation compilation, ImmutableArray<MethodDeclarationSyntax> methods, SourceProductionContext context)
+    private void Execute(Compilation compilation, ImmutableArray<MethodDeclarationSyntax> methods, SourceProductionContext context)
     {
         if (methods.IsDefaultOrEmpty)
             return;
@@ -85,7 +91,8 @@ public class InternalNodeGenerator : IIncrementalGenerator
                 continue;
 
             // 获取 StaticNodeAttribute 信息
-            var staticNodeAttribute = methodSymbol.GetAttributes()
+            var staticNodeAttribute = methodSymbol
+                .GetAttributes()
                 .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == "Flow.SDK.Plugins.Attributes.StaticNodeAttribute");
 
             if (staticNodeAttribute == null)
@@ -95,8 +102,6 @@ public class InternalNodeGenerator : IIncrementalGenerator
             var sourceCode = GenerateNodeClass(methodSymbol, staticNodeAttribute);
             context.AddSource($"{methodSymbol.Name}Node.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
         }
-        
-        // throw new NotImplementedException();
     }
     
     private static string GenerateNodeClass(IMethodSymbol methodSymbol, AttributeData staticNodeAttribute)
@@ -146,11 +151,9 @@ new ParameterMetadata(
     IsRequired: true, 
     DefaultValue: {GetDefaultValueForType(methodSymbol.ReturnType)}),
 """);
-
-        // 生成 Execute 方法体
+        
         var executeMethodBody = GenerateExecuteMethodBody(methodSymbol);
-
-        // 生成稳定的 GUID（基于命名空间+类名+方法名）
+        var ctorBody = GenerateCtor(className, methodSymbol);
         var guid = GenerateDeterministicGuid(namespaceName, methodSymbol.ContainingType.Name, methodSymbol.Name);
 
         return 
@@ -189,7 +192,7 @@ public partial class {{methodSymbol.ContainingType.Name}}
         public ParameterMetadata[]? InputVariableMetadata => InputMetadata;
         
         /// <inheritdoc />
-        public object?[]? Inputs { get; set; }
+        public object?[]? Inputs { get; init; }
         
         private static readonly ParameterMetadata[]? OutputMetadata =
         [
@@ -200,10 +203,12 @@ public partial class {{methodSymbol.ContainingType.Name}}
         public ParameterMetadata[]? OutputVariableMetadata => OutputMetadata;
         
         /// <inheritdoc />
-        public object?[]? Outputs { get; set; }
+        public object?[]? Outputs { get; init; }
         
         /// <inheritdoc />
         public Result? Result { get; private set; }
+        
+{{ctorBody.AlignWithIndent(8)}}
         
         /// <inheritdoc />
         public void Execute()
@@ -247,10 +252,27 @@ public partial class {{methodSymbol.ContainingType.Name}}
         else
         {
             sb.AppendLine($"var result = {methodSymbol.Name}({parametersString});");
-            sb.AppendLine("                Outputs = new object?[] { result };");
+            sb.AppendLine("                Outputs[0] = result;");
         }
 
         sb.Append("                Result = new Result(IsCompleted: true, IsSuccess: true, Message: \"Operation completed successfully.\");");
+
+        return sb.ToString();
+    }
+
+    private static string GenerateCtor(string className, IMethodSymbol methodSymbol)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine($"public {className}()\n" +
+                      $"{{");        
+        
+        var inputLength = methodSymbol.Parameters.Length;
+        const int outputLength = 1;
+
+        sb.AppendLine($"    Inputs = new object?[{inputLength}];");
+        sb.AppendLine($"    Outputs = new object?[{outputLength}];");
+        sb.AppendLine("}");
 
         return sb.ToString();
     }
