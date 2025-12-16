@@ -1,8 +1,9 @@
-﻿// #define ROSLYN_DEBUG
+﻿#define ROSLYN_DEBUG
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,36 +21,27 @@ namespace Flow.SDK.Plugins.Generators;
 /// </summary>
 /// <remarks>Extensive use of AI-generated code.</remarks>
 // #pragma warning disable RS1038
-[Generator(LanguageNames.CSharp)]
 // #pragma warning restore RS1038
+[Generator(LanguageNames.CSharp)]
 public class StaticMethodNodeGenerator : IIncrementalGenerator
 {
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
 #if ROSLYN_DEBUG
-        System.Diagnostics.Debugger.Launch();
+        Debugger.Launch();
 #endif
+        var methodsDeclarations = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                predicate: static (sn, _) => IsSyntaxTargetForGeneration(sn),
+                transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx)!)
+            .Where(static m => m is not null);
 
-        context.RegisterPostInitializationOutput(Generate);
-        // context.RegisterPostInitializationOutput(initializationContext =>
-        // {
-        //     initializationContext.AddSource("GeneratedCode.cs", Constants.Header);
-        // });
-        return;
+        // Compile with Roslyn 4.13.0 or earlier;
+        // otherwise, the correct generator name will not be displayed.
+        var compilation = context.CompilationProvider.Combine(methodsDeclarations.Collect());
 
-        void Generate(IncrementalGeneratorPostInitializationContext c)
-        {
-            var methodsDeclarations = context.SyntaxProvider
-                .CreateSyntaxProvider(
-                    predicate: static (sn, _) => IsSyntaxTargetForGeneration(sn),
-                    transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx)!)
-                .Where(static m => m is not null);
-            
-            var compilation = context.CompilationProvider.Combine(methodsDeclarations.Collect());
-            
-            context.RegisterSourceOutput(compilation, (spc, source) => Execute(source.Left, source.Right, spc));
-        }
+        context.RegisterSourceOutput(compilation, (spc, source) => Execute(source.Left, source.Right, spc));
     }
 
     private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
@@ -106,8 +98,6 @@ public class StaticMethodNodeGenerator : IIncrementalGenerator
     
     private static string GenerateNodeClass(IMethodSymbol methodSymbol, AttributeData staticNodeAttribute)
     {
-        // throw new NotImplementedException();
-
         var className = $"{methodSymbol.Name}Node";
         var namespaceName = methodSymbol.ContainingNamespace.ToDisplayString();
         
@@ -117,7 +107,7 @@ public class StaticMethodNodeGenerator : IIncrementalGenerator
 
         // 生成输入参数元数据
         var inputMetadata = new StringBuilder();
-        for (int i = 0; i < methodSymbol.Parameters.Length; i++)
+        for (var i = 0; i < methodSymbol.Parameters.Length; i++)
         {
             var parameter = methodSymbol.Parameters[i];
             var inputAttribute = parameter.GetAttributes()
@@ -161,69 +151,70 @@ $$"""
 // Generated at {{DateTime.Now}}
 {{Constants.Header}}
 
-namespace {{namespaceName}};
-
-public partial class {{methodSymbol.ContainingType.Name}}
+namespace {{namespaceName}}
 {
-    public class {{className}} : INode, IExecutable
+    public partial class {{methodSymbol.ContainingType.Name}}
     {
-        private static readonly NodeMetadata NodeMetadata = new()
+        public class {{className}} : INode, IExecutable
         {
-            Id = new Guid("{{guid}}"),
-            Name = "{{nodeName}}",
-            Description = "{{nodeDescription}}"
-        };
-        
-        /// <inheritdoc />
-        public NodeMetadata Metadata => NodeMetadata;
-        
-        /// <inheritdoc />
-        public Guid RuntimeId { get; init; }
-        
-        /// <inheritdoc />
-        public NodeStatus Status { get; set; }
-        
-        private static readonly ParameterMetadata[]? InputMetadata =
-        [
-{{inputMetadata.ToString().AlignWithIndent(12)}}
-        ];
-        
-        /// <inheritdoc />
-        public ParameterMetadata[]? InputVariableMetadata => InputMetadata;
-        
-        /// <inheritdoc />
-        public object?[]? Inputs { get; init; }
-        
-        private static readonly ParameterMetadata[]? OutputMetadata =
-        [
-{{outputMetadata.ToString().AlignWithIndent(12)}}
-        ];
-        
-        /// <inheritdoc />
-        public ParameterMetadata[]? OutputVariableMetadata => OutputMetadata;
-        
-        /// <inheritdoc />
-        public object?[]? Outputs { get; init; }
-        
-        /// <inheritdoc />
-        public Result? Result { get; private set; }
-        
-{{ctorBody.AlignWithIndent(8)}}
-        
-        /// <inheritdoc />
-        public void Execute()
-        {
-            try
+            private static readonly NodeMetadata NodeMetadata = new()
             {
-                {{executeMethodBody}}
-            }
-            catch (Exception ex)
+                Id = new Guid("{{guid}}"),
+                Name = "{{nodeName}}",
+                Description = "{{nodeDescription}}"
+            };
+            
+            /// <inheritdoc />
+            public NodeMetadata Metadata => NodeMetadata;
+            
+            /// <inheritdoc />
+            public Guid RuntimeId { get; init; }
+            
+            /// <inheritdoc />
+            public NodeStatus Status { get; set; }
+            
+            private static readonly ParameterMetadata[]? InputMetadata =
+            [
+{{inputMetadata.ToString().AlignWithIndent(16)}}
+            ];
+            
+            /// <inheritdoc />
+            public ParameterMetadata[]? InputVariableMetadata => InputMetadata;
+            
+            /// <inheritdoc />
+            public object?[]? Inputs { get; init; }
+            
+            private static readonly ParameterMetadata[]? OutputMetadata =
+            [
+{{outputMetadata.ToString().AlignWithIndent(16)}}
+            ];
+            
+            /// <inheritdoc />
+            public ParameterMetadata[]? OutputVariableMetadata => OutputMetadata;
+            
+            /// <inheritdoc />
+            public object?[]? Outputs { get; init; }
+            
+            /// <inheritdoc />
+            public Result? Result { get; private set; }
+            
+{{ctorBody.AlignWithIndent(12)}}
+            
+            /// <inheritdoc />
+            public void Execute()
             {
-                Result = new Result(
-                    IsCompleted: false, 
-                    IsSuccess: false, 
-                    Exception: ex, 
-                    Message: "Failed to execute {{methodSymbol.Name}} operation.");
+                try
+                {
+                    {{executeMethodBody}}
+                }
+                catch (Exception ex)
+                {
+                    Result = new Result(
+                        IsCompleted: false, 
+                        IsSuccess: false, 
+                        Exception: ex, 
+                        Message: "Failed to execute {{methodSymbol.Name}} operation.");
+                }
             }
         }
     }
