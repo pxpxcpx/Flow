@@ -1,9 +1,11 @@
-﻿#define ROSLYN_DEBUG
+﻿// #define ROSLYN_DEBUG
 
+// ReSharper disable once RedundantUsingDirective
+using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,25 +25,27 @@ namespace Flow.SDK.Plugins.Generators;
 // #pragma warning disable RS1038
 // #pragma warning restore RS1038
 [Generator(LanguageNames.CSharp)]
-public class StaticMethodNodeGenerator : IIncrementalGenerator
+public class StaticNodeGenerator : IIncrementalGenerator
 {
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        
 #if ROSLYN_DEBUG
         Debugger.Launch();
 #endif
+        
         var methodsDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (sn, _) => IsSyntaxTargetForGeneration(sn),
                 transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx)!)
             .Where(static m => m is not null);
 
-        // Compile with Roslyn 4.13.0 or earlier;
+        // Compile with Roslyn 4.13.0 or earlier (Microsoft.CodeAnalysis <= 4.13.0);
         // otherwise, the correct generator name will not be displayed.
         var compilation = context.CompilationProvider.Combine(methodsDeclarations.Collect());
 
-        context.RegisterSourceOutput(compilation, (spc, source) => Execute(source.Left, source.Right, spc));
+        context.RegisterSourceOutput(compilation, static (spc, source) => Execute(source.Left, source.Right, spc));
     }
 
     private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
@@ -62,14 +66,14 @@ public class StaticMethodNodeGenerator : IIncrementalGenerator
                 var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
                 var fullName = attributeContainingTypeSymbol.ToDisplayString();
 
-                if (fullName == "Flow.SDK.Plugins.Attributes.StaticNodeAttribute")
+                if (fullName == Constants.StaticNodeAttributeDisplayString)
                     return methodDeclaration;
             }
         }
         return null;
     }
 
-    private void Execute(Compilation compilation, ImmutableArray<MethodDeclarationSyntax> methods, SourceProductionContext context)
+    private static void Execute(Compilation compilation, ImmutableArray<MethodDeclarationSyntax> methods, SourceProductionContext context)
     {
         if (methods.IsDefaultOrEmpty)
             return;
@@ -85,7 +89,7 @@ public class StaticMethodNodeGenerator : IIncrementalGenerator
             // 获取 StaticNodeAttribute 信息
             var staticNodeAttribute = methodSymbol
                 .GetAttributes()
-                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == "Flow.SDK.Plugins.Attributes.StaticNodeAttribute");
+                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == Constants.StaticNodeAttributeDisplayString);
 
             if (staticNodeAttribute == null)
                 continue;
@@ -111,115 +115,49 @@ public class StaticMethodNodeGenerator : IIncrementalGenerator
         {
             var parameter = methodSymbol.Parameters[i];
             var inputAttribute = parameter.GetAttributes()
-                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == "Flow.SDK.Plugins.Attributes.InputAttribute");
+                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == Constants.StaticNodeAttributeDisplayString);
             
             var paramName = GetAttributeArgumentValue(inputAttribute, "name", parameter.Name);
             var paramDescription = GetAttributeArgumentValue(inputAttribute, "description", $"Parameter {parameter.Name}");
             var defaultValue = GetDefaultValueForType(parameter.Type);
 
             inputMetadata.AppendLine(
-$"""
-new ParameterMetadata(
-    Index: {i}, 
-    Name: "{paramName}", 
-    Description: "{paramDescription}", 
-    Type: typeof({parameter.Type.ToDisplayString()}), 
-    IsRequired: true, 
-    DefaultValue: {defaultValue}),
-""");
+                Constants.InputMetadataTemplate
+                    .Replace("$$PARAM_INDEX$$", i.ToString())
+                    .Replace("$$PARAM_NAME$$", paramName)
+                    .Replace("$$PARAM_DESCRIPTION$$", paramDescription)
+                    .Replace("$$PARAM_TYPE$$", parameter.Type.ToDisplayString())
+                    .Replace("$$PARAM_DEFAULT_VALUE$$", defaultValue) 
+            );
         }
 
         // 生成输出参数元数据
         var outputMetadata = new StringBuilder();
         outputMetadata.AppendLine(
-$"""
-new ParameterMetadata(
-    Index: 0, 
-    Name: "Result", 
-    Description: "Result of {methodSymbol.Name} operation.", 
-    Type: typeof({methodSymbol.ReturnType.ToDisplayString()}), 
-    IsRequired: true, 
-    DefaultValue: {GetDefaultValueForType(methodSymbol.ReturnType)}),
-""");
+            Constants.OutputMetadataTemplate
+                .Replace("$$PARAM_NAME$$", methodSymbol.Name)
+                .Replace("$$PARAM_TYPE$$", methodSymbol.ReturnType.ToDisplayString())
+                .Replace("$$PARAM_DEFAULT_VALUE$$", GetDefaultValueForType(methodSymbol.ReturnType)) 
+        );
         
         var executeMethodBody = GenerateExecuteMethodBody(methodSymbol);
         var ctorBody = GenerateCtor(className, methodSymbol);
         var guid = GenerateDeterministicGuid(namespaceName, methodSymbol.ContainingType.Name, methodSymbol.Name);
 
-        return 
-$$"""
-// Generated at {{DateTime.Now}}
-{{Constants.Header}}
-
-namespace {{namespaceName}}
-{
-    public partial class {{methodSymbol.ContainingType.Name}}
-    {
-        public class {{className}} : INode, IExecutable
-        {
-            private static readonly NodeMetadata NodeMetadata = new()
-            {
-                Id = new Guid("{{guid}}"),
-                Name = "{{nodeName}}",
-                Description = "{{nodeDescription}}"
-            };
-            
-            /// <inheritdoc />
-            public NodeMetadata Metadata => NodeMetadata;
-            
-            /// <inheritdoc />
-            public Guid RuntimeId { get; init; }
-            
-            /// <inheritdoc />
-            public NodeStatus Status { get; set; }
-            
-            private static readonly ParameterMetadata[]? InputMetadata =
-            [
-{{inputMetadata.ToString().AlignWithIndent(16)}}
-            ];
-            
-            /// <inheritdoc />
-            public ParameterMetadata[]? InputVariableMetadata => InputMetadata;
-            
-            /// <inheritdoc />
-            public object?[]? Inputs { get; init; }
-            
-            private static readonly ParameterMetadata[]? OutputMetadata =
-            [
-{{outputMetadata.ToString().AlignWithIndent(16)}}
-            ];
-            
-            /// <inheritdoc />
-            public ParameterMetadata[]? OutputVariableMetadata => OutputMetadata;
-            
-            /// <inheritdoc />
-            public object?[]? Outputs { get; init; }
-            
-            /// <inheritdoc />
-            public Result? Result { get; private set; }
-            
-{{ctorBody.AlignWithIndent(12)}}
-            
-            /// <inheritdoc />
-            public void Execute()
-            {
-                try
-                {
-                    {{executeMethodBody}}
-                }
-                catch (Exception ex)
-                {
-                    Result = new Result(
-                        IsCompleted: false, 
-                        IsSuccess: false, 
-                        Exception: ex, 
-                        Message: "Failed to execute {{methodSymbol.Name}} operation.");
-                }
-            }
-        }
-    }
-}
-""";
+        return Constants.StaticNodeSourceTemplate
+            .Replace("$$GENERATED_TIMESTAMP$$", DateTime.Now.ToString(CultureInfo.InvariantCulture))
+            .Replace("$$SOURCE_HEADER$$", Constants.SourceHeader)
+            .Replace("$$NAMESPACE$$", namespaceName)
+            .Replace("$$COLLECTION_NAME$$", methodSymbol.ContainingType.Name)
+            .Replace("$$NODE_CLASS_NAME$$", className)
+            .Replace("$$NODE_GUID$$", guid)
+            .Replace("$$NODE_NAME$$", nodeName)
+            .Replace("$$NODE_DESCRIPTION$$", nodeDescription)
+            .Replace("$$INPUT_METADATA$$", inputMetadata.ToString().AlignWithIndent(16))
+            .Replace("$$OUTPUT_METADATA$$", outputMetadata.ToString().AlignWithIndent(16))
+            .Replace("$$CTOR$$", ctorBody.AlignWithIndent(12))
+            .Replace("$$EXECUTE_METHOD_BODY$$", executeMethodBody)
+            .Replace("$$METHOD_NAME$$", methodSymbol.Name);
     }
     
     private static string GenerateExecuteMethodBody(IMethodSymbol methodSymbol)
@@ -243,10 +181,10 @@ namespace {{namespaceName}}
         else
         {
             sb.AppendLine($"var result = {methodSymbol.Name}({parametersString});");
-            sb.AppendLine("                Outputs[0] = result;");
+            sb.AppendLine("                    Outputs[0] = result;");
         }
 
-        sb.Append("                Result = new Result(IsCompleted: true, IsSuccess: true, Message: \"Operation completed successfully.\");");
+        sb.Append("                    Result = new Result(IsCompleted: true, IsSuccess: true, Message: \"Operation completed successfully.\");");
 
         return sb.ToString();
     }
