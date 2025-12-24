@@ -93,7 +93,7 @@ public class Executor
             }
         }
         
-        var succeed = true;
+        var successful = true;
         // Attention:
         // If the same node implements both synchronous and asynchronous interfaces,
         // only the synchronous method will be executed.
@@ -124,13 +124,13 @@ public class Executor
                 return;
         }
         
-        if (succeed) return;
+        if (successful) return;
         PassResults(node);
         return;
 
         void OnError(Exception ex)
         {
-            succeed = false;
+            successful = false;
             var result = node.Result;
             Debug.WriteLine($"Exception detected: {ex.Message}, result: {result}");
         }

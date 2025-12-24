@@ -1,4 +1,4 @@
-using Flow.Tests.FeasibilityTest.StaticNodeV1;
+﻿namespace Flow.Tests.FeasibilityTest.StaticNodeV1;
 
 [TestClass]
 public class StaticNodeV1Test
