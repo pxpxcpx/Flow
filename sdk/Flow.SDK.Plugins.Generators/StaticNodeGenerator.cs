@@ -9,7 +9,6 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using Flow.SDK.Plugins.Generators.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -22,10 +21,8 @@ namespace Flow.SDK.Plugins.Generators;
 /// 
 /// </summary>
 /// <remarks>Extensive use of AI-generated code.</remarks>
-// #pragma warning disable RS1038
-// #pragma warning restore RS1038
 [Generator(LanguageNames.CSharp)]
-public class StaticNodeGenerator : IIncrementalGenerator
+public sealed class StaticNodeGenerator : IIncrementalGenerator
 {
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -37,8 +34,8 @@ public class StaticNodeGenerator : IIncrementalGenerator
         
         var methodsDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: static (sn, _) => IsSyntaxTargetForGeneration(sn),
-                transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx)!)
+                predicate: static (sn, _) => GeneratorUtils.IsSyntaxTargetForGeneration(sn),
+                transform: static (ctx, _) => GeneratorUtils.GetSemanticTargetForGeneration(ctx, Constants.StaticNodeAttributeDisplayString)!)
             .Where(static m => m is not null);
 
         // Compile with Roslyn 4.13.0 or earlier (Microsoft.CodeAnalysis <= 4.13.0);
@@ -46,31 +43,6 @@ public class StaticNodeGenerator : IIncrementalGenerator
         var compilation = context.CompilationProvider.Combine(methodsDeclarations.Collect());
 
         context.RegisterSourceOutput(compilation, static (spc, source) => Execute(source.Left, source.Right, spc));
-    }
-
-    private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
-        => node is MethodDeclarationSyntax { AttributeLists.Count: > 0 };
-    
-    private static MethodDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
-    {
-        var methodDeclaration = (MethodDeclarationSyntax)context.Node;
-
-        // 检查方法是否包含 StaticNodeAttribute
-        foreach (var attributeList in methodDeclaration.AttributeLists)
-        {
-            foreach (var attribute in attributeList.Attributes)
-            {
-                if (context.SemanticModel.GetSymbolInfo(attribute).Symbol is not IMethodSymbol attributeSymbol)
-                    continue;
-                
-                var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-                var fullName = attributeContainingTypeSymbol.ToDisplayString();
-
-                if (fullName == Constants.StaticNodeAttributeDisplayString)
-                    return methodDeclaration;
-            }
-        }
-        return null;
     }
 
     private static void Execute(Compilation compilation, ImmutableArray<MethodDeclarationSyntax> methods, SourceProductionContext context)
@@ -105,11 +77,11 @@ public class StaticNodeGenerator : IIncrementalGenerator
         var className = $"{methodSymbol.Name}Node";
         var namespaceName = methodSymbol.ContainingNamespace.ToDisplayString();
         
-        // 从 StaticNodeAttribute 获取名称和描述
-        var nodeName = GetAttributeArgumentValue(staticNodeAttribute, "name", methodSymbol.Name);
-        var nodeDescription = GetAttributeArgumentValue(staticNodeAttribute, "description", $"Node for {methodSymbol.Name} method");
+        // Node metadata
+        var nodeName = GeneratorUtils.GetAttributeArgumentValue(staticNodeAttribute, "name", methodSymbol.Name);
+        var nodeDescription = GeneratorUtils.GetAttributeArgumentValue(staticNodeAttribute, "description", $"Node for {methodSymbol.Name} method");
 
-        // 生成输入参数元数据
+        // Input
         var inputMetadata = new StringBuilder();
         for (var i = 0; i < methodSymbol.Parameters.Length; i++)
         {
@@ -117,9 +89,9 @@ public class StaticNodeGenerator : IIncrementalGenerator
             var inputAttribute = parameter.GetAttributes()
                 .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == Constants.StaticNodeAttributeDisplayString);
             
-            var paramName = GetAttributeArgumentValue(inputAttribute, "name", parameter.Name);
-            var paramDescription = GetAttributeArgumentValue(inputAttribute, "description", $"Parameter {parameter.Name}");
-            var defaultValue = GetDefaultValueForType(parameter.Type);
+            var paramName = GeneratorUtils.GetAttributeArgumentValue(inputAttribute, "name", parameter.Name);
+            var paramDescription = GeneratorUtils.GetAttributeArgumentValue(inputAttribute, "description", $"Parameter {parameter.Name}");
+            var defaultValue = GeneratorUtils.GetDefaultValueForType(parameter.Type);
 
             inputMetadata.AppendLine(
                 Constants.InputMetadataTemplate
@@ -131,18 +103,19 @@ public class StaticNodeGenerator : IIncrementalGenerator
             );
         }
 
-        // 生成输出参数元数据
+        // Output
         var outputMetadata = new StringBuilder();
         outputMetadata.AppendLine(
             Constants.OutputMetadataTemplate
                 .Replace("$$PARAM_NAME$$", methodSymbol.Name)
                 .Replace("$$PARAM_TYPE$$", methodSymbol.ReturnType.ToDisplayString())
-                .Replace("$$PARAM_DEFAULT_VALUE$$", GetDefaultValueForType(methodSymbol.ReturnType)) 
+                .Replace("$$PARAM_DEFAULT_VALUE$$", GeneratorUtils.GetDefaultValueForType(methodSymbol.ReturnType)) 
         );
         
+        // Generate
         var executeMethodBody = GenerateExecuteMethodBody(methodSymbol);
         var ctorBody = GenerateCtor(className, methodSymbol);
-        var guid = GenerateDeterministicGuid(namespaceName, methodSymbol.ContainingType.Name, methodSymbol.Name);
+        var guid = GeneratorUtils.GenerateDeterministicGuid(namespaceName, methodSymbol.ContainingType.Name, methodSymbol.Name);
 
         return Constants.StaticNodeSourceTemplate
             .Replace("$$GENERATED_TIMESTAMP$$", DateTime.Now.ToString(CultureInfo.InvariantCulture))
@@ -166,7 +139,7 @@ public class StaticNodeGenerator : IIncrementalGenerator
         
         // 构建方法调用参数
         var parameters = new List<string>();
-        for (int i = 0; i < methodSymbol.Parameters.Length; i++)
+        for (var i = 0; i < methodSymbol.Parameters.Length; i++)
         {
             var parameter = methodSymbol.Parameters[i];
             parameters.Add($"({parameter.Type.ToDisplayString()})Inputs![{i}]!");
@@ -204,46 +177,5 @@ public class StaticNodeGenerator : IIncrementalGenerator
         sb.AppendLine("}");
 
         return sb.ToString();
-    }
-
-    private static string GetAttributeArgumentValue(AttributeData? attribute, string argumentName, string defaultValue)
-    {
-        if (attribute == null)
-            return defaultValue;
-
-        foreach (var arg in attribute.NamedArguments)
-        {
-            if (arg.Key == argumentName && arg.Value.Value is string value)
-            {
-                return value;
-            }
-        }
-
-        return defaultValue;
-    }
-
-    private static string GetDefaultValueForType(ITypeSymbol type)
-    {
-        return type.SpecialType switch
-        {
-            SpecialType.System_Int32 => "0",
-            SpecialType.System_Double => "0.0",
-            SpecialType.System_Boolean => "false",
-            SpecialType.System_String => "string.Empty",
-            SpecialType.System_Object => "null",
-            _ => type.Name switch
-            {
-                "String" => "string.Empty",
-                _ => type.IsValueType ? $"default({type.ToDisplayString()})" : "null"
-            }
-        };
-    }
-
-    private static string GenerateDeterministicGuid(string namespaceName, string className, string methodName)
-    {
-        var input = $"{namespaceName}.{className}.{methodName}";
-        using var md5 = MD5.Create();
-        var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
-        return new Guid(hash).ToString();
     }
 }
