@@ -4,9 +4,11 @@ namespace Flow.BuiltIn.Nodes;
 
 public partial class Math
 {
-    [StaticNode("", "")]
+    [StaticNode("Add", "Node for Add method")]
     public static int Add(
-        [Input("", "")] int a,
-        [Input("", "")] int b)
-        => a + b;
+        [Input("Number A", "")] int a,
+        [Input("Number A", "")] int b)
+    {
+        return a+b;
+    }
 }

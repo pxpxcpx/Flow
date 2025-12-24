@@ -3,12 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!--<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\sdk\Flow.SDK.Plugins\Flow.SDK.Plugins.csproj" />
+    <ProjectReference Include="..\..\src\Flow.Shared\Flow.Shared.csproj" />
+    <ProjectReference Include="..\..\sdk\Flow.SDK.Plugins.Generators\Flow.SDK.Plugins.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,6 @@
-using Flow.Tests.FeasibilityTest.StaticNodeV1;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Flow.Tests.Feasibility.StaticNodeV1;
 
 [TestClass]
 public class StaticNodeV1Test
