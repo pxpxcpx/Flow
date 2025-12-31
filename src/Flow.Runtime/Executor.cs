@@ -24,6 +24,8 @@ public class Executor
         Script = script ?? throw new ArgumentNullException(nameof(script));
     }
 
+    #region Execution
+    
     /// <summary>
     /// Execute the script.
     /// </summary>
@@ -58,10 +60,10 @@ public class Executor
             var nextIds = MoveNext(node);
             if (nextIds is null || nextIds.Length == 0) return;
         
-            // Get subsequent nodes and recursively invoke them.
+            // Get subsequent nodes and invoke them recursively.
             foreach (var nextId in nextIds)
             {
-                var next = nextId.GetNode(Script);
+                var next = Models.Script.GetNode(Script, nextId);
                 q.Enqueue(next);
             }
         }
@@ -93,10 +95,10 @@ public class Executor
             }
         }
         
-        var successful = true;
         // Attention:
         // If the same node implements both synchronous and asynchronous interfaces,
         // only the synchronous method will be executed.
+        var successful = true;
         switch (node)
         {
             // If possible, execute this method on the node.
@@ -159,11 +161,13 @@ public class Executor
         if (node is IControlStatement csn)
         {
             var i = csn.ReturnIndex;
-            return node.GetRuntimeGuid(Script) is not { } cid ? null : cid.GetNextProgressNodes(Script, i);
+            return Models.Script.GetRuntimeGuid(Script, node) is not { } cid ? null : Models.Script.GetNextProgressNodes(Script, cid, i);
         }
         
-        return node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
+        return Models.Script.GetRuntimeGuid(Script, node) is not { } id ? null : Models.Script.GetNextProgressNodes(Script, id);
     }
+    
+    #endregion
 
     #region Variable Utils
     
@@ -174,13 +178,13 @@ public class Executor
     /// <returns></returns>
     private bool PassResults(INode node)
     {
-        if (node.GetRuntimeGuid(Script) is not { } rt) return false;
-        if (rt.GetVariableTarget(Script) is not { } targets) return false;
+        if (Models.Script.GetRuntimeGuid(Script, node) is not { } rt) return false;
+        if (Models.Script.GetVariableTarget(Script, rt) is not { } targets) return false;
 
         var succeed = true;
         foreach (var p in targets)
         {
-            var targetNode = p.Node.GetNode(Script);
+            var targetNode = Models.Script.GetNode(Script, p.Node);
             var value = node.GetOutput(p.Index);
             if (!targetNode.Assign(p.Index, value))
             {
@@ -200,13 +204,13 @@ public class Executor
     /// <returns></returns>
     private bool TryPassValueFromSource(INode node)
     {
-        if (node.GetRuntimeGuid(Script) is not { } rt) return false;
-        if (rt.GetVariableSource(Script) is not { } sources) return false;
+        if (Models.Script.GetRuntimeGuid(Script, node) is not { } rt) return false;
+        if (Models.Script.GetVariableSource(Script, rt) is not { } sources) return false;
 
         var succeed = true;
         foreach (var p in sources)
         {
-            var targetNode = p.Node.GetNode(Script);
+            var targetNode = Models.Script.GetNode(Script, p.Node);
             var value = node.GetOutput(p.Index);
             if (!targetNode.Assign(p.Index, value))
                 succeed = false;
@@ -223,8 +227,8 @@ public class Executor
     /// <returns></returns>
     private bool TryPassContextToNode(INode node)
     {
-        if (node.GetRuntimeGuid(Script) is not { } rt) return false;
-        if (rt.GetRelatedContext(Script) is not { } rc) return false;
+        if (Models.Script.GetRuntimeGuid(Script, node) is not { } rt) return false;
+        if (Models.Script.GetRelatedContext(Script, rt) is not { } rc) return false;
 
         try
         {
