@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Flow.Runtime.Utils;
-using Flow.Runtime.Abstractions;
 using Flow.Runtime.ContextManager;
+using Flow.Runtime.Models;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Results;
@@ -14,16 +14,18 @@ public class Executor
 
     private ContextManager<Guid> _contextManager;
 
-    public IScript Script { get; set; }
+    public Script Script { get; set; }
 
     public Result? Result { get; private set; }
 
-    public Executor(IScript script, ContextManager<Guid>? contextManager = null)
+    public Executor(Script script, ContextManager<Guid>? contextManager = null)
     {
         _contextManager = contextManager ?? new ContextManager<Guid>();
         Script = script ?? throw new ArgumentNullException(nameof(script));
     }
 
+    #region Execution
+    
     /// <summary>
     /// Execute the script.
     /// </summary>
@@ -58,10 +60,10 @@ public class Executor
             var nextIds = MoveNext(node);
             if (nextIds is null || nextIds.Length == 0) return;
         
-            // Get subsequent nodes and recursively invoke them.
+            // Get subsequent nodes and invoke them recursively.
             foreach (var nextId in nextIds)
             {
-                var next = nextId.GetNode(Script);
+                var next = Script.GetNode(nextId);
                 q.Enqueue(next);
             }
         }
@@ -93,10 +95,10 @@ public class Executor
             }
         }
         
-        var successful = true;
         // Attention:
         // If the same node implements both synchronous and asynchronous interfaces,
         // only the synchronous method will be executed.
+        var successful = true;
         switch (node)
         {
             // If possible, execute this method on the node.
@@ -159,11 +161,13 @@ public class Executor
         if (node is IControlStatement csn)
         {
             var i = csn.ReturnIndex;
-            return node.GetRuntimeGuid(Script) is not { } cid ? null : cid.GetNextProgressNodes(Script, i);
+            return Script.GetRuntimeGuid(node) is not { } cid ? null : Script.GetNextProgressNodes(cid, i);
         }
         
-        return node.GetRuntimeGuid(Script) is not { } id ? null : id.GetNextProgressNodes(Script);
+        return Script.GetRuntimeGuid(node) is not { } id ? null : Script.GetNextProgressNodes(id);
     }
+    
+    #endregion
 
     #region Variable Utils
     
@@ -174,13 +178,13 @@ public class Executor
     /// <returns></returns>
     private bool PassResults(INode node)
     {
-        if (node.GetRuntimeGuid(Script) is not { } rt) return false;
-        if (rt.GetVariableTarget(Script) is not { } targets) return false;
+        if (Script.GetRuntimeGuid(node) is not { } rt) return false;
+        if (Script.GetVariableTarget(rt) is not { } targets) return false;
 
         var succeed = true;
         foreach (var p in targets)
         {
-            var targetNode = p.Node.GetNode(Script);
+            var targetNode = Script.GetNode(p.Node);
             var value = node.GetOutput(p.Index);
             if (!targetNode.Assign(p.Index, value))
             {
@@ -200,13 +204,13 @@ public class Executor
     /// <returns></returns>
     private bool TryPassValueFromSource(INode node)
     {
-        if (node.GetRuntimeGuid(Script) is not { } rt) return false;
-        if (rt.GetVariableSource(Script) is not { } sources) return false;
+        if (Script.GetRuntimeGuid(node) is not { } rt) return false;
+        if (Script.GetVariableSource(rt) is not { } sources) return false;
 
         var succeed = true;
         foreach (var p in sources)
         {
-            var targetNode = p.Node.GetNode(Script);
+            var targetNode = Script.GetNode(p.Node);
             var value = node.GetOutput(p.Index);
             if (!targetNode.Assign(p.Index, value))
                 succeed = false;
@@ -223,8 +227,8 @@ public class Executor
     /// <returns></returns>
     private bool TryPassContextToNode(INode node)
     {
-        if (node.GetRuntimeGuid(Script) is not { } rt) return false;
-        if (rt.GetRelatedContext(Script) is not { } rc) return false;
+        if (Script.GetRuntimeGuid(node) is not { } rt) return false;
+        if (Script.GetRelatedContext(rt) is not { } rc) return false;
 
         try
         {

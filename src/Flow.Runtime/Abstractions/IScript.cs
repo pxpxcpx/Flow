@@ -39,7 +39,7 @@ public interface IScript
     /// <summary>
     /// Collection of process controlling connections in the script
     /// </summary>
-    List<IProcessConnection> ProcessConnection { get; set; }
+    List<IProcessConnection> ProcessConnections { get; set; }
 
     /// <summary>
     /// Collection of variable connections in the script
