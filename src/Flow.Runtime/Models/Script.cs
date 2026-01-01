@@ -8,7 +8,9 @@ namespace Flow.Runtime.Models;
 public class Script : IScript, IDisposable
 {
     private readonly Dictionary<Guid, INode> _nodeLookup = new();
-    
+
+    private bool _disposed;
+
     /// <inheritdoc />
     public Guid RuntimeId { get; init; } = Guid.NewGuid();
 
@@ -17,7 +19,7 @@ public class Script : IScript, IDisposable
 
     /// <inheritdoc />
     public INode? Entry { get; set; }
-    
+
     /// <inheritdoc />
     public List<INode> Nodes { get; } = new();
 
@@ -35,11 +37,12 @@ public class Script : IScript, IDisposable
 
     public void InitializeGraph()
     {
+        Entry = Nodes.FirstOrDefault();
         throw new NotImplementedException();
     }
 
     #region CRUD
-    
+
     #region Dependency
 
     public bool AddDependency()
@@ -48,24 +51,27 @@ public class Script : IScript, IDisposable
     }
 
     #endregion
-    
+
     #region Node
-    
+
     /// <summary>
     /// Add node to the script.
     /// </summary>
     /// <param name="node"></param>
-    public void AddNode(INode node) 
-        => Nodes.Add(node);
-    
+    public void AddNode(INode node)
+    {
+        Nodes.Add(node);
+        _nodeLookup.Add(node.RuntimeId, node);
+    }
+
     /// <summary>
     /// Get the node in its script by its GUID.
     /// </summary>
     /// <param name="guid">Runtime GUID of the node.</param>
     /// <returns></returns>
-    public INode GetNode(Guid guid)
-        => Nodes.FirstOrDefault(n => n.RuntimeId == guid) ?? throw new KeyNotFoundException();
-    
+    public INode GetNode(Guid guid) 
+        => !_nodeLookup.TryGetValue(guid, out var node) ? throw new KeyNotFoundException() : node;
+
     /// <summary>
     /// Get the runtime GUID of the node.
     /// </summary>
@@ -75,28 +81,37 @@ public class Script : IScript, IDisposable
     {
         if (Nodes.Count == 0 || Nodes.All(n => n.RuntimeId != node.RuntimeId))
             return null;
-        
-        return Nodes.FirstOrDefault(n => n.RuntimeId == node.RuntimeId)?.RuntimeId ;
+
+        return Nodes.FirstOrDefault(n => n.RuntimeId == node.RuntimeId)?.RuntimeId;
     }
 
     public bool RemoveNode(INode node)
-        => Nodes.Remove(node);
+    {
+        if (!_nodeLookup.Remove(node.RuntimeId))
+            return false;
 
-    public bool IsNodeExists(INode node) 
-        => Nodes.Any(n => n.RuntimeId == node.RuntimeId);
-    
-    public bool IsNodeExists(Guid nodeId)
-        => Nodes.Any(n => n.RuntimeId == nodeId);
+        ProcessConnections.RemoveAll(pc => pc.From.NodeId == node.RuntimeId || pc.To.NodeId == node.RuntimeId);
+        VariableConnections.RemoveAll(vc => vc.From.NodeId == node.RuntimeId || vc.To.NodeId == node.RuntimeId);
+        InstanceConnections.RemoveAll(ic => ic.Node.NodeId == node.RuntimeId);
+
+        return Nodes.Remove(node);
+    }
+
+    public bool ContainsNode(INode node)
+        => ContainsNode(node.RuntimeId);
+
+    public bool ContainsNode(Guid nodeId)
+        => _nodeLookup.ContainsKey(nodeId);
 
     #endregion
-    
+
     #region Process Connections
-    
+
     public bool AddProcessConnection(IProcessConnection connection)
     {
-        if (!IsNodeExists(connection.From.NodeId) || !IsNodeExists(connection.To.NodeId))
+        if (!ContainsNode(connection.From.NodeId) || !ContainsNode(connection.To.NodeId))
             return false;
-        
+
         ProcessConnections.Add(connection);
         return true;
     }
@@ -105,48 +120,48 @@ public class Script : IScript, IDisposable
         => ProcessConnections.Remove(connection);
 
     #endregion
-    
+
     #region Variable Connections
-    
+
     public bool AddVariableConnection(IVariableConnection connection)
     {
-        if (!IsNodeExists(connection.From.Node) || !IsNodeExists(connection.To.Node))
+        if (!ContainsNode(connection.From.NodeId) || !ContainsNode(connection.To.NodeId))
             return false;
-        
+
         VariableConnections.Add(connection);
         return true;
     }
-    
+
     public bool RemoveVariableConnection(IVariableConnection connection)
         => VariableConnections.Remove(connection);
 
     #endregion
-    
+
     #region Instance Connections
-    
+
     public bool AddInstanceConnection(InstanceConnection connection)
     {
-        if (!IsNodeExists(connection.Node.NodeId) || !IsNodeExists(connection.Node.NodeId))
+        if (!ContainsNode(connection.Node.NodeId) || !ContainsNode(connection.Node.NodeId))
             return false;
-        
+
         InstanceConnections.Add(connection);
         return true;
     }
 
     public bool RemoveInstanceConnection(InstanceConnection connection)
         => InstanceConnections.Remove(connection);
-    
+
     #endregion
-    
+
     #region Context
-    
+
     public ContextItem? GetContextItem(Guid id)
         => ContextManager.TryFindContextItem(id);
-    
+
     #endregion
-    
+
     #endregion
-    
+
     /// <summary>
     /// Get the previous node in the process.
     /// </summary>
@@ -173,7 +188,7 @@ public class Script : IScript, IDisposable
     {
         if (Nodes.Count == 0 || Nodes.All(n => n.RuntimeId != currentRuntimeId))
             return null;
-        
+
         return ProcessConnections
             .Where(x => x.From.NodeId == currentRuntimeId && x.From.Index == index)
             .Select(x => x.To.NodeId)
@@ -191,7 +206,7 @@ public class Script : IScript, IDisposable
             return null;
 
         return VariableConnections
-            .Where(x => x.From.Node == currentRuntimeId)
+            .Where(x => x.From.NodeId == currentRuntimeId)
             .Select(x => x.To)
             .ToArray();
     }
@@ -207,7 +222,7 @@ public class Script : IScript, IDisposable
             return null;
 
         return VariableConnections
-            .Where(x => x.To.Node == currentRuntimeId)
+            .Where(x => x.To.NodeId == currentRuntimeId)
             .Select(x => x.From)
             .ToArray();
     }
@@ -216,15 +231,15 @@ public class Script : IScript, IDisposable
     /// Get the entry node of the 
     /// </summary>
     /// <returns></returns>
-    public INode? FindEntry()    
+    public INode? FindEntry()
     {
         var dict = new Dictionary<Guid, int>();
         foreach (var n in Nodes)
             dict.Add(n.RuntimeId, 0);
-        
+
         foreach (var c in ProcessConnections)
             dict[c.To.NodeId]++;
-        
+
         var entryRtId = dict.FirstOrDefault(x => x.Value == 0).Key;
         return GetNode(entryRtId);
     }
@@ -244,15 +259,36 @@ public class Script : IScript, IDisposable
     {
         if (ContextManager.ContainsKey(contextId))
             return null;
-        
+
         return InstanceConnections
-            .Where(x=>x.InstanceId == contextId)
+            .Where(x => x.InstanceId == contextId)
             .Select(x => x.InstanceId)
             .ToArray();
     }
 
     public void Dispose()
     {
-        // TODO 在此释放托管资源
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        if (disposing)
+        {
+            // Managed
+            ContextManager.Dispose();
+
+            // Node (if implements IDisposable)
+            foreach (var node in Nodes.OfType<IDisposable>())
+            {
+                node.Dispose();
+            }
+        }
+
+        _disposed = true;
     }
 }

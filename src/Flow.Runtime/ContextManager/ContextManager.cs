@@ -2,7 +2,7 @@
 
 namespace Flow.Runtime.ContextManager;
 
-public class ContextManager<TKey> where TKey : IEquatable<TKey>
+public class ContextManager<TKey>: IDisposable where TKey : IEquatable<TKey>
 {
     /// <summary>
     /// A dictionary that holds context objects categorized by context names and their types.
@@ -143,5 +143,10 @@ public class ContextManager<TKey> where TKey : IEquatable<TKey>
             return true;
         }
         return false;
+    }
+
+    public void Dispose()
+    {
+        // TODO 在此释放托管资源
     }
 }

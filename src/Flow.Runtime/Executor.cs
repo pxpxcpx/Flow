@@ -184,7 +184,7 @@ public class Executor
         var succeed = true;
         foreach (var p in targets)
         {
-            var targetNode = Script.GetNode(p.Node);
+            var targetNode = Script.GetNode(p.NodeId);
             var value = node.GetOutput(p.Index);
             if (!targetNode.Assign(p.Index, value))
             {
@@ -210,7 +210,7 @@ public class Executor
         var succeed = true;
         foreach (var p in sources)
         {
-            var targetNode = Script.GetNode(p.Node);
+            var targetNode = Script.GetNode(p.NodeId);
             var value = node.GetOutput(p.Index);
             if (!targetNode.Assign(p.Index, value))
                 succeed = false;
