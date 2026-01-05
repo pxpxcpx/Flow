@@ -33,7 +33,7 @@ public interface IScript
     /// Contains nodes and their GUID.
     /// The internal graph of the script.
     /// </summary>
-    List<INode> Nodes { get; }
+    Dictionary<Guid, INode> Nodes { get; }
 
     // TODO: Standalone graph data structure
     /// <summary>

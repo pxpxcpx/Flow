@@ -5,10 +5,11 @@ using Flow.Shared.Metadata;
 
 namespace Flow.Runtime.Models;
 
+/// <summary>
+/// Store executable script.
+/// </summary>
 public class Script : IScript, IDisposable
 {
-    private readonly Dictionary<Guid, INode> _nodeLookup = new();
-
     private bool _disposed;
 
     /// <inheritdoc />
@@ -21,7 +22,7 @@ public class Script : IScript, IDisposable
     public INode? Entry { get; set; }
 
     /// <inheritdoc />
-    public List<INode> Nodes { get; } = new();
+    public Dictionary<Guid, INode> Nodes { get; } = new();
 
     /// <inheritdoc />
     public List<IProcessConnection> ProcessConnections { get; set; } = new();
@@ -37,7 +38,7 @@ public class Script : IScript, IDisposable
 
     public void InitializeGraph()
     {
-        Entry = Nodes.FirstOrDefault();
+        // Entry = Nodes.FirstOrDefault();
         throw new NotImplementedException();
     }
 
@@ -60,8 +61,7 @@ public class Script : IScript, IDisposable
     /// <param name="node"></param>
     public void AddNode(INode node)
     {
-        Nodes.Add(node);
-        _nodeLookup.Add(node.RuntimeId, node);
+        Nodes.Add(node.RuntimeId, node);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public class Script : IScript, IDisposable
     /// <param name="guid">Runtime GUID of the node.</param>
     /// <returns></returns>
     public INode GetNode(Guid guid) 
-        => !_nodeLookup.TryGetValue(guid, out var node) ? throw new KeyNotFoundException() : node;
+        => !Nodes.TryGetValue(guid, out var node) ? throw new KeyNotFoundException() : node;
 
     /// <summary>
     /// Get the runtime GUID of the node.
@@ -79,29 +79,34 @@ public class Script : IScript, IDisposable
     /// <returns></returns>
     public Guid? GetRuntimeGuid(INode node)
     {
-        if (Nodes.Count == 0 || Nodes.All(n => n.RuntimeId != node.RuntimeId))
+        if (Nodes.Count == 0 || Nodes.All(n => n.Key != node.RuntimeId))
             return null;
 
-        return Nodes.FirstOrDefault(n => n.RuntimeId == node.RuntimeId)?.RuntimeId;
+        return Nodes.FirstOrDefault(n => n.Key == node.RuntimeId).Key;
     }
 
+    /// <summary>
+    /// Remove the node and its connections safely.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public bool RemoveNode(INode node)
     {
-        if (!_nodeLookup.Remove(node.RuntimeId))
+        if (!Nodes.Remove(node.RuntimeId))
             return false;
 
         ProcessConnections.RemoveAll(pc => pc.From.NodeId == node.RuntimeId || pc.To.NodeId == node.RuntimeId);
         VariableConnections.RemoveAll(vc => vc.From.NodeId == node.RuntimeId || vc.To.NodeId == node.RuntimeId);
         InstanceConnections.RemoveAll(ic => ic.Node.NodeId == node.RuntimeId);
 
-        return Nodes.Remove(node);
+        return Nodes.Remove(node.RuntimeId);
     }
 
     public bool ContainsNode(INode node)
         => ContainsNode(node.RuntimeId);
 
     public bool ContainsNode(Guid nodeId)
-        => _nodeLookup.ContainsKey(nodeId);
+        => Nodes.ContainsKey(nodeId);
 
     #endregion
 
@@ -169,7 +174,7 @@ public class Script : IScript, IDisposable
     /// <returns></returns>
     public Guid[]? GetPreviousProgressNodes(Guid currentRuntimeId)
     {
-        if (Nodes.Count == 0 || Nodes.All(n => n.RuntimeId != currentRuntimeId))
+        if (Nodes.Count == 0 || Nodes.All(n => n.Key != currentRuntimeId))
             return null;
 
         return ProcessConnections
@@ -186,7 +191,7 @@ public class Script : IScript, IDisposable
     /// <returns></returns>
     public Guid[]? GetNextProgressNodes(Guid currentRuntimeId, int? index = 0)
     {
-        if (Nodes.Count == 0 || Nodes.All(n => n.RuntimeId != currentRuntimeId))
+        if (Nodes.Count == 0 || Nodes.All(n => n.Key != currentRuntimeId))
             return null;
 
         return ProcessConnections
@@ -202,7 +207,7 @@ public class Script : IScript, IDisposable
     /// <returns><see cref="VariablePosition"/></returns>
     public VariablePosition[]? GetVariableTarget(Guid currentRuntimeId)
     {
-        if (Nodes.Count == 0 || Nodes.All(n => n.RuntimeId != currentRuntimeId))
+        if (Nodes.Count == 0 || Nodes.All(n => n.Key != currentRuntimeId))
             return null;
 
         return VariableConnections
@@ -218,7 +223,7 @@ public class Script : IScript, IDisposable
     /// <returns></returns>
     public VariablePosition[]? GetVariableSource(Guid currentRuntimeId)
     {
-        if (Nodes.Count == 0 || Nodes.All(n => n.RuntimeId != currentRuntimeId))
+        if (Nodes.Count == 0 || Nodes.All(n => n.Key != currentRuntimeId))
             return null;
 
         return VariableConnections
@@ -235,7 +240,7 @@ public class Script : IScript, IDisposable
     {
         var dict = new Dictionary<Guid, int>();
         foreach (var n in Nodes)
-            dict.Add(n.RuntimeId, 0);
+            dict.Add(n.Key, 0);
 
         foreach (var c in ProcessConnections)
             dict[c.To.NodeId]++;
@@ -246,7 +251,7 @@ public class Script : IScript, IDisposable
 
     public Guid? GetRelatedContext(Guid contextRequiredNodeId)
     {
-        if (Nodes.Count == 0 || Nodes.All(n => n.RuntimeId != contextRequiredNodeId))
+        if (Nodes.Count == 0 || Nodes.All(n => n.Key != contextRequiredNodeId))
             return null;
 
         return InstanceConnections
@@ -283,9 +288,9 @@ public class Script : IScript, IDisposable
             ContextManager.Dispose();
 
             // Node (if implements IDisposable)
-            foreach (var node in Nodes.OfType<IDisposable>())
+            foreach (var node in Nodes.OfType<KeyValuePair<Guid, IDisposable>>())
             {
-                node.Dispose();
+                node.Value.Dispose();
             }
         }
 
