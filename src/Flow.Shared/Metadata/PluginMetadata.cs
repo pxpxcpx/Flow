@@ -1,4 +1,5 @@
 ﻿using Flow.Shared.Abstractions;
+using Flow.Shared.Models;
 
 namespace Flow.Shared.Metadata;
 
@@ -71,7 +72,7 @@ public record PluginMetadata : IRecognizable
     /// <summary>
     /// Plugins that the plugin required and depends on.
     /// </summary>
-    public required PluginMetadata[] Dependencies { get; set; }
+    public required Dependency[] Dependencies { get; set; }
     
     /// <summary>
     /// Dictionary to pair a node and its GUID.

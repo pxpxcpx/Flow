@@ -1,6 +1,7 @@
 ﻿using Flow.Runtime.ContextManager;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Metadata;
+using Flow.Shared.Models;
 
 namespace Flow.Runtime.Abstractions;
 
@@ -21,7 +22,7 @@ public interface IScript
     /// <summary>
     /// Plugins that the script depends on.
     /// </summary>
-    PluginMetadata[] Dependencies { get; init; }
+    Dependency[] Dependencies { get; init; }
     
     /// <summary>
     /// Entry point of the script, which is the starting node.
