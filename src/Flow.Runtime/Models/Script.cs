@@ -1,7 +1,7 @@
 ﻿using Flow.Runtime.Abstractions;
 using Flow.Runtime.ContextManager;
 using Flow.Shared.Abstractions;
-using Flow.Shared.Metadata;
+using Flow.Shared.Models;
 
 namespace Flow.Runtime.Models;
 
@@ -16,7 +16,7 @@ public class Script : IScript, IDisposable
     public Guid RuntimeId { get; init; } = Guid.NewGuid();
 
     /// <inheritdoc />
-    public PluginMetadata[] Dependencies { get; init; } = Array.Empty<PluginMetadata>();
+    public Dependency[] Dependencies { get; init; } = Array.Empty<Dependency>();
 
     /// <inheritdoc />
     public INode? Entry { get; set; }
