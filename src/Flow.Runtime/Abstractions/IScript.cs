@@ -52,11 +52,6 @@ public interface IScript
     /// and <see cref="IInstanceRequired"/> in the script.
     /// </summary>
     List<InstanceConnection> InstanceConnections { get; set; }
-    
-    /// <summary>
-    /// Manager of the instances in the script.
-    /// </summary>
-    ContextManager<Guid> ContextManager { get; set; }
 
     /// <summary>
     /// Initialize the graph.

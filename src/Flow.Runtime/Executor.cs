@@ -232,7 +232,7 @@ public class Executor
 
         try
         {
-            ((IInstanceRequired)node).Instance = Script.ContextManager.TryFindContextObject(rc);
+            ((IInstanceRequired)node).Instance = _contextManager.TryFindContextObject(rc);
             return true;
         }
         catch (Exception ex)
@@ -247,6 +247,7 @@ public class Executor
 
     private void Pause()
     {
+        
         throw new NotImplementedException();
     }
 

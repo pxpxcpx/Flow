@@ -33,9 +33,6 @@ public class Script : IScript, IDisposable
     /// <inheritdoc />
     public List<InstanceConnection> InstanceConnections { get; set; } = new();
 
-    /// <inheritdoc />
-    public ContextManager<Guid> ContextManager { get; set; } = new();
-
     public void InitializeGraph()
     {
         // Entry = Nodes.FirstOrDefault();
@@ -158,13 +155,6 @@ public class Script : IScript, IDisposable
 
     #endregion
 
-    #region Context
-
-    public ContextItem? GetContextItem(Guid id)
-        => ContextManager.TryFindContextItem(id);
-
-    #endregion
-
     #endregion
 
     /// <summary>
@@ -262,9 +252,6 @@ public class Script : IScript, IDisposable
 
     public Guid[]? GetRelatedNodes(Guid contextId)
     {
-        if (ContextManager.ContainsKey(contextId))
-            return null;
-
         return InstanceConnections
             .Where(x => x.InstanceId == contextId)
             .Select(x => x.InstanceId)
@@ -284,9 +271,6 @@ public class Script : IScript, IDisposable
 
         if (disposing)
         {
-            // Managed
-            ContextManager.Dispose();
-
             // Node (if implements IDisposable)
             foreach (var node in Nodes.OfType<KeyValuePair<Guid, IDisposable>>())
             {
