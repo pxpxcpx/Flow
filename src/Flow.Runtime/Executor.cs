@@ -12,9 +12,13 @@ public class Executor
 {
     private INode _current;
 
-    private ContextManager<Guid> _contextManager;
+    private readonly ContextManager<Guid> _contextManager;
 
+    private readonly Queue<INode>? _pendingNodes = new();
+    
     public Script Script { get; set; }
+
+    public ProcessorStatus Status { get; private set; }
 
     public Result? Result { get; private set; }
 
@@ -25,7 +29,7 @@ public class Executor
     }
 
     #region Execution
-    
+
     /// <summary>
     /// Execute the script.
     /// </summary>
@@ -44,27 +48,25 @@ public class Executor
     /// <param name="node"></param>
     private void ExecuteIteratively(INode node)
     {
-        // Process the entry.
         _current = node;
-        var q = new Queue<INode>();
-        q.Enqueue(node);
+        _pendingNodes?.Enqueue(node);
         ExecuteSingle(node);
         
-        while (q.Count > 0)
+        while (_pendingNodes is { Count: > 0 })
         {
-            var n = q.Dequeue();
+            var n = _pendingNodes.Dequeue();
             _current = n;
             ExecuteSingle(n);
-            
+
             // If the node does not have a subsequent node (or the executor reaches to the end), return.
             var nextIds = MoveNext(node);
             if (nextIds is null || nextIds.Length == 0) return;
-        
+
             // Get subsequent nodes and invoke them recursively.
             foreach (var nextId in nextIds)
             {
                 var next = Script.GetNode(nextId);
-                q.Enqueue(next);
+                _pendingNodes.Enqueue(next);
             }
         }
     }
@@ -78,7 +80,7 @@ public class Executor
         // If the node has unfilled values:
         if (node.GetUnfilledRequiredValues().Any())
         {
-            if (!TryPassValueFromSource(node))
+            if (!TryGetValueFromSource(node))
             {
                 node.MarkAs(NodeStatus.Waiting);
                 return;
@@ -94,11 +96,13 @@ public class Executor
                 return;
             }
         }
-        
+
+        var succeed = true;
+        node.Status |= NodeStatus.Running;
+
         // Attention:
         // If the same node implements both synchronous and asynchronous interfaces,
         // only the synchronous method will be executed.
-        var successful = true;
         switch (node)
         {
             // If possible, execute this method on the node.
@@ -112,6 +116,7 @@ public class Executor
                 {
                     OnError(ex);
                 }
+
                 break;
             }
 
@@ -121,18 +126,24 @@ public class Executor
                 aen.ExecuteAsync().Await(OnError);
                 break;
             }
-            
+
             default:
                 return;
         }
-        
-        if (successful) return;
-        PassResults(node);
+
+        if (succeed)
+        {
+            node.Status |= NodeStatus.Completed;
+            node.Status |= NodeStatus.Ready;
+        }
+
+        PassResults(node); 
         return;
 
         void OnError(Exception ex)
         {
-            successful = false;
+            succeed = false;
+            node.Status |= NodeStatus.Failed;
             var result = node.Result;
             Debug.WriteLine($"Exception detected: {ex.Message}, result: {result}");
         }
@@ -143,12 +154,12 @@ public class Executor
     /// marked as <see cref="NodeStatus.Waiting"/> after parameters have been passed.
     /// </summary>
     /// <param name="node"></param>
-    private void CallIfNodeIsWaiting(INode node)
+    private void TryEnqueueIfNodeIsWaiting(INode node)
     {
         if (node.Status != NodeStatus.Waiting)
             return;
-        
-        ExecuteSingle(node);
+
+        _pendingNodes?.Enqueue(node);
     }
 
     /// <summary>
@@ -163,14 +174,14 @@ public class Executor
             var i = csn.ReturnIndex;
             return Script.GetRuntimeGuid(node) is not { } cid ? null : Script.GetNextProgressNodes(cid, i);
         }
-        
+
         return Script.GetRuntimeGuid(node) is not { } id ? null : Script.GetNextProgressNodes(id);
     }
-    
+
     #endregion
 
     #region Variable Utils
-    
+
     /// <summary>
     /// Get results from a node, and pass them according to connections. (Actively pass values)
     /// </summary>
@@ -191,7 +202,7 @@ public class Executor
                 succeed = false;
                 continue;
             }
-            CallIfNodeIsWaiting(targetNode);
+            TryEnqueueIfNodeIsWaiting(targetNode);
         }
 
         return succeed;
@@ -202,7 +213,7 @@ public class Executor
     /// </summary>
     /// <param name="node">Value source node</param>
     /// <returns></returns>
-    private bool TryPassValueFromSource(INode node)
+    private bool TryGetValueFromSource(INode node)
     {
         if (Script.GetRuntimeGuid(node) is not { } rt) return false;
         if (Script.GetVariableSource(rt) is not { } sources) return false;
@@ -215,7 +226,7 @@ public class Executor
             if (!targetNode.Assign(p.Index, value))
                 succeed = false;
         }
-        
+
         return succeed;
     }
 
@@ -240,14 +251,13 @@ public class Executor
             return false;
         }
     }
-    
+
     #endregion
 
     #region Process Control
 
     private void Pause()
     {
-        
         throw new NotImplementedException();
     }
 
