@@ -1,4 +1,4 @@
-﻿namespace Flow.Automation.Messaging.Records;
+﻿namespace Flow.Automation.Messaging;
 
 /// <summary>
 /// Represents a container for an event's sender and arguments.

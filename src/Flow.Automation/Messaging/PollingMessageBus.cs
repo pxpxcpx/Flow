@@ -1,16 +1,15 @@
-﻿using Flow.Automation.Messaging.Records;
-using Flow.Automation.Messaging.Trigger;
+﻿using Flow.Automation.Trigger;
 using Timer = System.Timers.Timer;
 
 namespace Flow.Automation.Messaging;
 
 /// <summary>
-/// Poller based on a timer that checks a list of triggers at specified intervals
+/// PollingMessageBus based on a timer that checks a list of triggers at specified intervals
 /// and publishes event messages when triggers are activated.
 /// </summary>
-public class Poller : MessageBus<EventMessage>
+public class PollingMessageBus : MessageBus<EventMessage>
 {
-    private readonly List<ITrigger<EventArgs>> _triggers = new();
+    private readonly List<IPollingTrigger<EventArgs>> _triggers = new();
 
     private readonly Timer _timer;
     
@@ -29,7 +28,7 @@ public class Poller : MessageBus<EventMessage>
     /// </summary>
     public bool ReportEveryTime { get; init; } = false;
 
-    public Poller(int interval, List<ITrigger<EventArgs>>? triggers = null)
+    public PollingMessageBus(int interval, List<IPollingTrigger<EventArgs>>? triggers = null)
     {
         if (triggers != null)
             _triggers = triggers;
@@ -76,12 +75,12 @@ public class Poller : MessageBus<EventMessage>
         => _timer.Stop();
     
     /// <inheritdoc cref="List{T}.Add"/>
-    public void AddTrigger(ITrigger<EventArgs> trigger)
-        => _triggers.Add(trigger);
+    public void AddTrigger(IPollingTrigger<EventArgs> pollerTrigger)
+        => _triggers.Add(pollerTrigger);
     
     /// <inheritdoc cref="List{T}.Remove"/>
-    public void RemoveTrigger(ITrigger<EventArgs> trigger)
-        => _triggers.Remove(trigger);
+    public void RemoveTrigger(IPollingTrigger<EventArgs> pollerTrigger)
+        => _triggers.Remove(pollerTrigger);
     
     /// <inheritdoc cref="List{T}.Clear"/>
     public void ClearTriggers()
