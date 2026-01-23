@@ -8,14 +8,14 @@ using Flow.Shared.Results;
 
 namespace Flow.Runtime;
 
-public class Executor
+public class Executor : IDisposable
 {
-    private INode _current;
+    private INode? _current;
 
     private readonly ContextManager<Guid> _contextManager;
 
-    private readonly Queue<INode>? _pendingNodes = new();
-    
+    private readonly Queue<INode>? _pendingNodes;
+
     public Script Script { get; set; }
 
     public ProcessorStatus Status { get; private set; }
@@ -24,6 +24,7 @@ public class Executor
 
     public Executor(Script script, ContextManager<Guid>? contextManager = null)
     {
+        _pendingNodes = new Queue<INode>();
         _contextManager = contextManager ?? new ContextManager<Guid>();
         Script = script ?? throw new ArgumentNullException(nameof(script));
     }
@@ -35,25 +36,24 @@ public class Executor
     /// </summary>
     public void Execute()
     {
-        // If the entry is null (or simply, the script is empty), return.
-        if (Script.Entry is null)
-            return;
-
-        ExecuteIteratively(Script.Entry);
+        if (Script.Entry is null) return;
+        Execute(Script.Entry);
     }
 
     /// <summary>
-    /// Invoke a node and its subsequent nodes recursively.
+    /// Invoke a node and its subsequent nodes iteratively.
     /// </summary>
     /// <param name="node"></param>
-    private void ExecuteIteratively(INode node)
+    private void Execute(INode node)
     {
         _current = node;
         _pendingNodes?.Enqueue(node);
-        ExecuteSingle(node);
-        
+
         while (_pendingNodes is { Count: > 0 })
         {
+            if (Status.HasFlag(ProcessorStatus.Paused) || Status.HasFlag(ProcessorStatus.Cancelled))
+                return;
+
             var n = _pendingNodes.Dequeue();
             _current = n;
             ExecuteSingle(n);
@@ -62,7 +62,7 @@ public class Executor
             var nextIds = MoveNext(node);
             if (nextIds is null || nextIds.Length == 0) return;
 
-            // Get subsequent nodes and invoke them recursively.
+            // Get subsequent nodes and invoke them iteratively.
             foreach (var nextId in nextIds)
             {
                 var next = Script.GetNode(nextId);
@@ -137,7 +137,9 @@ public class Executor
             node.Status |= NodeStatus.Ready;
         }
 
-        PassResults(node); 
+        if (!PassResults(node))
+            Result = new Result(false, false, null, $"Value transfer error occurred on node: {node.RuntimeId}");
+
         return;
 
         void OnError(Exception ex)
@@ -202,6 +204,7 @@ public class Executor
                 succeed = false;
                 continue;
             }
+
             TryEnqueueIfNodeIsWaiting(targetNode);
         }
 
@@ -246,7 +249,7 @@ public class Executor
             ((IInstanceRequired)node).Instance = _contextManager.TryFindContextObject(rc);
             return true;
         }
-        catch (Exception ex)
+        catch
         {
             return false;
         }
@@ -258,18 +261,33 @@ public class Executor
 
     private void Pause()
     {
-        throw new NotImplementedException();
+        Status |= ProcessorStatus.Paused;
     }
 
     private void Resume()
     {
-        throw new NotImplementedException();
+        Status |= ProcessorStatus.Running;
+        if (_current is null)
+        {
+            Execute();
+            return;
+        }
+
+        Execute(_current);
     }
 
     private void Stop()
     {
-        throw new NotImplementedException();
+        Status |= ProcessorStatus.Cancelled;
+        Dispose();
     }
 
     #endregion
+
+    public void Dispose()
+    {
+        _contextManager.Dispose();
+        Script.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }

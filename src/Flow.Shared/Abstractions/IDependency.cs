@@ -1,5 +1,4 @@
-﻿using System;
-using Flow.Shared.Enums;
+﻿using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 
 namespace Flow.Shared.Abstractions;
