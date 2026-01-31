@@ -1,4 +1,4 @@
-﻿using Flow.Automation.Trigger;
+﻿using Flow.Automation.Triggers;
 using Timer = System.Timers.Timer;
 
 namespace Flow.Automation.Messaging;

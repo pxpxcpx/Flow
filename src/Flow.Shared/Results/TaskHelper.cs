@@ -1,4 +1,4 @@
-﻿namespace Flow.Runtime.Utils;
+﻿namespace Flow.Shared.Results;
 
 /// <summary>
 /// Extension/static methods for <see cref="Task"/>.
