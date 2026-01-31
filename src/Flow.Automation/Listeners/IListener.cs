@@ -2,7 +2,7 @@
 using Flow.Automation.Messaging;
 using Flow.Shared.Enums;
 
-namespace Flow.Automation.Triggers;
+namespace Flow.Automation.Listeners;
 
 public interface IListener
 {

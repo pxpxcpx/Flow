@@ -1,5 +1,6 @@
-﻿using Flow.Automation.Messaging;
-using Flow.Automation.Triggers;
+﻿using Flow.Automation.Listeners;
+using Flow.Automation.Messaging;
+using Flow.Automation.Listeners;
 using Flow.Shared.Results;
 using Microsoft.Extensions.Hosting;
 
@@ -80,6 +81,5 @@ public class ListenerService : BackgroundService, IListenerService
         _router.Dispose();
         base.Dispose();
         GC.SuppressFinalize(this);
-        throw new NotImplementedException();
     }
 }
