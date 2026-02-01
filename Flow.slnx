@@ -1,4 +1,5 @@
 <Solution>
+  <Folder Name="/Clients/" />
   <Folder Name="/Plugins/">
     <Project Path="plugins/Flow.BuiltIn.ControlStatements/Flow.BuiltIn.ControlStatements.csproj" />
     <Project Path="plugins/Flow.BuiltIn.Nodes/Flow.BuiltIn.Nodes.csproj" />
