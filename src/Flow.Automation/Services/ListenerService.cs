@@ -1,6 +1,5 @@
 ﻿using Flow.Automation.Listeners;
 using Flow.Automation.Messaging;
-using Flow.Automation.Listeners;
 using Flow.Shared.Results;
 using Microsoft.Extensions.Hosting;
 

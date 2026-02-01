@@ -1,14 +1,14 @@
 ﻿using Flow.Automation.Decisioning.Abstractions;
 
-namespace Flow.Automation.Decisioning.Specifications;
+namespace Flow.Automation.Decisioning.Implementations;
 
 /// <summary>
-/// Used to calculate the results of two <see cref="ISpecification"/>
+/// Used to calculate the results of two <see cref="ICondition"/>
 /// </summary>
 /// <param name="a">Left param</param>
 /// <param name="b">Right param</param>
 /// <param name="operator"><see cref="LogicalOperator"/></param>
-public sealed class LogicalSpecification(ISpecification a, ISpecification b, LogicalOperator @operator) : ISpecification
+public sealed class LogicalCondition(ICondition a, ICondition b, LogicalOperator @operator) : ICondition
 {
     public bool Result => Evaluate(a, b, @operator);
 
@@ -43,12 +43,12 @@ public sealed class LogicalSpecification(ISpecification a, ISpecification b, Log
     }
     
     /// <summary>
-    /// Evaluate two <see cref="ISpecification"/> value with <see cref="LogicalOperator"/>.
+    /// Evaluate two <see cref="ICondition"/> value with <see cref="LogicalOperator"/>.
     /// </summary>
     /// <param name="a">Value a</param>
     /// <param name="b">Value b</param>
     /// <param name="op">Operator between a and b.</param>
     /// <returns>Result of evaluation, boolean.</returns>
-    public static bool Evaluate(ISpecification a, ISpecification b, LogicalOperator op)
+    public static bool Evaluate(ICondition a, ICondition b, LogicalOperator op)
         => Evaluate(a.Result, b.Result, op);
 }

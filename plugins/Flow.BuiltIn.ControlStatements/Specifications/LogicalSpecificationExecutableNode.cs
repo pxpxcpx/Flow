@@ -1,5 +1,5 @@
 ﻿using Flow.Automation.Decisioning.Abstractions;
-using Flow.Automation.Decisioning.Specifications;
+using Flow.Automation.Decisioning.Implementations;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
@@ -84,7 +84,7 @@ public class LogicalSpecificationNode : IExecutableNode
         bool result;
         try
         {
-            result = LogicalSpecification.Evaluate(value1, value2, @operator);
+            result = LogicalCondition.Evaluate(value1, value2, @operator);
         }
         catch(Exception ex)
         {

@@ -8,7 +8,7 @@ public interface IListener
 {
     string Name { get; }
     
-    List<ISpecification> Specifications { get; }
+    List<ICondition> Conditions { get; }
     
     IObservable<EventMessage> EventStream { get; }
 

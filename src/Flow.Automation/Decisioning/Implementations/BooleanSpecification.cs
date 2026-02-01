@@ -7,29 +7,29 @@ namespace Flow.Automation.Decisioning.Specifications;
 /// </summary>
 public static class BooleanSpecification
 {
-    /// <inheritdoc cref="TrueSpecification"/>
-    public static readonly TrueSpecification True = new();
+    /// <inheritdoc cref="TrueCondition"/>
+    public static readonly TrueCondition True = new();
     
-    /// <inheritdoc cref="FalseSpecification"/>
-    public static readonly FalseSpecification False = new();
+    /// <inheritdoc cref="FalseCondition"/>
+    public static readonly FalseCondition False = new();
     
     /// <summary>
     /// Always returns true.
     /// </summary>
-    public sealed class TrueSpecification : ISpecification
+    public sealed class TrueCondition : ICondition
     {
         public bool Result => true;
         
-        internal TrueSpecification() { }
+        internal TrueCondition() { }
     }
 
     /// <summary>
     /// Always returns false.
     /// </summary>
-    public sealed class FalseSpecification : ISpecification
+    public sealed class FalseCondition : ICondition
     {
         public bool Result => false;
         
-        internal FalseSpecification() { }
+        internal FalseCondition() { }
     }
 }

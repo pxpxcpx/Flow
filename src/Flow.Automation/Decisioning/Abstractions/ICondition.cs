@@ -4,7 +4,7 @@
 /// Used to form conditional groups and perform logical operations,
 /// only caring about the result.
 /// </summary>
-public interface ISpecification
+public interface ICondition
 {
     /// <summary>
     /// The result of the instance.
