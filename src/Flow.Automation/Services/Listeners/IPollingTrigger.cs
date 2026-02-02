@@ -1,6 +1,6 @@
 ﻿using Flow.Automation.Messaging;
 
-namespace Flow.Automation.Listeners;
+namespace Flow.Automation.Services.Listeners;
 
 /// <summary>
 /// A trigger that works with the <see cref="PollingMessageBus"/>.

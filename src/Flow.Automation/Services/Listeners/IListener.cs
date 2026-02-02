@@ -2,13 +2,13 @@
 using Flow.Automation.Messaging;
 using Flow.Shared.Enums;
 
-namespace Flow.Automation.Listeners;
+namespace Flow.Automation.Services.Listeners;
 
 public interface IListener
 {
     string Name { get; }
     
-    List<ICondition> Conditions { get; }
+    Dictionary<Guid, ICondition> Conditions { get; }
     
     IObservable<EventMessage> EventStream { get; }
 

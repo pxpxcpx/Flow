@@ -4,7 +4,7 @@ using Flow.Automation.Decisioning.Abstractions;
 using Flow.Automation.Messaging;
 using Flow.Shared.Enums;
 
-namespace Flow.Automation.Listeners;
+namespace Flow.Automation.Services.Listeners;
 
 public abstract class Listener : IListener
 {
@@ -12,7 +12,7 @@ public abstract class Listener : IListener
     
     public string Name { get; }
     
-    public List<ICondition> Conditions { get; }
+    public Dictionary<Guid, ICondition> Conditions { get; }
     
     public IObservable<EventMessage> EventStream => _subject.AsObservable();
     

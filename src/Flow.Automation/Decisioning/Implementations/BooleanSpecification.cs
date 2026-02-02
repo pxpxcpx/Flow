@@ -1,6 +1,6 @@
 ﻿using Flow.Automation.Decisioning.Abstractions;
 
-namespace Flow.Automation.Decisioning.Specifications;
+namespace Flow.Automation.Decisioning.Implementations;
 
 /// <summary>
 /// Specifications represents <see cref="bool"/> values: true or false.

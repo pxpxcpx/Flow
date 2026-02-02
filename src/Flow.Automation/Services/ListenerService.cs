@@ -1,5 +1,5 @@
-﻿using Flow.Automation.Listeners;
-using Flow.Automation.Messaging;
+﻿using Flow.Automation.Messaging;
+using Flow.Automation.Services.Listeners;
 using Flow.Shared.Results;
 using Microsoft.Extensions.Hosting;
 
@@ -11,14 +11,13 @@ namespace Flow.Automation.Services;
 public class ListenerService : BackgroundService, IListenerService
 {
     private readonly List<IListener> _listeners;
-    private readonly MessageBus<EventMessage> _bus;
-    private readonly MessageRouter _router;
+    private readonly MessageRouter<EventMessage, IObserver<EventMessage>> _router;
     private CancellationTokenSource _cts;
 
-    public ListenerService(List<IListener> listeners, MessageBus<EventMessage> bus, MessageRouter router, CancellationTokenSource cts)
+    public ListenerService(
+        List<IListener> listeners, MessageRouter<EventMessage, IObserver<EventMessage>> router, CancellationTokenSource cts)
     {
         _listeners = listeners;
-        _bus = bus;
         _router = router;
         _cts = cts;
     }
@@ -46,7 +45,7 @@ public class ListenerService : BackgroundService, IListenerService
         await _cts.CancelAsync();
         await base.StopAsync(cancellationToken);
         
-        _bus.OnCompleted();
+        _router.OnCompleted();
     }
     
     /// <inheritdoc />
@@ -55,9 +54,9 @@ public class ListenerService : BackgroundService, IListenerService
         foreach (var listener in _listeners)
         {
             listener.EventStream.Subscribe(
-                em=>_bus.OnNext(em), 
-                ex=>_bus.OnError(ex), 
-                ()=>_bus.OnCompleted(), 
+                _router.OnNext,
+                _router.OnError,
+                _router.OnCompleted, 
                 stoppingToken);
             listener.StartAsync().Await();
         }
@@ -76,7 +75,7 @@ public class ListenerService : BackgroundService, IListenerService
     /// <inheritdoc />
     public override void Dispose()
     {
-        _bus.Dispose();
+        _router.Dispose();
         _router.Dispose();
         base.Dispose();
         GC.SuppressFinalize(this);
