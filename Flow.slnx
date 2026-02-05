@@ -1,5 +1,5 @@
 <Solution>
-  <Folder Name="/Clients/" />
+  <Folder Name="/App/" />
   <Folder Name="/Plugins/">
     <Project Path="plugins/Flow.BuiltIn.ControlStatements/Flow.BuiltIn.ControlStatements.csproj" />
     <Project Path="plugins/Flow.BuiltIn.Nodes/Flow.BuiltIn.Nodes.csproj" />
@@ -14,7 +14,6 @@
     <Project Path="tests/Flow.Tests.RuntimeTest/Flow.Tests.RuntimeTest.csproj" />
   </Folder>
   <Project Path="src/Flow.Automation/Flow.Automation.csproj" />
-  <Project Path="src/Flow.Core/Flow.Core.csproj" />
   <Project Path="src/Flow.Runtime/Flow.Runtime.csproj" />
   <Project Path="src/Flow.Shared/Flow.Shared.csproj" />
 </Solution>
