@@ -1,12 +1,12 @@
 ﻿namespace Flow.Shared.Abstractions;
 
 /// <summary>
-/// Define the interface for executable objects.
+/// Defines the interface for executable objects.
 /// </summary>
 public interface IExecutable
 {
     /// <summary>
-    /// Execute the node.
+    /// Execute the method.
     /// </summary>
     void Execute();
 }

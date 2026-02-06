@@ -31,7 +31,6 @@ public abstract class Listener : IListener
         if (condition is IParamCondition<TObj> ps){
             return ps.Evaluate(obj);}
         
-        // TODO: 我们需要一种包含了GUID和原始信息的载体(EventMessage'), 这样既可以让router知道handler是谁, 也能给handler传原始消息
         // Example below:
         // _subject.OnNext(GenerateEventMessage());
         return condition.Result;

@@ -7,7 +7,7 @@ namespace Flow.Shared.Abstractions;
 /// <summary>
 /// An interface providing basic node composition and runtime information.
 /// <remarks>
-/// To implement the node, simply inherit from <see cref="IExecutableNode"/>/<see cref="IAsyncExecutableNode"/>.
+/// To implement the node, simply inherit from <see cref="IExecutableNode"/> / <see cref="IAsyncExecutableNode"/>.
 /// </remarks>
 /// </summary>
 public interface INode
