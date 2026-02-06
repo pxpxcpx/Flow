@@ -11,11 +11,11 @@ namespace Flow.Automation.Services;
 public class ListenerService : BackgroundService, IListenerService
 {
     private readonly List<IListener> _listeners;
-    private readonly MessageRouter<EventMessage, IObserver<EventMessage>> _router;
+    private readonly MessageRouter<IObserver<ListenerEventMessage>> _router;
     private CancellationTokenSource _cts;
 
     public ListenerService(
-        List<IListener> listeners, MessageRouter<EventMessage, IObserver<EventMessage>> router, CancellationTokenSource cts)
+        List<IListener> listeners, MessageRouter<IObserver<ListenerEventMessage>> router, CancellationTokenSource cts)
     {
         _listeners = listeners;
         _router = router;
@@ -75,7 +75,6 @@ public class ListenerService : BackgroundService, IListenerService
     /// <inheritdoc />
     public override void Dispose()
     {
-        _router.Dispose();
         _router.Dispose();
         base.Dispose();
         GC.SuppressFinalize(this);

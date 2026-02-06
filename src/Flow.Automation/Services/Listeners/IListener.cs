@@ -10,7 +10,7 @@ public interface IListener
     
     Dictionary<Guid, ICondition> Conditions { get; }
     
-    IObservable<EventMessage> EventStream { get; }
+    IObservable<ListenerEventMessage> EventStream { get; }
 
     void Initialize();
     

@@ -1,13 +1,18 @@
 ﻿namespace Flow.Automation.Messaging;
 
-public class MessageRouter<TKey, THandler> : MessageBus<TKey>
-    where TKey : notnull
-    where THandler : IObserver<TKey>
+// TODO: Better way to route the message and the identifier.
+
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="THandler"></typeparam>
+public class MessageRouter<THandler> : MessageBus<ListenerEventMessage>
+    where THandler : IObserver<ListenerEventMessage>
 {
     private bool _disposed;
-    private readonly Dictionary<TKey, THandler[]> _handlers;
+    private readonly Dictionary<Guid, THandler[]> _handlers;
 
-    public MessageRouter(Dictionary<TKey, THandler[]> handlers)
+    public MessageRouter(Dictionary<Guid, THandler[]> handlers)
     {
         _handlers = handlers;
     }
@@ -22,9 +27,9 @@ public class MessageRouter<TKey, THandler> : MessageBus<TKey>
         throw new NotImplementedException();
     }
 
-    public override void OnNext(TKey value)
+    public override void OnNext(ListenerEventMessage value)
     {
-        _handlers.TryGetValue(value, out var handlers);
+        _handlers.TryGetValue(value.EventArgs.ConditionId, out var handlers);
 
         if (handlers is not null or { Length: 0 })
             return;
