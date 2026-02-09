@@ -11,7 +11,7 @@ namespace Flow.Runtime.Abstractions;
 /// This interface provides the structure of the script,
 /// including its unique identifier, starting node, and various connections.
 /// </remarks>
-public interface IScript
+public interface IScript : IFunction
 {
     /// <summary>
     /// Script's unique identifier
@@ -39,21 +39,21 @@ public interface IScript
     /// <summary>
     /// Collection of process controlling connections in the script
     /// </summary>
-    List<IProcessConnection> ProcessConnections { get; set; }
+    HashSet<IProcessConnection> ProcessConnections { get; set; }
 
     /// <summary>
     /// Collection of variable connections in the script
     /// </summary>
-    List<IVariableConnection> VariableConnections { get; set; }
+    HashSet<IVariableConnection> VariableConnections { get; set; }
     
     /// <summary>
     /// Connection between <see cref="ContextItem"/> items
     /// and <see cref="IInstanceRequired"/> in the script.
     /// </summary>
-    List<InstanceConnection> InstanceConnections { get; set; }
+    HashSet<InstanceConnection> InstanceConnections { get; set; }
 
     /// <summary>
     /// Initialize the graph.
     /// </summary>
-    void InitializeGraph();
+    void Initialize();
 }

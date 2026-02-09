@@ -24,13 +24,13 @@ public class Script : IScript, IDisposable
     public Dictionary<Guid, INode> Nodes { get; } = new();
 
     /// <inheritdoc />
-    public List<IProcessConnection> ProcessConnections { get; set; } = new();
+    public HashSet<IProcessConnection> ProcessConnections { get; set; } = new();
 
     /// <inheritdoc />
-    public List<IVariableConnection> VariableConnections { get; set; } = new();
+    public HashSet<IVariableConnection> VariableConnections { get; set; } = new();
 
     /// <inheritdoc />
-    public List<InstanceConnection> InstanceConnections { get; set; } = new();
+    public HashSet<InstanceConnection> InstanceConnections { get; set; } = new();
 
     public void Initialize()
     {
@@ -91,9 +91,9 @@ public class Script : IScript, IDisposable
         if (!Nodes.Remove(node.RuntimeId))
             return false;
 
-        ProcessConnections.RemoveAll(pc => pc.From.NodeId == node.RuntimeId || pc.To.NodeId == node.RuntimeId);
-        VariableConnections.RemoveAll(vc => vc.From.NodeId == node.RuntimeId || vc.To.NodeId == node.RuntimeId);
-        InstanceConnections.RemoveAll(ic => ic.Node.NodeId == node.RuntimeId);
+        ProcessConnections.RemoveWhere(pc => pc.From.NodeId == node.RuntimeId || pc.To.NodeId == node.RuntimeId);
+        VariableConnections.RemoveWhere(vc => vc.From.NodeId == node.RuntimeId || vc.To.NodeId == node.RuntimeId);
+        InstanceConnections.RemoveWhere(ic => ic.Node.NodeId == node.RuntimeId);
 
         return Nodes.Remove(node.RuntimeId);
     }
