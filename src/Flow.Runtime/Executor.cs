@@ -212,21 +212,34 @@ public class Executor : IDisposable
     }
 
     /// <summary>
-    /// Get a result from a related value source. (Passive value retrieval)
+    /// Get results from related value sources. (Passive value retrieval)
     /// </summary>
-    /// <param name="node">Value source node</param>
+    /// <param name="node">Node that requires passing values</param>
     /// <returns></returns>
     private bool TryGetValueFromSource(INode node)
     {
         if (Script.GetRuntimeGuid(node) is not { } rt) return false;
-        if (Script.GetVariableSource(rt) is not { } sources) return false;
+        if (Script.GetSourceVariableConnections(rt) is not { } source) return false;
 
         var succeed = true;
-        foreach (var p in sources)
+        foreach (var p in source)
         {
-            var targetNode = Script.GetNode(p.NodeId);
-            var value = node.GetOutput(p.Index);
-            if (!targetNode.Assign(p.Index, value))
+            var sn = Script.GetNode(p.From.NodeId);
+            object? value;
+            
+            // If the value source is a value generator
+            if (sn is IValueGeneratorNode gen)
+            {
+                // then execute it because it's passive.
+                gen.Execute();
+                value = gen.Outputs;
+            }
+            else
+            {
+                value = sn.GetOutput(p.From.Index);
+            }
+
+            if (node.Assign(p.To.Index, value))
                 succeed = false;
         }
 

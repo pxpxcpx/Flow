@@ -12,6 +12,7 @@ public static class NodeHelper
     public static object? GetInput(this INode node, int index)
         => node.Inputs.IsNullOrIndexOutOfRange(index) ? null : node.Inputs![index];
 
+    // TODO: Method to get value generator's output.
     public static object? GetOutput(this INode node, int index)
         => node.Outputs.IsNullOrIndexOutOfRange(index) ? null : node.Outputs![index];
 

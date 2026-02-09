@@ -32,7 +32,7 @@ public class Script : IScript, IDisposable
     /// <inheritdoc />
     public List<InstanceConnection> InstanceConnections { get; set; } = new();
 
-    public void InitializeGraph()
+    public void Initialize()
     {
         // Entry = Nodes.FirstOrDefault();
         throw new NotImplementedException();
@@ -65,7 +65,7 @@ public class Script : IScript, IDisposable
     /// </summary>
     /// <param name="guid">Runtime GUID of the node.</param>
     /// <returns></returns>
-    public INode GetNode(Guid guid) 
+    public INode GetNode(Guid guid)
         => !Nodes.TryGetValue(guid, out var node) ? throw new KeyNotFoundException() : node;
 
     /// <summary>
@@ -186,6 +186,36 @@ public class Script : IScript, IDisposable
         return ProcessConnections
             .Where(x => x.From.NodeId == currentRuntimeId && x.From.Index == index)
             .Select(x => x.To.NodeId)
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Get variable connections related to value sources.
+    /// </summary>
+    /// <param name="nodeId"></param>
+    /// <returns></returns>
+    public IVariableConnection[]? GetSourceVariableConnections(Guid nodeId)
+    {
+        if (Nodes.Count == 0 || Nodes.All(n => n.Key != nodeId))
+            return null;
+
+        return VariableConnections
+            .Where(c => c.To.NodeId == nodeId)
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Get variable connections related to value target.
+    /// </summary>
+    /// <param name="nodeId"></param>
+    /// <returns></returns>
+    public IVariableConnection[]? GetTargetVariableConnections(Guid nodeId)
+    {
+        if (Nodes.Count == 0 || Nodes.All(n => n.Key != nodeId))
+            return null;
+        
+        return VariableConnections
+            .Where(c => c.To.NodeId == nodeId)
             .ToArray();
     }
 
