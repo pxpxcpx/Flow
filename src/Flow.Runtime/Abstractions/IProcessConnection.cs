@@ -4,7 +4,7 @@ namespace Flow.Runtime.Abstractions;
 
 public interface IProcessConnection
 {
-    NodePosition From { get; set; }
+    NodePosition Source { get; set; }
 
-    NodePosition To { get; set; }
+    NodePosition Target { get; set; }
 }

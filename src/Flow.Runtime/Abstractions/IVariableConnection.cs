@@ -4,11 +4,11 @@ namespace Flow.Runtime.Abstractions;
 
 public interface IVariableConnection
 {
-    VariablePosition From { get; set; }
+    VariablePosition Source { get; set; }
 
-    VariablePosition To { get; set; }
+    VariablePosition Target { get; set; }
 
-    Type VariableType { get; set; }
-
-    object? Value { get; set; }
+    Type SourceType { get; set; }
+    
+    Type TargetType { get; set; }
 }

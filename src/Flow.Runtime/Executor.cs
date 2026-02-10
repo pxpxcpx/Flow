@@ -236,10 +236,10 @@ public class Executor : IDisposable
             }
             else
             {
-                value = sn.GetOutput(p.From.Index);
+                value = sn.GetOutput(p.Source.Index);
             }
 
-            if (node.Assign(p.To.Index, value))
+            if (node.Assign(p.Target.Index, value))
                 succeed = false;
         }
 
