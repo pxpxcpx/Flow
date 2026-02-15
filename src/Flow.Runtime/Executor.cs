@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using Flow.Runtime.Abstractions;
 using Flow.Runtime.Utils;
 using Flow.Runtime.ContextManager;
 using Flow.Runtime.Models;
@@ -12,21 +14,33 @@ public class Executor : IDisposable
 {
     private INode? _current;
 
+    private Function _function;
+
+    [NotNull] 
+    private Queue<INode>? _currentPendingNodes;
+
+    private readonly Stack<KeyValuePair<Function, Queue<INode>>> _backupStack;
+
+    // TODO: Context manager?How it works???
     private readonly ContextManager<Guid> _contextManager;
-
-    private readonly Queue<INode>? _pendingNodes;
-
-    public Script Script { get; set; }
 
     public ProcessorStatus Status { get; private set; }
 
     public Result? Result { get; private set; }
 
-    public Executor(Script script, ContextManager<Guid>? contextManager = null)
+    public Executor(Function function, ContextManager<Guid>? contextManager = null)
     {
-        _pendingNodes = new Queue<INode>();
+        _currentPendingNodes = new Queue<INode>();
         _contextManager = contextManager ?? new ContextManager<Guid>();
-        Script = script ?? throw new ArgumentNullException(nameof(script));
+        _function = function ?? throw new ArgumentNullException(nameof(function));
+
+        _backupStack = new Stack<KeyValuePair<Function, Queue<INode>>>();
+        _backupStack.Push(new KeyValuePair<Function, Queue<INode>>(function, new Queue<INode>()));
+    }
+
+    private Executor(IFunctionNode functionNode)
+    {
+        _currentPendingNodes = new Queue<INode>();
     }
 
     #region Execution
@@ -36,8 +50,8 @@ public class Executor : IDisposable
     /// </summary>
     public void Execute()
     {
-        if (Script.Entry is null) return;
-        Execute(Script.Entry);
+        if (_function.Entry is null) return;
+        Execute(_function.Entry);
     }
 
     /// <summary>
@@ -47,26 +61,35 @@ public class Executor : IDisposable
     private void Execute(INode node)
     {
         _current = node;
-        _pendingNodes?.Enqueue(node);
+        _currentPendingNodes.Enqueue(node);
 
-        while (_pendingNodes is { Count: > 0 })
+        while (_currentPendingNodes is { Count: > 0 })
         {
             if (Status.HasFlag(ProcessorStatus.Paused) || Status.HasFlag(ProcessorStatus.Cancelled))
                 return;
 
-            var n = _pendingNodes.Dequeue();
-            _current = n;
+            var n = _currentPendingNodes.Dequeue();
             ExecuteSingle(n);
+            _current = n;
 
             // If the node does not have a subsequent node (or the executor reaches to the end), return.
+            // TODO: Pop the function stack to return, dequeue from here.
             var nextIds = MoveNext(node);
-            if (nextIds is null || nextIds.Length == 0) return;
-
+            if (nextIds is null || nextIds.Length == 0)
+            {
+                if (_function is INode)
+                {
+                    ReturnToPreviousFunction();
+                    if (nextIds is null) continue;
+                }
+                else continue;
+            }
+            
             // Get subsequent nodes and invoke them iteratively.
             foreach (var nextId in nextIds)
             {
-                var next = Script.GetNode(nextId);
-                _pendingNodes.Enqueue(next);
+                var next = _function.GetNode(nextId);
+                _currentPendingNodes.Enqueue(next);
             }
         }
     }
@@ -127,6 +150,13 @@ public class Executor : IDisposable
                 break;
             }
 
+            // Function node
+            case IFunctionNode fn:
+            {
+                SwitchToSubFunction(fn);
+                break;
+            }
+
             default:
                 return;
         }
@@ -161,7 +191,7 @@ public class Executor : IDisposable
         if (node.Status != NodeStatus.Waiting)
             return;
 
-        _pendingNodes?.Enqueue(node);
+        _currentPendingNodes?.Enqueue(node);
     }
 
     /// <summary>
@@ -174,10 +204,70 @@ public class Executor : IDisposable
         if (node is IControlStatement csn)
         {
             var i = csn.ReturnIndex;
-            return Script.GetRuntimeGuid(node) is not { } cid ? null : Script.GetNextProgressNodes(cid, i);
+            return _function.GetRuntimeGuid(node) is not { } cid ? null : _function.GetNextProgressNodes(cid, i);
         }
 
-        return Script.GetRuntimeGuid(node) is not { } id ? null : Script.GetNextProgressNodes(id);
+        return _function.GetRuntimeGuid(node) is not { } id ? null : _function.GetNextProgressNodes(id);
+    }
+
+    /// <summary>
+    /// Check the stack and return to origin function (caller).
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Throws when the function in stack is NOT a <see cref="FunctionNode"/>
+    /// </exception>
+    private void ReturnToPreviousFunction()
+    {
+        // _backupStack                             --return-> previous level
+        if (!_backupStack.TryPop(out var pl))
+            return;
+        _function = pl.Key;
+        
+        // backup                                   --rejoin-> _currentPendingNodes
+        _currentPendingNodes = Clone(pl.Value);
+        
+        // Pass results                             -> next
+        if (pl.Key is not FunctionNode f)
+            throw new InvalidOperationException();
+        PassResults(f);
+    }
+
+    /// <summary>
+    /// Switch to function inside a function.
+    /// </summary>
+    /// <param name="node"><see cref="FunctionNode"/></param>
+    /// <exception cref="InvalidOperationException">
+    /// Throws when <see cref="node"/> is NOT a <see cref="FunctionNode"/>
+    /// </exception>
+    private void SwitchToSubFunction(IFunctionNode node)
+    {
+        if (node is not FunctionNode f)
+            throw new InvalidOperationException();
+
+        // backup(NOT reference copy) _cpq          -> var backup
+        var backup = Clone(_currentPendingNodes);
+        var pair = new KeyValuePair<Function, Queue<INode>>(_function, backup);
+        
+        // function(with backup)                    -> _backupStack
+        _backupStack.Push(pair);
+
+        // result of the previous node (Re-assign)  -> function.Entry
+        ResendInputs(f, f.Entry);
+        
+        // node.Entry                               -> _currentPendingQueue
+        _function = f;
+        _currentPendingNodes.Enqueue(f.Entry);
+    }
+    
+    private static Queue<INode> Clone(Queue<INode> nodes)
+    {
+        var c = new Queue<INode>(nodes);
+        while (nodes.TryDequeue(out var n))
+        {
+            c.Enqueue(n);
+        }
+
+        return c;
     }
 
     #endregion
@@ -191,13 +281,16 @@ public class Executor : IDisposable
     /// <returns></returns>
     private bool PassResults(INode node)
     {
-        if (Script.GetRuntimeGuid(node) is not { } rt) return false;
-        if (Script.GetVariableTarget(rt) is not { } targets) return false;
+        if (_function.GetRuntimeGuid(node) is not { } rt) return false;
+        if (_function.GetVariableTarget(rt) is not { } targets) return false;
 
         var succeed = true;
         foreach (var p in targets)
         {
-            var targetNode = Script.GetNode(p.NodeId);
+            var targetNode = _function.GetNode(p.NodeId);
+            if (node is IFunctionNode fn)
+                targetNode = fn.Entry;
+
             var value = node.GetOutput(p.Index);
             if (!targetNode.Assign(p.Index, value))
             {
@@ -218,15 +311,15 @@ public class Executor : IDisposable
     /// <returns></returns>
     private bool TryGetValueFromSource(INode node)
     {
-        if (Script.GetRuntimeGuid(node) is not { } rt) return false;
-        if (Script.GetSourceVariableConnections(rt) is not { } source) return false;
+        if (_function.GetRuntimeGuid(node) is not { } rt) return false;
+        if (_function.GetSourceVariableConnections(rt) is not { } source) return false;
 
         var succeed = true;
         foreach (var p in source)
         {
-            var sn = Script.GetNode(p.From.NodeId);
+            var sn = _function.GetNode(p.Source.NodeId);
             object? value;
-            
+
             // If the value source is a value generator
             if (sn is IValueGeneratorNode gen)
             {
@@ -254,8 +347,8 @@ public class Executor : IDisposable
     /// <returns></returns>
     private bool TryPassContextToNode(INode node)
     {
-        if (Script.GetRuntimeGuid(node) is not { } rt) return false;
-        if (Script.GetRelatedContext(rt) is not { } rc) return false;
+        if (_function.GetRuntimeGuid(node) is not { } rt) return false;
+        if (_function.GetRelatedContext(rt) is not { } rc) return false;
 
         try
         {
@@ -266,6 +359,27 @@ public class Executor : IDisposable
         {
             return false;
         }
+    }
+
+    /// <summary>
+    /// Resend one node's inputs to the other one.
+    /// </summary>
+    /// <remarks>Ensure two nodes' input metadata can be match.</remarks>
+    /// <param name="source"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    private bool ResendInputs(INode source, INode target)
+    {
+        // Match two nodes' metadata
+        if (source.InputVariableMetadata is null || target.InputVariableMetadata is null
+           || source.Inputs is null || target.Inputs is null
+           || source.InputVariableMetadata.Length != target.InputVariableMetadata.Length)
+            return false;
+
+        for (var i = 0; i < source.Inputs.Length; i++)
+            target.Inputs[i] = source.Inputs[i];
+
+        return true;
     }
 
     #endregion
@@ -300,7 +414,7 @@ public class Executor : IDisposable
     public void Dispose()
     {
         _contextManager.Dispose();
-        Script.Dispose();
+        _function.Dispose();
         GC.SuppressFinalize(this);
     }
 }

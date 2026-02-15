@@ -10,7 +10,7 @@ public interface IFunction
     /// Entry point of the script, which is the starting node.
     /// </summary>
     /// <remarks>Can be null if the script is empty.</remarks>
-    INode? Entry { get; set; }
+    INode Entry { get; set; }
 
     /// <summary>
     /// Contains nodes and their GUID.

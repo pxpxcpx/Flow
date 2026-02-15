@@ -7,8 +7,21 @@ public class Function : IFunction, IDisposable
 {
     private bool _disposed;
     
+    private INode? _entry;
+
     /// <inheritdoc />
-    public INode? Entry { get; set; }
+    public INode Entry
+    {
+        get
+        {
+            if (_entry is not null)
+                return _entry;
+
+            _entry = FindEntry();
+            return _entry ?? throw new EntryPointNotFoundException();
+        }
+        set => _entry = value;
+    }
 
     /// <inheritdoc />
     public Dictionary<Guid, INode> Nodes { get; } = new();
