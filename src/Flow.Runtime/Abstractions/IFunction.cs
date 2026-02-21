@@ -4,13 +4,17 @@ using Flow.Shared.Abstractions;
 
 namespace Flow.Runtime.Abstractions;
 
-public interface IFunction
+public interface IFunction : INode
 {
     /// <summary>
     /// Entry point of the script, which is the starting node.
     /// </summary>
-    /// <remarks>Can be null if the script is empty.</remarks>
     INode Entry { get; set; }
+    
+    /// <summary>
+    /// Exit of the function, exit when any is executed.
+    /// </summary>
+    INode Exit { get; set; }
 
     /// <summary>
     /// Contains nodes and their GUID.
