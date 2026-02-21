@@ -6,22 +6,12 @@ namespace Flow.Runtime.Models;
 public class Function : IFunction, IDisposable
 {
     private bool _disposed;
-    
-    private INode? _entry;
 
     /// <inheritdoc />
-    public INode Entry
-    {
-        get
-        {
-            if (_entry is not null)
-                return _entry;
+    public INode Entry { get; set; }
 
-            _entry = FindEntry();
-            return _entry ?? throw new EntryPointNotFoundException();
-        }
-        set => _entry = value;
-    }
+    /// <inheritdoc />
+    public INode Exit { get; set; }
 
     /// <inheritdoc />
     public Dictionary<Guid, INode> Nodes { get; } = new();
@@ -34,7 +24,7 @@ public class Function : IFunction, IDisposable
 
     /// <inheritdoc />
     public HashSet<InstanceConnection> InstanceConnections { get; set; } = new();
-    
+
     #region Node
 
     /// <summary>
@@ -89,7 +79,7 @@ public class Function : IFunction, IDisposable
 
     public bool ContainsNode(Guid nodeId)
         => Nodes.ContainsKey(nodeId);
-    
+
     public Guid[]? GetRelatedNodes(Guid contextId)
     {
         return InstanceConnections
@@ -129,8 +119,8 @@ public class Function : IFunction, IDisposable
 
     public bool RemoveVariableConnection(VariableConnection connection)
         => VariableConnections.Remove(connection);
-    
-        /// <summary>
+
+    /// <summary>
     /// Get the previous node in the process.
     /// </summary>
     /// <param name="currentRuntimeId">Runtime GUID of the current node.</param>
@@ -187,7 +177,7 @@ public class Function : IFunction, IDisposable
     {
         if (Nodes.Count == 0 || Nodes.All(n => n.Key != nodeId))
             return null;
-        
+
         return VariableConnections
             .Where(c => c.Target.NodeId == nodeId)
             .ToArray();
@@ -240,8 +230,8 @@ public class Function : IFunction, IDisposable
 
     public bool RemoveInstanceConnection(InstanceConnection connection)
         => InstanceConnections.Remove(connection);
-    
-    
+
+
     public Guid? GetRelatedContext(Guid contextRequiredNodeId)
     {
         if (Nodes.Count == 0 || Nodes.All(n => n.Key != contextRequiredNodeId))
@@ -255,23 +245,6 @@ public class Function : IFunction, IDisposable
 
     #endregion
     
-    /// <summary>
-    /// Get the entry node of the 
-    /// </summary>
-    /// <returns></returns>
-    public INode? FindEntry()
-    {
-        var dict = new Dictionary<Guid, int>();
-        foreach (var n in Nodes)
-            dict.Add(n.Key, 0);
-
-        foreach (var c in ProcessConnections)
-            dict[c.Target.NodeId]++;
-
-        var entryRtId = dict.FirstOrDefault(x => x.Value == 0).Key;
-        return GetNode(entryRtId);
-    }
-
     public void Dispose()
     {
         Dispose(true);

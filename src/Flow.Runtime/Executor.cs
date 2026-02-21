@@ -12,14 +12,17 @@ namespace Flow.Runtime;
 
 public class Executor : IDisposable
 {
+    private bool _completed;
+
     private INode? _current;
 
     private Function _function;
 
-    [NotNull] 
-    private Queue<INode>? _currentPendingNodes;
+    [NotNull] private Queue<INode>? _currentPendingNodes;
 
     private readonly Stack<KeyValuePair<Function, Queue<INode>>> _backupStack;
+
+    private readonly SemaphoreSlim _semaphoreSlim = new(1);
 
     // TODO: Context manager?How it works???
     private readonly ContextManager<Guid> _contextManager;
@@ -35,7 +38,6 @@ public class Executor : IDisposable
         _function = function ?? throw new ArgumentNullException(nameof(function));
 
         _backupStack = new Stack<KeyValuePair<Function, Queue<INode>>>();
-        _backupStack.Push(new KeyValuePair<Function, Queue<INode>>(function, new Queue<INode>()));
     }
 
     private Executor(IFunctionNode functionNode)
@@ -46,51 +48,62 @@ public class Executor : IDisposable
     #region Execution
 
     /// <summary>
+    /// Check if this is the exit.
+    /// </summary>
+    /// <returns></returns>
+    public bool IsExit(INode node)
+        => _function.Exit == node;
+
+    /// <summary>
     /// Execute the script.
     /// </summary>
-    public void Execute()
+    public async Task Execute()
     {
         if (_function.Entry is null) return;
-        Execute(_function.Entry);
+        await Execute(_function.Entry);
     }
 
     /// <summary>
     /// Invoke a node and its subsequent nodes iteratively.
     /// </summary>
     /// <param name="node"></param>
-    private void Execute(INode node)
+    private async Task Execute(INode node)
     {
         _current = node;
         _currentPendingNodes.Enqueue(node);
 
-        while (_currentPendingNodes is { Count: > 0 })
+        while (!_completed)
         {
+            await _semaphoreSlim.WaitAsync();
+
             if (Status.HasFlag(ProcessorStatus.Paused) || Status.HasFlag(ProcessorStatus.Cancelled))
                 return;
 
-            var n = _currentPendingNodes.Dequeue();
-            ExecuteSingle(n);
-            _current = n;
-
-            // If the node does not have a subsequent node (or the executor reaches to the end), return.
-            // TODO: Pop the function stack to return, dequeue from here.
-            var nextIds = MoveNext(node);
-            if (nextIds is null || nextIds.Length == 0)
+            if (IsExit(node))
             {
-                if (_function is INode)
+                if (node is IFunctionNode)
                 {
                     ReturnToPreviousFunction();
-                    if (nextIds is null) continue;
+                    _semaphoreSlim.Release(1);
+                    continue;
                 }
-                else continue;
+
+                _completed = true;
+                return;
             }
-            
-            // Get subsequent nodes and invoke them iteratively.
-            foreach (var nextId in nextIds)
-            {
-                var next = _function.GetNode(nextId);
-                _currentPendingNodes.Enqueue(next);
-            }
+
+            var n = _currentPendingNodes.Dequeue();
+            await ExecuteSingle(n);
+            _semaphoreSlim.Release(1);
+            _current = n;
+
+            var nextIds = MoveNext(node);
+
+            // If the node does not have a subsequent node.
+            if (nextIds is null || nextIds.Length == 0) continue;
+
+            // Enqueue subsequent nodes.
+            EnqueueNodes(nextIds);
         }
     }
 
@@ -98,7 +111,7 @@ public class Executor : IDisposable
     /// Pass the arguments and invoke a single node.
     /// </summary>
     /// <param name="node">Single node to be invoked.</param>
-    private void ExecuteSingle(INode node)
+    private ValueTask ExecuteSingle(INode node)
     {
         // If the node has unfilled values:
         if (node.GetUnfilledRequiredValues().Any())
@@ -106,7 +119,7 @@ public class Executor : IDisposable
             if (!TryGetValueFromSource(node))
             {
                 node.MarkAs(NodeStatus.Waiting);
-                return;
+                return ValueTask.CompletedTask;
             }
         }
 
@@ -116,11 +129,11 @@ public class Executor : IDisposable
             if (!TryPassContextToNode(node))
             {
                 node.MarkAs(NodeStatus.Waiting);
-                return;
+                return ValueTask.CompletedTask;
             }
         }
 
-        var succeed = true;
+        var success = true;
         node.Status |= NodeStatus.Running;
 
         // Attention:
@@ -137,7 +150,8 @@ public class Executor : IDisposable
                 }
                 catch (Exception ex)
                 {
-                    OnError(ex);
+                    success = false;
+                    OnNodeError(ex, en);
                 }
 
                 break;
@@ -146,7 +160,13 @@ public class Executor : IDisposable
             // Execute asynchronously if the node implements the IAsyncExecutableNode.
             case IAsyncExecutableNode aen:
             {
-                aen.ExecuteAsync().Await(OnError);
+                aen.ExecuteAsync()
+                    .Await(ex =>
+                        {
+                            success = false;
+                            OnNodeError(ex, aen);
+                        },
+                        () => { OnNodeCompleted(aen); });
                 break;
             }
 
@@ -158,10 +178,10 @@ public class Executor : IDisposable
             }
 
             default:
-                return;
+                return ValueTask.CompletedTask;
         }
 
-        if (succeed)
+        if (success)
         {
             node.Status |= NodeStatus.Completed;
             node.Status |= NodeStatus.Ready;
@@ -170,14 +190,51 @@ public class Executor : IDisposable
         if (!PassResults(node))
             Result = new Result(false, false, null, $"Value transfer error occurred on node: {node.RuntimeId}");
 
-        return;
+        return ValueTask.CompletedTask;
+    }
 
-        void OnError(Exception ex)
+    private void OnNodeError(Exception ex, INode node)
+    {
+        node.Status |= NodeStatus.Failed;
+        var result = node.Result;
+        Debug.WriteLine($"Exception detected: {ex.Message}, result: {result}");
+    }
+
+    private void OnNodeCompleted(INode node)
+    {
+        if (_completed) return;
+
+        // When a (async) node completed its execution, we only need to check if the node is the exit.
+        // If it is one exit:
+        if (IsExit(node))
         {
-            succeed = false;
-            node.Status |= NodeStatus.Failed;
-            var result = node.Result;
-            Debug.WriteLine($"Exception detected: {ex.Message}, result: {result}");
+            // Set the _completed to true.
+            _completed = true;
+
+            // And call function Execute(...) to finish.
+            _semaphoreSlim.Release(1);
+            return;
+        }
+
+        // It isn't:
+        // Enqueue next nodes.
+        EnqueueSubsequentNode(node);
+        // Call function Execute(...) to execute.
+        _semaphoreSlim.Release(1);
+    }
+
+    private void EnqueueSubsequentNode(INode node)
+    {
+        var nextIds = MoveNext(node);
+        EnqueueNodes(nextIds!);
+    }
+
+    private void EnqueueNodes(Guid[] nextIds)
+    {
+        foreach (var nextId in nextIds)
+        {
+            var next = _function.GetNode(nextId);
+            _currentPendingNodes.Enqueue(next);
         }
     }
 
@@ -191,7 +248,7 @@ public class Executor : IDisposable
         if (node.Status != NodeStatus.Waiting)
             return;
 
-        _currentPendingNodes?.Enqueue(node);
+        _currentPendingNodes.Enqueue(node);
     }
 
     /// <summary>
@@ -220,12 +277,15 @@ public class Executor : IDisposable
     {
         // _backupStack                             --return-> previous level
         if (!_backupStack.TryPop(out var pl))
+        {
+            _completed = true;
             return;
+        }
         _function = pl.Key;
-        
+
         // backup                                   --rejoin-> _currentPendingNodes
         _currentPendingNodes = Clone(pl.Value);
-        
+
         // Pass results                             -> next
         if (pl.Key is not FunctionNode f)
             throw new InvalidOperationException();
@@ -247,18 +307,18 @@ public class Executor : IDisposable
         // backup(NOT reference copy) _cpq          -> var backup
         var backup = Clone(_currentPendingNodes);
         var pair = new KeyValuePair<Function, Queue<INode>>(_function, backup);
-        
+
         // function(with backup)                    -> _backupStack
         _backupStack.Push(pair);
 
         // result of the previous node (Re-assign)  -> function.Entry
         ResendInputs(f, f.Entry);
-        
+
         // node.Entry                               -> _currentPendingQueue
         _function = f;
         _currentPendingNodes.Enqueue(f.Entry);
     }
-    
+
     private static Queue<INode> Clone(Queue<INode> nodes)
     {
         var c = new Queue<INode>(nodes);
@@ -284,7 +344,7 @@ public class Executor : IDisposable
         if (_function.GetRuntimeGuid(node) is not { } rt) return false;
         if (_function.GetVariableTarget(rt) is not { } targets) return false;
 
-        var succeed = true;
+        var success = true;
         foreach (var p in targets)
         {
             var targetNode = _function.GetNode(p.NodeId);
@@ -294,14 +354,14 @@ public class Executor : IDisposable
             var value = node.GetOutput(p.Index);
             if (!targetNode.Assign(p.Index, value))
             {
-                succeed = false;
+                success = false;
                 continue;
             }
 
             TryEnqueueIfNodeIsWaiting(targetNode);
         }
 
-        return succeed;
+        return success;
     }
 
     /// <summary>
@@ -314,7 +374,7 @@ public class Executor : IDisposable
         if (_function.GetRuntimeGuid(node) is not { } rt) return false;
         if (_function.GetSourceVariableConnections(rt) is not { } source) return false;
 
-        var succeed = true;
+        var success = true;
         foreach (var p in source)
         {
             var sn = _function.GetNode(p.Source.NodeId);
@@ -333,10 +393,10 @@ public class Executor : IDisposable
             }
 
             if (node.Assign(p.Target.Index, value))
-                succeed = false;
+                success = false;
         }
 
-        return succeed;
+        return success;
     }
 
     /// <summary>
@@ -372,8 +432,9 @@ public class Executor : IDisposable
     {
         // Match two nodes' metadata
         if (source.InputVariableMetadata is null || target.InputVariableMetadata is null
-           || source.Inputs is null || target.Inputs is null
-           || source.InputVariableMetadata.Length != target.InputVariableMetadata.Length)
+                                                 || source.Inputs is null || target.Inputs is null
+                                                 || source.InputVariableMetadata.Length !=
+                                                 target.InputVariableMetadata.Length)
             return false;
 
         for (var i = 0; i < source.Inputs.Length; i++)
@@ -396,11 +457,11 @@ public class Executor : IDisposable
         Status |= ProcessorStatus.Running;
         if (_current is null)
         {
-            Execute();
+            Execute().Await();
             return;
         }
 
-        Execute(_current);
+        Execute(_current).Await();
     }
 
     private void Stop()
