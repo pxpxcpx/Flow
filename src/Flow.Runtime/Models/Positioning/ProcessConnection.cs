@@ -1,6 +1,6 @@
 ﻿using Flow.Runtime.Abstractions;
 
-namespace Flow.Runtime.Models;
+namespace Flow.Runtime.Models.Positioning;
 
 /// <summary>
 /// Process connection between two nodes.

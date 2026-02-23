@@ -1,5 +1,6 @@
 ﻿using Flow.Runtime.ContextManager;
 using Flow.Runtime.Models;
+using Flow.Runtime.Models.Positioning;
 using Flow.Shared.Abstractions;
 
 namespace Flow.Runtime.Abstractions;
@@ -9,7 +10,7 @@ public interface IFunction : INode
     /// <summary>
     /// Entry point of the script, which is the starting node.
     /// </summary>
-    INode Entry { get; set; }
+    INode Entrance { get; set; }
     
     /// <summary>
     /// Exit of the function, exit when any is executed.

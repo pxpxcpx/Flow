@@ -1,10 +1,11 @@
 ﻿using Flow.Runtime.Abstractions;
+using Flow.Runtime.Models.Positioning;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
 
-namespace Flow.Runtime.Models;
+namespace Flow.Runtime.Models.Nodes;
 
 public class Function : IFunction, IDisposable
 {
@@ -20,7 +21,7 @@ public class Function : IFunction, IDisposable
     public NodeStatus Status { get; set; }
 
     /// <inheritdoc />
-    public INode Entry { get; set; } // TODO
+    public INode Entrance { get; set; } // TODO
 
     /// <inheritdoc />
     public INode Exit { get; set; } // TODO

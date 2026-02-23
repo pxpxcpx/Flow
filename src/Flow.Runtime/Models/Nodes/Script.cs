@@ -1,7 +1,7 @@
 ﻿using Flow.Runtime.Abstractions;
 using Flow.Shared.Models;
 
-namespace Flow.Runtime.Models;
+namespace Flow.Runtime.Models.Nodes;
 
 /// <summary>
 /// Store executable script.
@@ -16,7 +16,7 @@ public class Script : Function, IScript
 
     public void Initialize()
     {
-        // Entry = Nodes.FirstOrDefault();
+        // Entrance = Nodes.FirstOrDefault();
         throw new NotImplementedException();
     }
     

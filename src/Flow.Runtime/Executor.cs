@@ -4,6 +4,7 @@ using Flow.Runtime.Abstractions;
 using Flow.Runtime.Utils;
 using Flow.Runtime.ContextManager;
 using Flow.Runtime.Models;
+using Flow.Runtime.Models.Nodes;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Results;
@@ -59,8 +60,8 @@ public class Executor : IDisposable
     /// </summary>
     public async Task Execute()
     {
-        if (_function.Entry is null) return;
-        await Execute(_function.Entry);
+        if (_function.Entrance is null) return;
+        await Execute(_function.Entrance);
     }
 
     /// <summary>
@@ -302,12 +303,12 @@ public class Executor : IDisposable
         // function(with backup)                    -> _backupStack
         _backupStack.Push(pair);
 
-        // result of the previous node (Re-assign)  -> function.Entry
-        ResendInputs(f, f.Entry);
+        // result of the previous node (Re-assign)  -> function.Entrance
+        ResendInputs(f, f.Entrance);
 
-        // node.Entry                               -> _currentPendingQueue
+        // node.Entrance                               -> _currentPendingQueue
         _function = f;
-        _currentPendingNodes.Enqueue(f.Entry);
+        _currentPendingNodes.Enqueue(f.Entrance);
     }
 
     private static Queue<INode> Clone(Queue<INode> nodes)
@@ -341,7 +342,7 @@ public class Executor : IDisposable
         {
             var targetNode = _function.GetNode(p.NodeId);
             if (node is IFunction fn)
-                targetNode = fn.Entry;
+                targetNode = fn.Entrance;
 
             var value = node.GetOutput(p.Index);
             if (!targetNode.Assign(p.Index, value))

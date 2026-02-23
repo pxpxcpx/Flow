@@ -1,6 +1,6 @@
 ﻿using Flow.Runtime.Abstractions;
 
-namespace Flow.Runtime.Models;
+namespace Flow.Runtime.Models.Positioning;
 
 /// <summary>
 /// Connection between two <see cref="VariablePosition">value points</see> coming from two different nodes

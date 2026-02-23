@@ -1,4 +1,4 @@
-﻿namespace Flow.Runtime.Models;
+﻿namespace Flow.Runtime.Models.Positioning;
 
 public record struct VariablePosition
 {
