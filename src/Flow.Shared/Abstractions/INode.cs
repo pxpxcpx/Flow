@@ -41,12 +41,12 @@ public interface INode
     /// <summary>
     /// Data of the Inputs (arguments). Can be null if there's no input.
     /// </summary>
-    object?[]? Inputs { get; init; }
+    object?[]? Inputs { get; }
     
     /// <summary>
     /// Data of the outputs. Can be null if there's no output.
     /// </summary>
-    object?[]? Outputs { get; init; }
+    object?[]? Outputs { get; }
     
     /// <summary>
     /// Used as an alternative to throwing exceptions.

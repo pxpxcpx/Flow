@@ -1,4 +1,5 @@
-﻿using Flow.Runtime.Abstractions;
+﻿using System.Collections.ObjectModel;
+using Flow.Runtime.Abstractions;
 using Flow.Runtime.Models.Positioning;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
@@ -10,24 +11,40 @@ namespace Flow.Runtime.Models.Nodes;
 public class Function : IFunction, IDisposable
 {
     private bool _disposed;
-    
+
     /// <inheritdoc />
     public NodeMetadata Metadata { get; }
-    
+
     /// <inheritdoc />
     public Guid RuntimeId { get; }
-    
+
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
 
     /// <inheritdoc />
-    public INode Entrance { get; set; } // TODO
+    public IExecutableNode Entrance => _entrance; // TODO
+
+    private readonly EntranceNode _entrance;
 
     /// <inheritdoc />
-    public INode Exit { get; set; } // TODO
+    public IExecutableNode Exit => _exit; // TODO
+
+    private readonly ExitNode _exit;
 
     /// <inheritdoc />
-    public Dictionary<Guid, INode> Nodes { get; } = new();
+    public Dictionary<Guid, INode> Nodes
+    {
+        get
+        {
+            UpdateNode();
+            return _publicNodes;
+        }
+    }
+
+    private bool _isNodeEdited;
+    private readonly Dictionary<Guid, INode> _publicNodes = new();
+    private readonly Dictionary<Guid, INode> _nodes = new();
+    private readonly ReadOnlyDictionary<Guid, INode> _presetNodes;
 
     /// <inheritdoc />
     public HashSet<ProcessConnection> ProcessConnections { get; set; } = new();
@@ -43,15 +60,34 @@ public class Function : IFunction, IDisposable
 
     /// <inheritdoc />
     public ParameterMetadata[]? OutputVariableMetadata { get; } = [];
-    
+
     /// <inheritdoc />
     public object?[]? Inputs { get; init; }
-    
+
     /// <inheritdoc />
     public object?[]? Outputs { get; init; }
-    
+
     /// <inheritdoc />
     public Result? Result { get; }
+
+    protected Function()
+    {
+    }
+
+    public Function(NodeMetadata metadata)
+    {
+        Metadata = metadata;
+
+        _entrance = new EntranceNode(this);
+        _exit = new ExitNode(this);
+
+        var p = new Dictionary<Guid, INode>
+        {
+            { _entrance.RuntimeId, _entrance },
+            { _exit.RuntimeId, _entrance },
+        };
+        _presetNodes = new ReadOnlyDictionary<Guid, INode>(p);
+    }
 
     #region Node
 
@@ -59,9 +95,29 @@ public class Function : IFunction, IDisposable
     /// Add node to the script.
     /// </summary>
     /// <param name="node"></param>
-    public void AddNode(INode node)
+    public bool AddNode(INode node)
+        => TryAdd(node);
+
+    /// <summary>
+    /// Update collection <see cref="Nodes"/> when get.
+    /// </summary>
+    private void UpdateNode()
     {
-        Nodes.Add(node.RuntimeId, node);
+        if (!_isNodeEdited) return;
+
+        _publicNodes.Clear();
+
+        foreach (var p in _nodes)
+        {
+            _publicNodes.Add(p.Key, p.Value);
+        }
+
+        foreach (var p in _presetNodes)
+        {
+            _publicNodes.TryAdd(p.Key, p.Value);
+        }
+
+        _isNodeEdited = false;
     }
 
     /// <summary>
@@ -92,14 +148,14 @@ public class Function : IFunction, IDisposable
     /// <returns></returns>
     public bool RemoveNode(INode node)
     {
-        if (!Nodes.Remove(node.RuntimeId))
+        if (!Remove(node.RuntimeId))
             return false;
 
         ProcessConnections.RemoveWhere(pc => pc.Source.NodeId == node.RuntimeId || pc.Target.NodeId == node.RuntimeId);
         VariableConnections.RemoveWhere(vc => vc.Source.NodeId == node.RuntimeId || vc.Target.NodeId == node.RuntimeId);
         InstanceConnections.RemoveWhere(ic => ic.Node.NodeId == node.RuntimeId);
 
-        return Nodes.Remove(node.RuntimeId);
+        return Remove(node.RuntimeId);
     }
 
     public bool ContainsNode(INode node)
@@ -115,6 +171,22 @@ public class Function : IFunction, IDisposable
             .Select(x => x.InstanceId)
             .ToArray();
     }
+
+    #region Internal Node Dict Utils
+
+    private bool TryAdd(INode node)
+    {
+        _isNodeEdited = true;
+        return _nodes.TryAdd(node.RuntimeId, node);
+    }
+
+    private bool Remove(Guid key)
+    {
+        _isNodeEdited = true;
+        return _nodes.Remove(key);
+    }
+
+    #endregion
 
     #endregion
 
@@ -272,7 +344,11 @@ public class Function : IFunction, IDisposable
     }
 
     #endregion
-    
+
+    public void AddInput(ParameterMetadata parameterMetadata)
+    {
+    }
+
     public void Dispose()
     {
         Dispose(true);

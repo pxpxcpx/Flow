@@ -10,12 +10,12 @@ public interface IFunction : INode
     /// <summary>
     /// Entry point of the script, which is the starting node.
     /// </summary>
-    INode Entrance { get; set; }
+    IExecutableNode Entrance { get; }
     
     /// <summary>
     /// Exit of the function, exit when any is executed.
     /// </summary>
-    INode Exit { get; set; }
+    IExecutableNode Exit { get; }
 
     /// <summary>
     /// Contains nodes and their GUID.

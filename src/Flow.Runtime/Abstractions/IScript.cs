@@ -12,11 +12,6 @@ namespace Flow.Runtime.Abstractions;
 public interface IScript : IFunction
 {
     /// <summary>
-    /// Script's unique identifier
-    /// </summary>
-    Guid RuntimeId { get; init; }
-
-    /// <summary>
     /// Plugins that the script depends on.
     /// </summary>
     Dependency[] Dependencies { get; init; }

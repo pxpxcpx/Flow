@@ -9,9 +9,6 @@ namespace Flow.Runtime.Models.Nodes;
 public class Script : Function, IScript
 {
     /// <inheritdoc />
-    public Guid RuntimeId { get; init; } = Guid.NewGuid();
-
-    /// <inheritdoc />
     public Dependency[] Dependencies { get; init; } = Array.Empty<Dependency>();
 
     public void Initialize()
