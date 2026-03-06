@@ -1,10 +1,10 @@
 ﻿// #define ROSLYN_DEBUG
 
 // ReSharper disable once RedundantUsingDirective
-using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;

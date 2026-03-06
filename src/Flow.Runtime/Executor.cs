@@ -1,12 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Flow.Runtime.Abstractions;
-using Flow.Runtime.Utils;
 using Flow.Runtime.ContextManager;
-using Flow.Runtime.Models;
 using Flow.Runtime.Models.Nodes;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
+using Flow.Shared.Models;
 using Flow.Shared.Results;
 
 namespace Flow.Runtime;
@@ -112,11 +111,11 @@ public class Executor : IDisposable
     private ValueTask ExecuteSingle(INode node)
     {
         // If the node has unfilled values:
-        if (node.GetUnfilledRequiredValues().Any())
+        if (Node.GetUnfilledRequiredValues(node).Any())
         {
             if (!TryGetValueFromSource(node))
             {
-                node.MarkAs(NodeStatus.Waiting);
+                Node.MarkAs(node, NodeStatus.Waiting);
                 return ValueTask.CompletedTask;
             }
         }
@@ -126,7 +125,7 @@ public class Executor : IDisposable
         {
             if (!TryPassContextToNode(node))
             {
-                node.MarkAs(NodeStatus.Waiting);
+                Node.MarkAs(node, NodeStatus.Waiting);
                 return ValueTask.CompletedTask;
             }
         }
@@ -344,8 +343,8 @@ public class Executor : IDisposable
             if (node is IFunction fn)
                 targetNode = fn.Entrance;
 
-            var value = node.GetOutput(p.Index);
-            if (!targetNode.Assign(p.Index, value))
+            var value = Node.GetOutput(node, p.Index);
+            if (!Node.Assign(targetNode, p.Index, value))
             {
                 success = false;
                 continue;
@@ -382,10 +381,10 @@ public class Executor : IDisposable
             }
             else
             {
-                value = sn.GetOutput(p.Source.Index);
+                value = Node.GetOutput(sn, p.Source.Index);
             }
 
-            if (node.Assign(p.Target.Index, value))
+            if (Node.Assign(node, p.Target.Index, value))
                 success = false;
         }
 

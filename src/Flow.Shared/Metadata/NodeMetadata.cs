@@ -23,4 +23,11 @@ public readonly record struct NodeMetadata()
     /// Description of the node.
     /// </summary>
     public required string Description { get; init; }
+
+    public static NodeMetadata Empty => new NodeMetadata()
+    {
+        Id = Guid.Empty,
+        Name = string.Empty,
+        Description = string.Empty,
+    };
 }
