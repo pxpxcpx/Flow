@@ -67,7 +67,7 @@ public abstract class Node : INode, IEquatable<INode>
         }
         catch (InvalidCastException)
         {
-            value = default(T);
+            value = default;
         }
         
         return false;
@@ -87,7 +87,7 @@ public abstract class Node : INode, IEquatable<INode>
         }
         catch (InvalidCastException)
         {
-            value = default(T);
+            value = default;
         }
         
         return false;
@@ -165,6 +165,18 @@ public abstract class Node : INode, IEquatable<INode>
     public static void MarkAs(INode node, NodeStatus status)
         => node.Status = status;
 
+#if DEBUG
+    public override string ToString()
+    {
+        return 
+            $"""
+            Type: {this.GetType().Name}", 
+            RuntimeId: {RuntimeId},
+            Metadata:{Metadata}
+            """;
+    }
+#endif
+
     private static bool Equals(INode node, INode? other)
     {
         if (other is null)
@@ -189,9 +201,6 @@ public abstract class Node : INode, IEquatable<INode>
     public bool Equals(INode? other)
         => Equals(this, other);
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(
-            Metadata, RuntimeId, InputVariableMetadata, OutputVariableMetadata);
-    }
+    public override int GetHashCode() 
+        => HashCode.Combine(Metadata, RuntimeId, InputVariableMetadata, OutputVariableMetadata);
 }

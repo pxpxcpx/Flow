@@ -17,6 +17,7 @@ using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
+using Flow.Shared.Models;
 using Flow.SDK.Plugins;
 using Flow.SDK.Plugins.Attributes;
 using Flow.Shared;
@@ -58,7 +59,7 @@ namespace $$NAMESPACE$$
 {
     public partial class $$COLLECTION_NAME$$
     {
-        public class $$NODE_CLASS_NAME$$ : INode, IExecutable
+        public class $$NODE_CLASS_NAME$$ : Node, IExecutable
         {
             private static readonly NodeMetadata NodeMetadata = new()
             {
@@ -67,39 +68,15 @@ namespace $$NAMESPACE$$
                 Description = "$$NODE_DESCRIPTION$$"
             };
             
-            /// <inheritdoc />
-            public NodeMetadata Metadata => NodeMetadata;
-            
-            /// <inheritdoc />
-            public Guid RuntimeId { get; init; }
-            
-            /// <inheritdoc />
-            public NodeStatus Status { get; set; }
-            
             private static readonly ParameterMetadata[]? InputMetadata =
             [
 $$INPUT_METADATA$$
             ];
             
-            /// <inheritdoc />
-            public ParameterMetadata[]? InputVariableMetadata => InputMetadata;
-            
-            /// <inheritdoc />
-            public object?[]? Inputs { get; init; }
-            
             private static readonly ParameterMetadata[]? OutputMetadata =
             [
 $$OUTPUT_METADATA$$
             ];
-            
-            /// <inheritdoc />
-            public ParameterMetadata[]? OutputVariableMetadata => OutputMetadata;
-            
-            /// <inheritdoc />
-            public object?[]? Outputs { get; init; }
-            
-            /// <inheritdoc />
-            public Result? Result { get; private set; }
             
 $$CTOR$$
             

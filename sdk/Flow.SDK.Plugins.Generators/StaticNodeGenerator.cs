@@ -17,9 +17,8 @@ namespace Flow.SDK.Plugins.Generators;
 #nullable enable
 
 /// <summary>
-/// 
+/// Source generator which turn static methods into nodes.
 /// </summary>
-/// <remarks>Extensive use of AI-generated code.</remarks>
 [Generator(LanguageNames.CSharp)]
 public sealed class StaticNodeGenerator : IIncrementalGenerator
 {
@@ -37,7 +36,8 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
                 transform: static (ctx, _) => GeneratorUtils.GetSemanticTargetForGeneration(ctx, Constants.StaticNodeAttributeDisplayString)!)
             .Where(static m => m is not null);
 
-        // Compile with Roslyn 4.13.0 or earlier (Microsoft.CodeAnalysis <= 4.13.0);
+        // ATTENTION!
+        // Compile with Roslyn 4.13.0 or EARLY VERSION (Microsoft.CodeAnalysis <= 4.13.0);
         // otherwise, the correct generator name will not be displayed.
         var compilation = context.CompilationProvider.Combine(methodsDeclarations.Collect());
 
@@ -57,7 +57,7 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
             if (methodSymbol is not { IsStatic: true })
                 continue;
 
-            // 获取 StaticNodeAttribute 信息
+            // Get StaticNodeAttribute
             var staticNodeAttribute = methodSymbol
                 .GetAttributes()
                 .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == Constants.StaticNodeAttributeDisplayString);
@@ -65,7 +65,7 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
             if (staticNodeAttribute == null)
                 continue;
 
-            // 生成节点类代码
+            // Generate
             var sourceCode = GenerateNodeClass(methodSymbol, staticNodeAttribute);
             context.AddSource($"{methodSymbol.Name}Node.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
         }
@@ -136,7 +136,7 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
     {
         var sb = new StringBuilder();
         
-        // 构建方法调用参数
+        // Call Parameters
         var parameters = new List<string>();
         for (var i = 0; i < methodSymbol.Parameters.Length; i++)
         {
@@ -165,7 +165,7 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine($"public {className}()\n" +
+        sb.AppendLine($"public {className}(): base(NodeMetadata, InputMetadata, OutputMetadata)\n" +
                       $"{{");        
         
         var inputLength = methodSymbol.Parameters.Length;
