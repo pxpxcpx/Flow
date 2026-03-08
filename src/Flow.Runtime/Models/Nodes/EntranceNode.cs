@@ -45,6 +45,8 @@ internal class EntranceNode : IExecutableNode
 
     internal EntranceNode(Function function)
     {
+        RuntimeId = Guid.NewGuid();
+        
         _function = function;
         _inputs = [];
     }

@@ -45,6 +45,8 @@ public class ExitNode : IExecutableNode
 
     internal ExitNode(Function function)
     {
+        RuntimeId = Guid.NewGuid();
+        
         _function = function;
         _outputs = [];
     }

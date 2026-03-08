@@ -31,6 +31,11 @@ public class Function : IFunction, IDisposable
 
     private readonly ExitNode _exit;
 
+    private bool _isNodeEdited;
+    private readonly Dictionary<Guid, INode> _publicNodes = new();
+    private readonly Dictionary<Guid, INode> _nodes = new();
+    private readonly ReadOnlyDictionary<Guid, INode> _presetNodes;
+
     /// <inheritdoc />
     public Dictionary<Guid, INode> Nodes
     {
@@ -41,10 +46,16 @@ public class Function : IFunction, IDisposable
         }
     }
 
-    private bool _isNodeEdited;
-    private readonly Dictionary<Guid, INode> _publicNodes = new();
-    private readonly Dictionary<Guid, INode> _nodes = new();
-    private readonly ReadOnlyDictionary<Guid, INode> _presetNodes;
+    public INode this[Guid runtimeId]
+    {
+        get => Nodes[runtimeId];
+        set => _nodes[runtimeId] = value;
+    }
+
+    public Guid? this[INode node]
+    {
+        get => GetRuntimeGuid(node);
+    }
 
     /// <inheritdoc />
     public HashSet<ProcessConnection> ProcessConnections { get; set; } = new();
@@ -84,7 +95,7 @@ public class Function : IFunction, IDisposable
         var p = new Dictionary<Guid, INode>
         {
             { _entrance.RuntimeId, _entrance },
-            { _exit.RuntimeId, _entrance },
+            { _exit.RuntimeId, _exit },
         };
         _presetNodes = new ReadOnlyDictionary<Guid, INode>(p);
     }
@@ -248,7 +259,7 @@ public class Function : IFunction, IDisposable
             return null;
 
         return ProcessConnections
-            .Where(x => x.Source.NodeId == currentRuntimeId && x.Source.Index == index)
+            .Where(x => x.Source.NodeId == currentRuntimeId && x.ProcessIndex == index)
             .Select(x => x.Target.NodeId)
             .ToArray();
     }
