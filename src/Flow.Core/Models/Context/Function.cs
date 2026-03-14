@@ -1,12 +1,13 @@
 ﻿using System.Collections.ObjectModel;
-using Flow.Runtime.Abstractions;
-using Flow.Runtime.Models.Positioning;
+using Flow.Core.Abstractions;
+using Flow.Core.Models.Nodes;
+using Flow.Core.Models.Positioning;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
 
-namespace Flow.Runtime.Models.Nodes;
+namespace Flow.Core.Models.Context;
 
 public class Function : IFunction, IDisposable
 {
@@ -83,9 +84,11 @@ public class Function : IFunction, IDisposable
 
     protected Function()
     {
+        RuntimeId = Guid.NewGuid();
     }
 
     public Function(NodeMetadata metadata)
+        : this()
     {
         Metadata = metadata;
 

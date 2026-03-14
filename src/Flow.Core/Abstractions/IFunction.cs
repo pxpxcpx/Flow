@@ -1,9 +1,9 @@
-﻿using Flow.Runtime.ContextManager;
-using Flow.Runtime.Models;
-using Flow.Runtime.Models.Positioning;
+﻿using Flow.Core.Models.Positioning;
+using Flow.Core.Models;
 using Flow.Shared.Abstractions;
+using Flow.Core.Models.Context;
 
-namespace Flow.Runtime.Abstractions;
+namespace Flow.Core.Abstractions;
 
 public interface IFunction : INode
 {

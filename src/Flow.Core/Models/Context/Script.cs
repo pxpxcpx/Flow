@@ -1,7 +1,7 @@
-﻿using Flow.Runtime.Abstractions;
+﻿using Flow.Core.Abstractions;
 using Flow.Shared.Models;
 
-namespace Flow.Runtime.Models.Nodes;
+namespace Flow.Core.Models.Context;
 
 /// <summary>
 /// Store executable script.

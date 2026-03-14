@@ -1,6 +1,6 @@
-﻿using Flow.Runtime.Models.Positioning;
+﻿using Flow.Core.Models.Positioning;
 
-namespace Flow.Runtime.Abstractions;
+namespace Flow.Core.Abstractions;
 
 /// <summary>
 /// Connection between context items and IInstanceRequired nodes.

@@ -1,4 +1,6 @@
-﻿namespace Flow.Runtime.ContextManager;
+﻿using Flow.Core.Runtime;
+
+namespace Flow.Core.Models.Context;
 
 /// <summary>
 /// Storages an instance in a domain.
@@ -31,7 +33,7 @@ public sealed record ContextItem
 
     /// <summary>
     /// Data of the item.
-    /// </summary>
+    /// </summary> 
     public object Value { get; set; }
     
     /// <summary>

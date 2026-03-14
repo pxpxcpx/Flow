@@ -1,4 +1,6 @@
-﻿using Flow.Shared.Abstractions;
+﻿using System.Text.Json.Serialization;
+using Flow.Shared.Abstractions;
+using Flow.Shared.Enums;
 using Flow.Shared.Models;
 
 namespace Flow.Shared.Metadata;
@@ -41,6 +43,7 @@ namespace Flow.Shared.Metadata;
 /// <br/>
 /// 3. Parse this metadata into JSON and save it as "Plugin.json" in the root directory.
 /// </example>
+[JsonSerializable(typeof(PluginMetadata))]
 public record PluginMetadata : IRecognizable
 {
     /// <summary>
@@ -63,6 +66,11 @@ public record PluginMetadata : IRecognizable
     /// Description of the plugin.
     /// </summary>
     public required string Description { get; set; }
+    
+    /// <summary>
+    /// Describes what kind of contents are contained. 
+    /// </summary>
+    public required PluginType PluginType { get; set; }
 
     /// <summary>
     /// Author of the plugin.

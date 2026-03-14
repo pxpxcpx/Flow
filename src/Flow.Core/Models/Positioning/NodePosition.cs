@@ -1,4 +1,4 @@
-﻿namespace Flow.Runtime.Models.Positioning;
+﻿namespace Flow.Core.Models.Positioning;
 
 public record struct NodePosition(Guid NodeId)
 {

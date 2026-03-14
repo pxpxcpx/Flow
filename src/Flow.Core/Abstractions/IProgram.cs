@@ -1,4 +1,4 @@
-﻿namespace Flow.Runtime.Abstractions;
+﻿namespace Flow.Core.Abstractions;
 
 public interface IProgram
 {

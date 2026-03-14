@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using Flow.Core.Models.Context;
+using System.Collections.Concurrent;
 
-namespace Flow.Runtime.ContextManager;
+namespace Flow.Core.Runtime;
 
 public class ContextManager<TKey>: IDisposable where TKey : IEquatable<TKey>
 {

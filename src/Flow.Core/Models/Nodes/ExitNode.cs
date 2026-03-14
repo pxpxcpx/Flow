@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Flow.Core.Models.Context;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
 
-namespace Flow.Runtime.Models.Nodes;
+namespace Flow.Core.Models.Nodes;
 
-internal class EntranceNode : IExecutableNode
+public class ExitNode : IExecutableNode
 {
     [NotNull] private readonly Function? _function;
 
@@ -17,7 +18,7 @@ internal class EntranceNode : IExecutableNode
     {
         Name = "Entrance Node",
         Description = "As an entry point of a function, usually there can only be one within each function.",
-        Id = Guid.Parse("B522839C-3BA1-4CDD-B128-6BDFE09A1022"),
+        Id = Guid.Parse("ACCE82DB-F41E-4F4C-8F02-4302A047DA3E"),
     };
 
     /// <inheritdoc />
@@ -33,35 +34,35 @@ internal class EntranceNode : IExecutableNode
     public ParameterMetadata[]? OutputVariableMetadata =>  _function.InputVariableMetadata;
 
     /// <inheritdoc />
-    public object?[] Inputs => _inputs.ToArray();
+    public object?[] Inputs => _outputs.ToArray();
     
-    private readonly List<object?> _inputs;
-
     /// <inheritdoc />
-    public object?[] Outputs => _inputs.ToArray();
+    public object?[] Outputs => _outputs.ToArray();
 
+    private readonly List<object?> _outputs;
+    
     /// <inheritdoc />
     public Result? Result { get; private set; }
 
-    internal EntranceNode(Function function)
+    internal ExitNode(Function function)
     {
         RuntimeId = Guid.NewGuid();
         
         _function = function;
-        _inputs = [];
+        _outputs = [];
     }
 
     /// <inheritdoc />
     public void Execute()
     {
-        if (_function.Inputs == null || _function.Inputs.Length == 0)
+        if (_function.Outputs == null || _function.Outputs.Length == 0)
         {
             Result = Result.Completed;
             return;
         }
 
-        foreach (var input in _function.Inputs)
-            _inputs.Add(input);
+        foreach (var output in _function.Outputs)
+            _outputs.Add(output);
         
         Result = Result.Completed;
     }

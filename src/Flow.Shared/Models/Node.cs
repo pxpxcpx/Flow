@@ -2,6 +2,7 @@
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Flow.Shared.Models;
 
@@ -19,6 +20,8 @@ public abstract class Node : INode, IEquatable<INode>
 
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
+    
+    public IServiceCollection RequiredServices { get; init; }
 
     /// <inheritdoc />
     public ParameterMetadata[]? InputVariableMetadata { get; init; }

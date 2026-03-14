@@ -1,6 +1,6 @@
 ﻿using Flow.Shared.Models;
 
-namespace Flow.Runtime.Abstractions;
+namespace Flow.Core.Abstractions;
 
 /// <summary>
 /// Represents a script that defines a logical sequence of nodes, connections, and portals
