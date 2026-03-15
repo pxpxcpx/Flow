@@ -21,7 +21,7 @@ public abstract class Node : INode, IEquatable<INode>
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
     
-    public IServiceCollection RequiredServices { get; init; }
+    public object?[]? Services { get; init; }
 
     /// <inheritdoc />
     public ParameterMetadata[]? InputVariableMetadata { get; init; }
@@ -163,6 +163,34 @@ public abstract class Node : INode, IEquatable<INode>
             if (node.Inputs[i] is null && metadata.DefaultValue is null)
                 yield return metadata;
         }
+    }
+
+    /// <summary>
+    /// Attempts to resolve and assign all required services from the specified service provider.
+    /// </summary>
+    /// <remarks>If any required service cannot be resolved, the method returns false and no further services
+    /// are assigned. The method does not throw exceptions for missing services.</remarks>
+    /// <param name="serviceSource">The service provider used to resolve the required service instances. Cannot be null.</param>
+    /// <returns>true if all required services are successfully resolved and assigned; otherwise, false.</returns>
+    public bool SetRequiredServices(IServiceProvider serviceSource)
+    {
+        if (Metadata.RequiredServices is not { } s || !s.Any())
+            return false;
+
+        for (var i = 0; i < s.Count(); i++)
+        {
+            var t = s.ElementAt(i);
+            try
+            {
+                Services?[i] = serviceSource.GetRequiredService(t);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static void MarkAs(INode node, NodeStatus status)

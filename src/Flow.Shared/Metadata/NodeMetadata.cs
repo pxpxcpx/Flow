@@ -23,6 +23,11 @@ public readonly record struct NodeMetadata()
     /// Description of the node.
     /// </summary>
     public required string Description { get; init; }
+    
+    /// <summary>
+    /// Services that node required.
+    /// </summary>
+    public IEnumerable<Type>? RequiredServices { get; init; }
 
     public static NodeMetadata Empty => new NodeMetadata()
     {
