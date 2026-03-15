@@ -19,8 +19,8 @@ public static class DependencyHelper
     /// <param name="minVersion"><see cref="IDependency.MinVersion"/>, nullable.</param>
     /// <returns></returns>
     public static bool IsSatisfiedBy(
-        this PluginMetadata metadata, PluginMetadata target,
-        DependencyConditionType conditionType, Predicate<(PluginMetadata, PluginMetadata)>? condition, Version? minVersion)
+        this DependencyMetadata metadata, DependencyMetadata target,
+        DependencyConditionType conditionType, Predicate<(DependencyMetadata, DependencyMetadata)>? condition, Version? minVersion)
     {
         if (conditionType == DependencyConditionType.All)
             return metadata == target;

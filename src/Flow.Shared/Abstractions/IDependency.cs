@@ -16,12 +16,12 @@ public interface IDependency
     /// <summary>
     /// Target plugin's metadata.
     /// </summary>
-    PluginMetadata Target { get; set; }
+    DependencyMetadata Target { get; set; }
     
     /// <summary>
     /// Current (or installed) plugin's metadata.
     /// </summary>
-    PluginMetadata Current { get; set; }
+    DependencyMetadata Current { get; set; }
     
     /// <summary>
     /// Used as the basis for determining whether the conditions have been met since then.
@@ -43,5 +43,5 @@ public interface IDependency
     /// follows the format below:
     /// (CurrentPlugin, TargetPlugin)
     /// </remarks>
-    Predicate<(PluginMetadata, PluginMetadata)>? Condition { get; set; }
+    Predicate<(DependencyMetadata, DependencyMetadata)>? Condition { get; set; }
 }

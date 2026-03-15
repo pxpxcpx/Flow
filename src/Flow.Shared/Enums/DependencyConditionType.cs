@@ -21,22 +21,22 @@ public enum DependencyConditionType
     All       = 0b_0000_1111,
     
     /// <summary>
-    /// Plugin's <see cref="PluginMetadata.Name"/>.
+    /// Plugin's <see cref="DependencyMetadata.Name"/>.
     /// </summary>
     Name      = 0b_0000_0001,
     
     /// <summary>
-    /// Plugin's <see cref="PluginMetadata.Guid"/>.
+    /// Plugin's <see cref="DependencyMetadata.Guid"/>.
     /// </summary>
     Guid      = 0b_0000_0010,
     
     /// <summary>
-    /// Compare plugin's <see cref="PluginMetadata.Version"/> with MinVersion.
+    /// Compare plugin's <see cref="DependencyMetadata.Version"/> with MinVersion.
     /// </summary>
     Version   = 0b_0000_0100,
     
     /// <summary>
-    /// Compare plugin's <see cref="PluginMetadata.Version"/> with MinVersion.
+    /// Compare plugin's <see cref="DependencyMetadata.Version"/> with MinVersion.
     /// </summary>
     Predicate = 0b_0000_1000,
 }

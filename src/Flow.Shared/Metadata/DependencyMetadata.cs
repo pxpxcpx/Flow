@@ -43,8 +43,8 @@ namespace Flow.Shared.Metadata;
 /// <br/>
 /// 3. Parse this metadata into JSON and save it as "Plugin.json" in the root directory.
 /// </example>
-[JsonSerializable(typeof(PluginMetadata))]
-public record PluginMetadata : IRecognizable
+[JsonSerializable(typeof(DependencyMetadata))]
+public record DependencyMetadata : IRecognizable
 {
     /// <summary>
     /// ID of the plugin.
@@ -66,11 +66,16 @@ public record PluginMetadata : IRecognizable
     /// Description of the plugin.
     /// </summary>
     public required string Description { get; set; }
+
+    /// <summary>
+    /// Use <b>MD5</b> of the assembly file.
+    /// </summary>
+    public required string Hash { get; set; }
     
     /// <summary>
     /// Describes what kind of contents are contained. 
     /// </summary>
-    public required PluginType PluginType { get; set; }
+    public required DependencyType Type { get; set; }
 
     /// <summary>
     /// Author of the plugin.
@@ -81,19 +86,30 @@ public record PluginMetadata : IRecognizable
     /// Plugins that the plugin required and depends on.
     /// </summary>
     public required Dependency[] Dependencies { get; set; }
+
+    /// <summary>
+    /// Determines if this plugin is portable.
+    /// If configurations includes secrets(password, API keys, etc.), keep it <b>false</b>.
+    /// </summary>
+    public bool IsPortable { get; set; } = false;
     
     /// <summary>
     /// Dictionary to pair a node and its GUID.
     /// </summary>
     public required Dictionary<Guid, NodeMetadata> Nodes { get; set; } = new();
-    
+
     /// <summary>
     /// Path to the plugin assembly file (*.dll).
     /// </summary>
-    public required string PluginPath { get; set; }
-    
+    public required string AssemblyPath { get; set; } = "./Assembly/Plugin.dll";
+
     /// <summary>
     /// Path to the plugin's assets' folder.
     /// </summary>
-    public required string AssetsPath { get; set; }
+    public required string AssetsPath { get; set; } = "./Assets/";
+
+    /// <summary>
+    /// Path to the settings JSON file.
+    /// </summary>
+    public required string SettingsFilePath { get; set; } = "./Settings/Settings.json";
 }

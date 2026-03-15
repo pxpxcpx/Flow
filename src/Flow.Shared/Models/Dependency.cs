@@ -10,21 +10,21 @@ namespace Flow.Shared.Models;
 /// </summary>
 public record Dependency(
     bool IsRequired,
-    PluginMetadata Target,
-    PluginMetadata Current,
+    DependencyMetadata Target,
+    DependencyMetadata Current,
     DependencyConditionType ConditionType,
     Version? MinVersion,
-    Predicate<(PluginMetadata, PluginMetadata)>? Condition = null)
+    Predicate<(DependencyMetadata, DependencyMetadata)>? Condition = null)
     : IDependency
 {
     /// <inheritdoc/>
     public bool IsRequired { get; set; } = IsRequired;
 
     /// <inheritdoc/>
-    public PluginMetadata Target { get; set; } = Target;
+    public DependencyMetadata Target { get; set; } = Target;
 
     /// <inheritdoc/>
-    public PluginMetadata Current { get; set; } = Current;
+    public DependencyMetadata Current { get; set; } = Current;
 
     /// <inheritdoc/>
     public DependencyConditionType ConditionType { get; set; } = ConditionType;
@@ -33,7 +33,7 @@ public record Dependency(
     public Version? MinVersion { get; set; } = MinVersion;
 
     /// <inheritdoc/>
-    public Predicate<(PluginMetadata, PluginMetadata)>? Condition { get; set; } = Condition;
+    public Predicate<(DependencyMetadata, DependencyMetadata)>? Condition { get; set; } = Condition;
 
     public bool IsSatisfied()
         => Current.IsSatisfiedBy(Target, ConditionType, Condition, MinVersion);
