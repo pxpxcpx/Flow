@@ -4,10 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>14.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\sdk\Flow.SDK.Plugins\Flow.SDK.Plugins.csproj" />
+    <ProjectReference Include="..\..\sdk\Flow.SDK.Dependency\Flow.SDK.Dependency.csproj" />
     <ProjectReference Include="..\Flow.Shared\Flow.Shared.csproj" />
   </ItemGroup>
 

@@ -11,8 +11,4 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Metadata\PluginMetadata.cs" />
-  </ItemGroup>
-
 </Project>

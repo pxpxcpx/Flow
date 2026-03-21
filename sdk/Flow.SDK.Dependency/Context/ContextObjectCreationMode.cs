@@ -1,4 +1,4 @@
-﻿namespace Flow.SDK.Plugins.Context;
+﻿namespace Flow.SDK.Dependency.Context;
 
 public enum ContextObjectCreationMode
 {

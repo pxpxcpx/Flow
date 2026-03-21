@@ -4,8 +4,12 @@ using Flow.Shared.Models;
 
 namespace Flow.Shared.Metadata;
 
-public record AppPluginMetadata : IRecognizable
+public record struct PluginMetadata : IRecognizable
 {
+    public PluginMetadata()
+    {
+    }
+
     /// <summary>
     /// ID of the plugin.
     /// <b>Do NOT regenerate</b> or modify during the plugin lifecycle.
@@ -35,7 +39,17 @@ public record AppPluginMetadata : IRecognizable
     /// <summary>
     /// Describes what kind of contents are contained. 
     /// </summary>
-    public required AppPluginType AppPluginType { get; set; }
+    public required PluginType PluginType { get; set; }
+    
+    /// <summary>
+    /// Type of the main class of the plugin, must implete <see cref="Plugin"/>.
+    /// </summary>
+    public required Type ClassType { get; set; }
+    
+    /// <summary>
+    /// Required services.
+    /// </summary>
+    public required IEnumerable<Type> Dependencies { get; set; }
 
     /// <summary>
     /// Author of the plugin.

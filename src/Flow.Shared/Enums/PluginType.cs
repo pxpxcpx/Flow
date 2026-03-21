@@ -1,6 +1,6 @@
 ﻿namespace Flow.Shared.Enums;
 
-public enum AppPluginType
+public enum PluginType
 {
     None      = 0b_0000_0000,
     Service   = 0b_0000_0010,

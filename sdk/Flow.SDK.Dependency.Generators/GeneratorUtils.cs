@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Flow.SDK.Plugins.Generators;
+namespace Flow.SDK.Dependency.Generators;
 
 internal static class GeneratorUtils
 {

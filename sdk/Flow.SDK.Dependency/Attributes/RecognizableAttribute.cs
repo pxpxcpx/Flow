@@ -1,6 +1,6 @@
 ﻿using Flow.Shared.Abstractions;
 
-namespace Flow.SDK.Plugins.Attributes;
+namespace Flow.SDK.Dependency.Attributes;
 
 /// <summary>
 /// The flag will have no effect. Do not apply it to any properties or fields.

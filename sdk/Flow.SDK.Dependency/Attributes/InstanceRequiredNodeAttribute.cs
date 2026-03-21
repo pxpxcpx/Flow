@@ -1,4 +1,4 @@
-﻿namespace Flow.SDK.Plugins.Attributes;
+﻿namespace Flow.SDK.Dependency.Attributes;
 
 /// <summary>
 /// Used to mark a method if it requires an instance.

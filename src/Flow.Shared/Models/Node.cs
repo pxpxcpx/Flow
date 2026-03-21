@@ -172,12 +172,14 @@ public abstract class Node : INode, IEquatable<INode>
     /// are assigned. The method does not throw exceptions for missing services.</remarks>
     /// <param name="serviceSource">The service provider used to resolve the required service instances. Cannot be null.</param>
     /// <returns>true if all required services are successfully resolved and assigned; otherwise, false.</returns>
-    public bool SetRequiredServices(IServiceProvider serviceSource)
+    public bool GetRequiredServices(IServiceProvider serviceSource)
     {
-        if (Metadata.RequiredServices is not { } s || !s.Any())
+        if (Metadata.RequiredServices is null || !Metadata.RequiredServices.Any())
             return false;
 
-        for (var i = 0; i < s.Count(); i++)
+        var s = Metadata.RequiredServices.ToArray();
+
+        for (var i = 0; i < s.Length; i++)
         {
             var t = s.ElementAt(i);
             try

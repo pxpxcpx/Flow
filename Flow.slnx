@@ -5,8 +5,8 @@
     <Project Path="plugins/Flow.BuiltIn.Nodes/Flow.BuiltIn.Nodes.csproj" />
   </Folder>
   <Folder Name="/SDK/">
-    <Project Path="sdk/Flow.SDK.Plugins.Generators/Flow.SDK.Plugins.Generators.csproj" />
-    <Project Path="sdk/Flow.SDK.Plugins/Flow.SDK.Plugins.csproj" />
+    <Project Path="sdk/Flow.SDK.Dependency.Generators/Flow.SDK.Dependency.Generators.csproj" />
+    <Project Path="sdk/Flow.SDK.Dependency/Flow.SDK.Dependency.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests/Flow.Tests.FeasibilityTest/Flow.Tests.FeasibilityTest.csproj" />
