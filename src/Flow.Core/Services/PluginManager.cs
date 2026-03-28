@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace Flow.Core.Services;
 
-public class PluginManager : IDisposable
+public sealed class PluginManager : IDisposable
 {
     private static PluginManager? _instance;
     private static readonly object Lock = new();
@@ -43,7 +43,7 @@ public class PluginManager : IDisposable
     }
 
     /// <summary>
-    /// Factory method for <see cref="PluginManager"/>.
+    /// Factory method for <see cref="PluginManager"/>, which is singleton.
     /// </summary>
     /// <param name="pluginFolderPath"></param>
     /// <param name="serviceProvider"></param>
@@ -63,10 +63,15 @@ public class PluginManager : IDisposable
             if (pluginFolderPath != _folderPathTemp)
                 throw new InvalidOperationException("Manager already created with different parameters.");
         }
-        
+
         return _instance;
     }
 
+    /// <summary>
+    /// Load all plugins.
+    /// Used to be called at the service started.
+    /// </summary>
+    /// <returns></returns>
     public Task LoadPlugins()
     {
         if (string.IsNullOrEmpty(FolderPath) || !Directory.Exists(FolderPath))
@@ -79,11 +84,11 @@ public class PluginManager : IDisposable
         PluginDict = new ReadOnlyDictionary<PluginMetadata, Plugin>(dict);
         return Task.CompletedTask;
 
-        void LoadPlugin(string pathDirectory)
+        void LoadPlugin(string dirPath)
         {
             // Metadata
-            var settingsFile = Path.Combine(pathDirectory, "settings.json");
-            var m = GetMetadata(settingsFile);
+            var metadataFile = Path.Combine(dirPath, PluginMetadataFileName);
+            var m = TryGetMetadata(metadataFile);
             if (m is not { } metadata)
                 return;
 
@@ -106,14 +111,14 @@ public class PluginManager : IDisposable
         }
     }
 
-    private static PluginMetadata? GetMetadata(string settingsFile)
+    private static PluginMetadata? TryGetMetadata(string metadataFile)
     {
-        if (string.IsNullOrEmpty(settingsFile) || !File.Exists(settingsFile))
+        if (string.IsNullOrEmpty(metadataFile) || !File.Exists(metadataFile))
             return null;
 
         try
         {
-            var text = File.ReadAllText(settingsFile);
+            var text = File.ReadAllText(metadataFile);
             return JsonSerializer.Deserialize<PluginMetadata>(text);
         }
         catch
@@ -193,6 +198,9 @@ public class PluginManager : IDisposable
         return Task.FromResult(true);
     }
 
+    /// <summary>
+    /// Dispose manager and managed plugin resources.
+    /// </summary>
     public void Dispose()
     {
         foreach (var plugin in PluginDict)
