@@ -43,9 +43,13 @@ namespace Flow.Shared.Metadata;
 /// <br/>
 /// 3. Parse this metadata into JSON and save it as "Plugin.json" in the root directory.
 /// </example>
-[JsonSerializable(typeof(DependencyMetadata))]
-public record DependencyMetadata : IRecognizable
+[Serializable]
+public record struct DependencyMetadata : IRecognizable
 {
+    public DependencyMetadata()
+    {
+    }
+
     /// <summary>
     /// ID of the plugin.
     /// <b>Do NOT regenerate</b> or modify during the plugin lifecycle.
