@@ -191,7 +191,7 @@ public sealed class DependencyManager
             zip.ExtractToDirectory(FolderPath);
         }
         catch (Exception exception)
-        {
+    {
             return Task.FromException<bool>(exception);
         }
 
@@ -211,7 +211,7 @@ public sealed class DependencyManager
             Directory.Delete(sourcePath + '\\' + name, true);
         }
         catch (Exception exception)
-        {
+    {
             return Task.FromException<bool>(exception);
         }
 
