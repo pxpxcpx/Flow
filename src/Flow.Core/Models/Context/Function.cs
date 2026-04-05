@@ -215,8 +215,30 @@ public class Function : IFunction, IDisposable
         return true;
     }
 
+    public bool AddProcessConnection(Guid sourceId, Guid targetId, int port = 0)
+        => AddProcessConnection(new ProcessConnection
+        {
+            Source = new NodePosition(sourceId),
+            Target = new NodePosition(targetId),
+            ProcessIndex = port
+        });
+
+    public bool AddProcessConnection(INode source, INode target, int port = 0) 
+        => AddProcessConnection(source.RuntimeId, target.RuntimeId, port);
+
     public bool RemoveProcessConnection(ProcessConnection connection)
         => ProcessConnections.Remove(connection);
+
+    public bool RemoveProcessConnection(Guid sourceId, Guid targetId, int port = 0)
+        => RemoveProcessConnection(new ProcessConnection()
+        {
+            Source = new NodePosition(sourceId),
+            Target = new NodePosition(targetId),
+            ProcessIndex = port
+        });
+    
+    public bool RemoveProcessConnection(INode source, INode target)
+        => RemoveProcessConnection(source.RuntimeId, target.RuntimeId);
 
     #endregion
 

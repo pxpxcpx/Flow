@@ -37,11 +37,8 @@ public class Executor : IDisposable
         _function = function ?? throw new ArgumentNullException(nameof(function));
 
         _backupStack = new Stack<KeyValuePair<Function, Queue<INode>>>();
-    }
 
-    private Executor(IFunction function)
-    {
-        _currentPendingNodes = new Queue<INode>();
+        Status = ProcessorStatus.Ready;
     }
 
     #region Execution
@@ -51,7 +48,7 @@ public class Executor : IDisposable
     /// </summary>
     /// <returns></returns>
     public bool IsExit(INode node)
-        => _function.Exit == node;
+        => Equals(_function.Exit, node);
 
     /// <summary>
     /// Execute the script.
@@ -81,19 +78,20 @@ public class Executor : IDisposable
             if (Status.HasFlag(ProcessorStatus.Paused) || Status.HasFlag(ProcessorStatus.Cancelled))
                 return;
 
-            if (IsExit(node))
+            var n = _currentPendingNodes.Dequeue();
+            
+            if (IsExit(n))
             {
                 ReturnToPreviousFunction();
                 _semaphoreSlim.Release(1);
                 continue;
             }
 
-            var n = _currentPendingNodes.Dequeue();
             await ExecuteSingle(n);
             _semaphoreSlim.Release(1);
             _current = n;
 
-            var nextIds = MoveNext(node);
+            var nextIds = MoveNext(n);
 
             // If the node does not have a subsequent node.
             if (nextIds is null || nextIds.Length == 0) continue;
@@ -310,16 +308,7 @@ public class Executor : IDisposable
     }
 
     private static Queue<INode> Clone(Queue<INode> nodes)
-    {
-        var c = new Queue<INode>(nodes);
-
-        while (nodes.TryDequeue(out var n))
-        {
-            c.Enqueue(n);
-        }
-
-        return c;
-    }
+        => new(nodes);
 
     #endregion
 
@@ -383,7 +372,7 @@ public class Executor : IDisposable
                 value = Node.GetOutput(sn, p.Source.Index);
             }
 
-            if (Node.Assign(node, p.Target.Index, value))
+            if (!Node.Assign(node, p.Target.Index, value))
                 success = false;
         }
 
@@ -468,6 +457,8 @@ public class Executor : IDisposable
     {
         _contextManager.Dispose();
         _function.Dispose();
+        _semaphoreSlim.Dispose();
+
         GC.SuppressFinalize(this);
     }
 }

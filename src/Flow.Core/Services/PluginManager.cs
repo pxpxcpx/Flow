@@ -205,7 +205,5 @@ public sealed class PluginManager : IDisposable
     {
         foreach (var plugin in PluginDict)
             plugin.Value.Dispose();
-
-        GC.SuppressFinalize(this);
     }
 }

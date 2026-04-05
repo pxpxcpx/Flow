@@ -6,6 +6,9 @@ using System.Text.Json;
 
 namespace Flow.Core.Services;
 
+/// <summary>
+/// Singleton manager of dependencies.
+/// </summary>
 public sealed class DependencyManager
 {
     private static DependencyManager? _instance;
@@ -126,12 +129,12 @@ public sealed class DependencyManager
         foreach (var target in targets)
         {
             if (_cache.TryGetValue(target, out var path))
-                LoadDependency(target, path);
+                LoadDependency(target);
         }
 
         return Task.FromResult(result);
 
-        void LoadDependency(DependencyMetadata metadata, string dirPath)
+        void LoadDependency(DependencyMetadata metadata)
         {
             // Get the assembly of the dependency, which contains all nodes.
             var a = GetAssembly(metadata.AssemblyPath);
@@ -180,6 +183,12 @@ public sealed class DependencyManager
         }
     }
 
+    /// <summary>
+    /// Install plugin to specified folder.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="refresh"></param>
+    /// <returns></returns>
     public Task<bool> InstallDependency(string path, bool refresh = true)
     {
         if (string.IsNullOrEmpty(path) || !File.Exists(path) || !path.EndsWith(DependencyExtension))
@@ -191,7 +200,7 @@ public sealed class DependencyManager
             zip.ExtractToDirectory(FolderPath);
         }
         catch (Exception exception)
-    {
+        {
             return Task.FromException<bool>(exception);
         }
 
@@ -200,6 +209,12 @@ public sealed class DependencyManager
         return Task.FromResult(true);
     }
 
+    /// <summary>
+    /// Try to uninstall specified dependency.
+    /// </summary>
+    /// <param name="sourcePath"></param>
+    /// <param name="refresh"></param>
+    /// <returns></returns>
     public Task<bool> UninstallDependency(string sourcePath, bool refresh = true)
     {
         if (string.IsNullOrEmpty(sourcePath) || !File.Exists(sourcePath) || !sourcePath.EndsWith(DependencyExtension))
@@ -211,7 +226,7 @@ public sealed class DependencyManager
             Directory.Delete(sourcePath + '\\' + name, true);
         }
         catch (Exception exception)
-    {
+        {
             return Task.FromException<bool>(exception);
         }
 

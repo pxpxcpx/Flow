@@ -7,7 +7,7 @@ using Flow.Shared.Results;
 
 namespace Flow.Core.Models.Nodes;
 
-public class ExitNode : IExecutableNode
+internal sealed class ExitNode : IExecutableNode
 {
     [NotNull] private readonly Function? _function;
 
