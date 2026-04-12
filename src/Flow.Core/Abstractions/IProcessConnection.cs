@@ -4,7 +4,7 @@ namespace Flow.Core.Abstractions;
 
 public interface IProcessConnection
 {
-    NodePosition Source { get; set; }
+    NodePort Source { get; set; }
 
-    NodePosition Target { get; set; }
+    NodePort Target { get; set; }
 }

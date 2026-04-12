@@ -9,5 +9,5 @@ public record struct InstanceConnection
 {
     public required Guid InstanceId { get; set; }
     
-    public required NodePosition Node { get; set; }
+    public required NodePort Node { get; set; }
 }

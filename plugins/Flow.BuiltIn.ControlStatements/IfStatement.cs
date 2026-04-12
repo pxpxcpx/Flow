@@ -41,7 +41,15 @@ public class IfStatement : IExecutableNode, IControlStatement
 
     private static readonly ParameterMetadata[]? InputMetadata =
     [
-        new ParameterMetadata(0, "Bool Value", "True or False", typeof(bool), true, false)
+        new ParameterMetadata
+        {
+            Index = 0,
+            Name = "Bool Value",
+            Description = "True or False",
+            Type = typeof(bool),
+            IsRequired = true,
+            DefaultValue = false
+        }
     ];
 
     /// <inheritdoc />

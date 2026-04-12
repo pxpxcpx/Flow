@@ -218,9 +218,9 @@ public class Function : IFunction, IDisposable
     public bool AddProcessConnection(Guid sourceId, Guid targetId, int port = 0)
         => AddProcessConnection(new ProcessConnection
         {
-            Source = new NodePosition(sourceId),
-            Target = new NodePosition(targetId),
-            ProcessIndex = port
+            Source = new NodePort(sourceId),
+            Target = new NodePort(targetId),
+            Port = port
         });
 
     public bool AddProcessConnection(INode source, INode target, int port = 0) 
@@ -232,9 +232,9 @@ public class Function : IFunction, IDisposable
     public bool RemoveProcessConnection(Guid sourceId, Guid targetId, int port = 0)
         => RemoveProcessConnection(new ProcessConnection()
         {
-            Source = new NodePosition(sourceId),
-            Target = new NodePosition(targetId),
-            ProcessIndex = port
+            Source = new NodePort(sourceId),
+            Target = new NodePort(targetId),
+            Port = port
         });
     
     public bool RemoveProcessConnection(INode source, INode target)
@@ -253,9 +253,33 @@ public class Function : IFunction, IDisposable
         return true;
     }
 
+    public bool AddVariableConnection(Guid sourceId, Guid targetId, Type? sourceType, Type? targetType)
+        => AddVariableConnection(new VariableConnection()
+        {
+            Source = new VariablePort() { NodeId = sourceId },
+            SourceType = sourceType ?? typeof(object),
+            Target = new VariablePort() { NodeId = targetId },
+            TargetType = targetType ?? typeof(object),
+        });
+
+    public bool AddVariableConnection(INode source, INode target, Type? sourceType, Type? targetType)
+        => AddVariableConnection(source.RuntimeId, target.RuntimeId, sourceType, targetType);
+    
     public bool RemoveVariableConnection(VariableConnection connection)
         => VariableConnections.Remove(connection);
 
+    public bool RemoveVariableConnection(Guid sourceId, Guid targetId, Type? sourceType, Type? targetType)
+        => RemoveVariableConnection(new VariableConnection()
+        {
+            Source = new VariablePort() { NodeId = sourceId },
+            SourceType = sourceType ?? typeof(object),
+            Target = new VariablePort() { NodeId = targetId },
+            TargetType = targetType ?? typeof(object),
+        });
+    
+    public bool RemoveVariableConnection(INode source, INode target, Type? sourceType, Type? targetType)
+        => RemoveVariableConnection(source.RuntimeId, target.RuntimeId, sourceType, targetType);
+    
     /// <summary>
     /// Get the previous node in the process.
     /// </summary>
@@ -284,7 +308,7 @@ public class Function : IFunction, IDisposable
             return null;
 
         return ProcessConnections
-            .Where(x => x.Source.NodeId == currentRuntimeId && x.ProcessIndex == index)
+            .Where(x => x.Source.NodeId == currentRuntimeId && x.Port == index)
             .Select(x => x.Target.NodeId)
             .ToArray();
     }
@@ -323,8 +347,8 @@ public class Function : IFunction, IDisposable
     /// Get the next variables.
     /// </summary>
     /// <param name="currentRuntimeId">Runtime GUID of the current node.</param>
-    /// <returns><see cref="VariablePosition"/></returns>
-    public VariablePosition[]? GetVariableTarget(Guid currentRuntimeId)
+    /// <returns><see cref="VariablePort"/></returns>
+    public VariablePort[]? GetVariableTarget(Guid currentRuntimeId)
     {
         if (Nodes.Count == 0 || Nodes.All(n => n.Key != currentRuntimeId))
             return null;
@@ -340,7 +364,7 @@ public class Function : IFunction, IDisposable
     /// </summary>
     /// <param name="currentRuntimeId"></param>
     /// <returns></returns>
-    public VariablePosition[]? GetVariableSource(Guid currentRuntimeId)
+    public VariablePort[]? GetVariableSource(Guid currentRuntimeId)
     {
         if (Nodes.Count == 0 || Nodes.All(n => n.Key != currentRuntimeId))
             return null;

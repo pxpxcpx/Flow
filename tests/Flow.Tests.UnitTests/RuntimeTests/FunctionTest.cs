@@ -4,7 +4,7 @@ using Flow.Shared.Metadata;
 using Flow.Shared.Models;
 using JetBrains.Annotations;
 
-namespace Flow.Tests.RuntimeTest;
+namespace Flow.Tests.UnitTests;
 
 [TestClass]
 [TestSubject(typeof(Function))]
@@ -52,12 +52,12 @@ public class FunctionTest
 
         _function.AddProcessConnection(new ProcessConnection()
         {
-            Source = new NodePosition(
+            Source = new NodePort(
                 _function[
                     _function.Nodes
                         .Where(x => x.Value.Metadata.Id == Guid.Parse("B522839C-3BA1-4CDD-B128-6BDFE09A1022"))
                         .Select(x => x.Value).FirstOrDefault()!] ?? Guid.Empty),
-            Target = new NodePosition(
+            Target = new NodePort(
                 _function[
                     _function.Nodes
                         .Where(x => x.Value.Metadata.Id == Guid.Parse("ACCE82DB-F41E-4F4C-8F02-4302A047DA3E"))

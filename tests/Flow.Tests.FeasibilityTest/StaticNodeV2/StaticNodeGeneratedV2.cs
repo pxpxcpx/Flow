@@ -24,33 +24,38 @@ public partial class StaticNodeExampleV2
         
         private static readonly ParameterMetadata[]? InputMetadata =
         [
-            new ParameterMetadata(
-                Index: 0, 
-                Name: "Number A", 
-                Description: "First number to add.", 
-                Type: typeof(int), 
-                IsRequired: true, 
-                DefaultValue: 0),
-            new ParameterMetadata(
-                Index: 1, 
-                Name: "Number B", 
-                Description: "Second Number to add.", 
-                Type: typeof(int), 
-                IsRequired: true, 
-                DefaultValue: 0)
+            new ParameterMetadata
+            {
+                Index = 0,
+                Name = "Number A", 
+                Description = "First number to add.",
+                Type = typeof(int), 
+                IsRequired = true, 
+                DefaultValue = 0
+            },
+            new ParameterMetadata
+            {
+                Index = 1,
+                Name = "Number B",
+                Description = "Second Number to add.",
+                Type = typeof(int), 
+                IsRequired = true,
+                DefaultValue = 0
+            }
         ];
         public ParameterMetadata[]? InputVariableMetadata => InputMetadata;
         public object?[]? Inputs { get; init; }
         
         private static readonly ParameterMetadata[]? OutputMetadata =
         [
-            new ParameterMetadata(
-                Index: 0, 
-                Name: "Sum", 
-                Description: "Sum of two numbers.", 
-                Type: typeof(int), 
-                IsRequired: true, 
-                DefaultValue: 0)
+            new ParameterMetadata
+            {
+                Index = 0,
+                Name = "Sum",
+                Description = "Sum of two numbers.",
+                Type = typeof(int),
+                IsRequired = true,
+            }
         ];
         public ParameterMetadata[]? OutputVariableMetadata => OutputMetadata;
         public object?[]? Outputs { get; init; }

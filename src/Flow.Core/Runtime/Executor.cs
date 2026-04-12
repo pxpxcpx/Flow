@@ -55,7 +55,9 @@ public class Executor : IDisposable
     /// </summary>
     public async Task Execute()
     {
-        if (_function.Entrance is null) return;
+        if (_function.Entrance is null)
+            return;
+        
         await Execute(_function.Entrance);
     }
 

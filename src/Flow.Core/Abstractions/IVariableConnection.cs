@@ -4,9 +4,9 @@ namespace Flow.Core.Abstractions;
 
 public interface IVariableConnection
 {
-    VariablePosition Source { get; set; }
+    VariablePort Source { get; set; }
 
-    VariablePosition Target { get; set; }
+    VariablePort Target { get; set; }
 
     Type SourceType { get; set; }
     

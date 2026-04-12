@@ -40,9 +40,33 @@ public class LogicalSpecificationNode : IExecutableNode
 
     private static readonly ParameterMetadata[]? InputMetadata =
     [
-        new ParameterMetadata(0, "Value 1", "", typeof(object), true),
-        new ParameterMetadata(1, "Value 2", "", typeof(object), true),
-        new ParameterMetadata(2, "Operator", "Calculation symbol used to compute the left and right values", typeof(LogicalOperator), true, LogicalOperator.And)
+        new ParameterMetadata
+        {
+            Index = 0,
+            Name = "Value 1",
+            Description = "",
+            Type = typeof(object),
+            IsRequired = false,
+            DefaultValue = true
+        },
+        new ParameterMetadata
+        {
+            Index = 1,
+            Name = "Value 2",
+            Description = "",
+            Type = typeof(object),
+            IsRequired = true,
+            DefaultValue = null
+        },
+        new ParameterMetadata
+        {
+            Index = 2,
+            Name = "Operator",
+            Description = "Calculation symbol used to compute the left and right values",
+            Type = typeof(LogicalOperator),
+            IsRequired = true,
+            DefaultValue = LogicalOperator.And
+        }
     ];
 
     /// <inheritdoc />
@@ -53,7 +77,14 @@ public class LogicalSpecificationNode : IExecutableNode
     
     private static readonly ParameterMetadata[]? OutputMetadata =
     [
-        new ParameterMetadata(0, "Result", "Result of the operation.", typeof(bool), false)
+        new ParameterMetadata
+        {
+            Index = 0,
+            Name = "Result",
+            Description = "Result of the operation.",
+            Type = typeof(bool),
+            IsRequired = false
+        }
     ];
 
     /// <inheritdoc />
@@ -78,17 +109,25 @@ public class LogicalSpecificationNode : IExecutableNode
         }
         catch(Exception ex)
         {
-            Result = new Result(false, false, ex, "Failed to calculate the result.");
+            Result = new Result(false,
+                false,
+                ex,
+                "Failed to calculate the result.");
         }
         
         bool result;
         try
         {
-            result = LogicalCondition.Evaluate(value1, value2, @operator);
+            result = LogicalCondition.Evaluate(value1,
+                value2,
+                @operator);
         }
         catch(Exception ex)
         {
-            Result = new Result(false, false, ex, ex.Message);
+            Result = new Result(false,
+                false,
+                ex,
+                ex.Message);
             return;
         }
         Outputs![0] = result;

@@ -11,7 +11,7 @@
   <Folder Name="/Tests/">
     <Project Path="tests/Flow.Tests.FeasibilityTest/Flow.Tests.FeasibilityTest.csproj" />
     <Project Path="tests/Flow.Tests.GeneratingTest/Flow.Tests.GenerationTest.csproj" />
-    <Project Path="tests/Flow.Tests.RuntimeTest/Flow.Tests.RuntimeTest.csproj" />
+    <Project Path="tests/Flow.Tests.UnitTests/Flow.Tests.UnitTests.csproj" />
   </Folder>
   <Project Path="src/Flow.Automation/Flow.Automation.csproj" />
   <Project Path="src/Flow.Core/Flow.Core.csproj" />

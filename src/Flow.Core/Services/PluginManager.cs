@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
+using Flow.Shared.Abstractions;
 
 namespace Flow.Core.Services;
 
+// TODO: IFactory
 public sealed class PluginManager : IDisposable
 {
     private static PluginManager? _instance;

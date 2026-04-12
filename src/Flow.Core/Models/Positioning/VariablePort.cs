@@ -1,6 +1,6 @@
 ﻿namespace Flow.Core.Models.Positioning;
 
-public record struct VariablePosition
+public record struct VariablePort
 {
     public int Index { get; set; }
 

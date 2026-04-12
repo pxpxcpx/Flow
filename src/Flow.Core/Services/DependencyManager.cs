@@ -3,13 +3,14 @@ using Flow.Shared.Metadata;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
+using Flow.Shared.Abstractions;
 
 namespace Flow.Core.Services;
 
 /// <summary>
 /// Singleton manager of dependencies.
 /// </summary>
-public sealed class DependencyManager
+public sealed class DependencyManager : IFactory<DependencyManager, string>
 {
     private static DependencyManager? _instance;
     private static readonly object Lock = new();

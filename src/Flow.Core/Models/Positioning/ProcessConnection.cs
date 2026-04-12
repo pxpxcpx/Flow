@@ -5,11 +5,11 @@ namespace Flow.Core.Models.Positioning;
 /// <summary>
 /// Process connection between two nodes.
 /// </summary>
-public record struct ProcessConnection(NodePosition Source, NodePosition Target, int ProcessIndex = 0) : IProcessConnection
+public record struct ProcessConnection(NodePort Source, NodePort Target, int Port = 0) : IProcessConnection
 {
-    public required NodePosition Source { get; set; } = Source;
+    public required NodePort Source { get; set; } = Source;
 
-    public int ProcessIndex { get; set; } = ProcessIndex;
+    public int Port { get; set; } = Port;
 
-    public required NodePosition Target { get; set; } = Target;
+    public required NodePort Target { get; set; } = Target;
 }
