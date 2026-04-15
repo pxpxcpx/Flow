@@ -18,9 +18,15 @@ public abstract class Node : INode, IEquatable<INode>
     /// <inheritdoc />
     public Guid RuntimeId { get; init; }
 
+    /// <inheritdoc/>
+    public bool IsEnabled { get; set; }
+
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
     
+    /// <summary>
+    /// Services required.
+    /// </summary>
     public object?[]? Services { get; init; }
 
     /// <inheritdoc />
@@ -222,6 +228,20 @@ public abstract class Node : INode, IEquatable<INode>
                node.InputVariableMetadata == other.InputVariableMetadata &&
                node.OutputVariableMetadata == other.OutputVariableMetadata;
     }
+
+    /// <summary>
+    /// Clone the node itself.
+    /// </summary>
+    /// <remarks>
+    /// Due to <see cref="Node"/> is an abstract class,
+    /// this method must be implemented manually if the node want to support cloning.
+    /// </remarks>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException">
+    /// <see cref="Node"/> is an abstract class, throws when calling without overriding.
+    /// </exception>
+    public virtual INode? Clone() 
+        => throw new NotImplementedException("The base class did not implement the Clone() method.");
 
     public override bool Equals(object? obj)
     {

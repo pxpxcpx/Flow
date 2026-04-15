@@ -13,7 +13,7 @@ public class Script : Function, IScript
 
     public void Initialize()
     {
-        // Entrance = Nodes.FirstOrDefault();
+        // Entry = Nodes.FirstOrDefault();
         throw new NotImplementedException();
     }
     

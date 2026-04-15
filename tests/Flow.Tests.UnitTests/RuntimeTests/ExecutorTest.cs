@@ -34,12 +34,12 @@ public class SimpleFuncExecutorTests
         _function.AddNode(_syncNode1);
         _function.AddNode(_syncNode2);
 
-        _function.AddProcessConnection(_function.Entrance, _syncNode1);
+        _function.AddProcessConnection(_function.Entry, _syncNode1);
         _function.AddProcessConnection(_syncNode1, _syncNode2);
         _function.AddProcessConnection(_syncNode2, _function.Exit);
 
         Console.WriteLine($"""
-                           Entrance: {_function.Entrance.RuntimeId};
+                           Entry: {_function.Entry.RuntimeId};
                            #1 : {_syncNode1.RuntimeId};
                            #2 : {_syncNode2.RuntimeId};
                            Exit: {_function.Exit.RuntimeId};
@@ -199,12 +199,12 @@ public class ComplexFuncExecutorTests
         _function.AddNode(_syncNode1);
         _function.AddNode(_syncNode2);
 
-        _function.AddProcessConnection(_function.Entrance, _syncNode1);
+        _function.AddProcessConnection(_function.Entry, _syncNode1);
         _function.AddProcessConnection(_syncNode1, _syncNode2);
         _function.AddProcessConnection(_syncNode2, _function.Exit);
 
         Console.WriteLine($"""
-                           Entrance: {_function.Entrance.RuntimeId};
+                           Entry: {_function.Entry.RuntimeId};
                            #1 : {_syncNode1.RuntimeId};
                            #2 : {_syncNode2.RuntimeId};
                            Exit: {_function.Exit.RuntimeId};

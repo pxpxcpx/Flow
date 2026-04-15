@@ -17,7 +17,7 @@ public class LogicalSpecificationNode : IExecutableNode
         Name = "Logical operations",
         Description = "Used for logical calculations between left and right values."
     };
-    
+
     /// <inheritdoc />
     public NodeMetadata Metadata => NodeMetadata;
 
@@ -27,15 +27,18 @@ public class LogicalSpecificationNode : IExecutableNode
 
     /// <inheritdoc />
     public Guid RuntimeId { get; init; }
-    
+
+    /// <inheritdoc />
+    public bool IsEnabled { get; }
+
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
-    
+
     /// <inheritdoc />
     public Result? Result { get; private set; }
 
     #endregion
-    
+
     #region IO
 
     private static readonly ParameterMetadata[]? InputMetadata =
@@ -71,10 +74,10 @@ public class LogicalSpecificationNode : IExecutableNode
 
     /// <inheritdoc />
     public ParameterMetadata[]? InputVariableMetadata => InputMetadata;
-    
+
     /// <inheritdoc />
     public object?[]? Inputs { get; init; } = new object?[2];
-    
+
     private static readonly ParameterMetadata[]? OutputMetadata =
     [
         new ParameterMetadata
@@ -89,12 +92,12 @@ public class LogicalSpecificationNode : IExecutableNode
 
     /// <inheritdoc />
     public ParameterMetadata[]? OutputVariableMetadata => OutputMetadata;
-    
+
     /// <inheritdoc />
     public object?[]? Outputs { get; init; } = new object?[1];
 
     #endregion
-    
+
     /// <inheritdoc />
     public void Execute()
     {
@@ -107,14 +110,14 @@ public class LogicalSpecificationNode : IExecutableNode
             value2 = (bool)Inputs![1]!;
             @operator = (LogicalOperator)Inputs![2]!;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Result = new Result(false,
                 false,
                 ex,
                 "Failed to calculate the result.");
         }
-        
+
         bool result;
         try
         {
@@ -122,7 +125,7 @@ public class LogicalSpecificationNode : IExecutableNode
                 value2,
                 @operator);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Result = new Result(false,
                 false,
@@ -130,6 +133,12 @@ public class LogicalSpecificationNode : IExecutableNode
                 ex.Message);
             return;
         }
+
         Outputs![0] = result;
+    }
+
+    public INode? Clone()
+    {
+        throw new NotImplementedException();
     }
 }

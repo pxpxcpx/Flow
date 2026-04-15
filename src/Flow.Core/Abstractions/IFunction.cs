@@ -9,7 +9,7 @@ public interface IFunction : INode
     /// <summary>
     /// Entry point of the script, which is the starting node.
     /// </summary>
-    IExecutableNode Entrance { get; }
+    IExecutableNode Entry { get; }
     
     /// <summary>
     /// Exit of the function, exit when any is executed.

@@ -9,14 +9,14 @@ namespace Flow.Core.Models.Nodes;
 
 internal sealed class ExitNode : IExecutableNode
 {
-    [NotNull] private readonly Function? _function;
+    [NotNull] internal Function? Function;
 
     /// <inheritdoc />
     public NodeMetadata Metadata => Meta;
 
     private static readonly NodeMetadata Meta = new NodeMetadata()
     {
-        Name = "Entrance Node",
+        Name = "Entry Node",
         Description = "As an entry point of a function, usually there can only be one within each function.",
         Id = Guid.Parse("ACCE82DB-F41E-4F4C-8F02-4302A047DA3E"),
     };
@@ -24,14 +24,17 @@ internal sealed class ExitNode : IExecutableNode
     /// <inheritdoc />
     public Guid RuntimeId { get; init; }
 
+    /// <inheritdoc/>
+    public bool IsEnabled => true;
+
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
 
     /// <inheritdoc />
-    public ParameterMetadata[]? InputVariableMetadata => _function.InputVariableMetadata;
+    public ParameterMetadata[]? InputVariableMetadata => Function.InputVariableMetadata;
 
     /// <inheritdoc />
-    public ParameterMetadata[]? OutputVariableMetadata =>  _function.InputVariableMetadata;
+    public ParameterMetadata[]? OutputVariableMetadata =>  Function.InputVariableMetadata;
 
     /// <inheritdoc />
     public object?[] Inputs => _outputs.ToArray();
@@ -48,22 +51,33 @@ internal sealed class ExitNode : IExecutableNode
     {
         RuntimeId = Guid.NewGuid();
         
-        _function = function;
+        Function = function;
         _outputs = [];
+    }
+
+    private ExitNode(ExitNode old)
+    {
+        RuntimeId = Guid.NewGuid();
+
+        Function = old.Function;
+        _outputs = old._outputs;
     }
 
     /// <inheritdoc />
     public void Execute()
     {
-        if (_function.Outputs == null || _function.Outputs.Length == 0)
+        if (Function.Outputs == null || Function.Outputs.Length == 0)
         {
             Result = Result.Completed;
             return;
         }
 
-        foreach (var output in _function.Outputs)
+        foreach (var output in Function.Outputs)
             _outputs.Add(output);
         
         Result = Result.Completed;
     }
+
+    public INode? Clone()
+        => new ExitNode(this);
 }

@@ -55,10 +55,10 @@ public class Executor : IDisposable
     /// </summary>
     public async Task Execute()
     {
-        if (_function.Entrance is null)
+        if (_function.Entry is null)
             return;
         
-        await Execute(_function.Entrance);
+        await Execute(_function.Entry);
     }
 
     /// <summary>
@@ -109,6 +109,9 @@ public class Executor : IDisposable
     /// <param name="node">Single node to be invoked.</param>
     private ValueTask ExecuteSingle(INode node)
     {
+        if (!node.IsEnabled)
+            return ValueTask.CompletedTask;
+        
         // If the node has unfilled values:
         if (Node.GetUnfilledRequiredValues(node).Any())
         {
@@ -256,7 +259,7 @@ public class Executor : IDisposable
     {
         if (node is IControlStatement csn)
         {
-            var i = csn.ReturnIndex;
+            var i = csn.ReturnedPort;
             return _function.GetRuntimeGuid(node) is not { } cid ? null : _function.GetNextProgressNodes(cid, i);
         }
 
@@ -301,12 +304,12 @@ public class Executor : IDisposable
         // function(with backup)                    -> _backupStack
         _backupStack.Push(pair);
 
-        // result of the previous node (Re-assign)  -> function.Entrance
-        ResendInputs(f, f.Entrance);
+        // result of the previous node (Re-assign)  -> function.Entry
+        ResendInputs(f, f.Entry);
 
-        // node.Entrance                               -> _currentPendingQueue
+        // node.Entry                               -> _currentPendingQueue
         _function = f;
-        _currentPendingNodes.Enqueue(f.Entrance);
+        _currentPendingNodes.Enqueue(f.Entry);
     }
 
     private static Queue<INode> Clone(Queue<INode> nodes)
@@ -331,7 +334,7 @@ public class Executor : IDisposable
         {
             var targetNode = _function.GetNode(p.NodeId);
             if (node is IFunction fn)
-                targetNode = fn.Entrance;
+                targetNode = fn.Entry;
 
             var value = Node.GetOutput(node, p.Index);
             if (!Node.Assign(targetNode, p.Index, value))

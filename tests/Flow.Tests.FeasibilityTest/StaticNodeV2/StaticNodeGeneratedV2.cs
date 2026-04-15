@@ -20,6 +20,8 @@ public partial class StaticNodeExampleV2
         
         public Guid RuntimeId { get; init; }
         
+        public bool IsEnabled { get; }
+
         public NodeStatus Status { get; set; }
         
         private static readonly ParameterMetadata[]? InputMetadata =
@@ -76,6 +78,11 @@ public partial class StaticNodeExampleV2
                     Exception: ex, 
                     Message: "Failed to calculate the result.");
             }
+        }
+
+        public INode? Clone()
+        {
+            throw new NotImplementedException();
         }
     }
 }

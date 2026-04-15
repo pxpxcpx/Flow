@@ -7,31 +7,34 @@ using Flow.Shared.Results;
 
 namespace Flow.Core.Models.Nodes;
 
-internal sealed class EntranceNode : IExecutableNode
+internal sealed class EntryNode : IExecutableNode
 {
-    [NotNull] private readonly Function? _function;
+    [NotNull] internal Function? Function;
 
     /// <inheritdoc />
     public NodeMetadata Metadata => Meta;
 
     private static readonly NodeMetadata Meta = new NodeMetadata()
     {
-        Name = "Entrance Node",
+        Name = "Entry Node",
         Description = "As an entry point of a function, usually there can only be one within each function.",
         Id = Guid.Parse("B522839C-3BA1-4CDD-B128-6BDFE09A1022"),
     };
 
     /// <inheritdoc />
     public Guid RuntimeId { get; init; }
+    
+    /// <inheritdoc/>
+    public bool IsEnabled => true;
 
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
 
     /// <inheritdoc />
-    public ParameterMetadata[]? InputVariableMetadata => _function.InputVariableMetadata;
+    public ParameterMetadata[]? InputVariableMetadata => Function.InputVariableMetadata;
 
     /// <inheritdoc />
-    public ParameterMetadata[]? OutputVariableMetadata =>  _function.InputVariableMetadata;
+    public ParameterMetadata[]? OutputVariableMetadata =>  Function.InputVariableMetadata;
 
     /// <inheritdoc />
     public object?[] Inputs => _inputs.ToArray();
@@ -44,26 +47,37 @@ internal sealed class EntranceNode : IExecutableNode
     /// <inheritdoc />
     public Result? Result { get; private set; }
 
-    internal EntranceNode(Function function)
+    internal EntryNode(Function function)
     {
         RuntimeId = Guid.NewGuid();
         
-        _function = function;
+        Function = function;
         _inputs = [];
+    }
+
+    private EntryNode(EntryNode old)
+    {
+        RuntimeId = Guid.NewGuid();
+
+        Function = old.Function;
+        _inputs = old._inputs;
     }
 
     /// <inheritdoc />
     public void Execute()
     {
-        if (_function.Inputs == null || _function.Inputs.Length == 0)
+        if (Function.Inputs == null || Function.Inputs.Length == 0)
         {
             Result = Result.Completed;
             return;
         }
 
-        foreach (var input in _function.Inputs)
+        foreach (var input in Function.Inputs)
             _inputs.Add(input);
         
         Result = Result.Completed;
     }
+
+    public INode? Clone()
+        => new EntryNode(this);
 }

@@ -10,7 +10,7 @@ namespace Flow.Shared.Abstractions;
 /// To implement the node, simply inherit from <see cref="IExecutableNode"/> / <see cref="IAsyncExecutableNode"/>.
 /// </remarks>
 /// </summary>
-public interface INode
+public interface INode : ICloneable<INode>
 {
     /// <summary>
     /// Metadata of the node. Includes name, description, GUID of this node. 
@@ -22,6 +22,11 @@ public interface INode
     /// </summary>
     /// <remarks>Note the distinction from the <see cref="NodeMetadata.Id"/></remarks>
     Guid RuntimeId { get; }
+    
+    /// <summary>
+    /// Indicates whether the node is enabled.
+    /// </summary>
+    bool IsEnabled { get; }
     
     /// <summary>
     /// Node status during the runtime.

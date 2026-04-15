@@ -5,7 +5,7 @@ namespace Flow.BuiltIn.ControlStatements;
 
 public class WhileStatement : IControlStatement
 {
-    public int ReturnIndex { get; set; }
+    public int ReturnedPort { get; set; }
     
     public ProcessPointMetadata[] ProcessPointMetadata { get; }
 }

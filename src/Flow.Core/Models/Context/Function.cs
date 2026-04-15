@@ -19,13 +19,16 @@ public class Function : IFunction, IDisposable
     /// <inheritdoc />
     public Guid RuntimeId { get; }
 
+    /// <inheritdoc/>
+    public bool IsEnabled { get; set; }
+
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
 
     /// <inheritdoc />
-    public IExecutableNode Entrance => _entrance; // TODO
+    public IExecutableNode Entry => _entry; // TODO
 
-    private readonly EntranceNode _entrance;
+    private readonly EntryNode _entry;
 
     /// <inheritdoc />
     public IExecutableNode Exit => _exit; // TODO
@@ -83,24 +86,54 @@ public class Function : IFunction, IDisposable
     public Result? Result { get; }
 
     protected Function()
+        : this(NodeMetadata.Empty)
     {
-        RuntimeId = Guid.NewGuid();
     }
 
     public Function(NodeMetadata metadata)
-        : this()
     {
+        RuntimeId = Guid.NewGuid();
         Metadata = metadata;
 
-        _entrance = new EntranceNode(this);
+        _entry = new EntryNode(this);
         _exit = new ExitNode(this);
 
         var p = new Dictionary<Guid, INode>
         {
-            { _entrance.RuntimeId, _entrance },
+            { _entry.RuntimeId, _entry },
             { _exit.RuntimeId, _exit },
         };
         _presetNodes = new ReadOnlyDictionary<Guid, INode>(p);
+    }
+
+    /// <summary>
+    /// Constructor for cloning.
+    /// </summary>
+    /// <param name="old"></param>
+    private Function(Function old)
+    {
+        RuntimeId = Guid.NewGuid();
+        Metadata = old.Metadata;
+
+        _entry = (EntryNode)old._entry.Clone(); // !!!
+        _exit = (ExitNode)old._exit.Clone();
+        _entry.Function = this;
+        _exit.Function = this;
+
+        var p = new Dictionary<Guid, INode>
+        {
+            { _entry.RuntimeId, _entry },
+            { _exit.RuntimeId, _exit  },
+        };
+        _presetNodes = new ReadOnlyDictionary<Guid, INode>(p);
+
+        _nodes = new Dictionary<Guid, INode>(old._nodes);
+        ProcessConnections = [.. old.ProcessConnections]; // ???
+        VariableConnections = [.. old.VariableConnections];
+        InstanceConnections = [.. old.InstanceConnections];
+
+        _isNodeEdited = true;
+        old._isNodeEdited = true;
     }
 
     #region Node
@@ -223,7 +256,7 @@ public class Function : IFunction, IDisposable
             Port = port
         });
 
-    public bool AddProcessConnection(INode source, INode target, int port = 0) 
+    public bool AddProcessConnection(INode source, INode target, int port = 0)
         => AddProcessConnection(source.RuntimeId, target.RuntimeId, port);
 
     public bool RemoveProcessConnection(ProcessConnection connection)
@@ -236,7 +269,7 @@ public class Function : IFunction, IDisposable
             Target = new NodePort(targetId),
             Port = port
         });
-    
+
     public bool RemoveProcessConnection(INode source, INode target)
         => RemoveProcessConnection(source.RuntimeId, target.RuntimeId);
 
@@ -264,7 +297,7 @@ public class Function : IFunction, IDisposable
 
     public bool AddVariableConnection(INode source, INode target, Type? sourceType, Type? targetType)
         => AddVariableConnection(source.RuntimeId, target.RuntimeId, sourceType, targetType);
-    
+
     public bool RemoveVariableConnection(VariableConnection connection)
         => VariableConnections.Remove(connection);
 
@@ -276,10 +309,10 @@ public class Function : IFunction, IDisposable
             Target = new VariablePort() { NodeId = targetId },
             TargetType = targetType ?? typeof(object),
         });
-    
+
     public bool RemoveVariableConnection(INode source, INode target, Type? sourceType, Type? targetType)
         => RemoveVariableConnection(source.RuntimeId, target.RuntimeId, sourceType, targetType);
-    
+
     /// <summary>
     /// Get the previous node in the process.
     /// </summary>
@@ -431,4 +464,7 @@ public class Function : IFunction, IDisposable
 
         _disposed = true;
     }
+
+    public virtual INode? Clone()
+        => new Function(this);
 }

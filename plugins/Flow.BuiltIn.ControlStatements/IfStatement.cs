@@ -28,7 +28,10 @@ public class IfStatement : IExecutableNode, IControlStatement
 
     /// <inheritdoc />
     public Guid RuntimeId { get; init; }
-    
+
+    /// <inheritdoc />
+    public bool IsEnabled { get; set; }
+
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
     
@@ -66,10 +69,15 @@ public class IfStatement : IExecutableNode, IControlStatement
 
     #endregion
 
+    private IfStatement(IfStatement old)
+    {
+
+    }
+
     #region Process Point Controlling
 
     /// <inheritdoc />
-    public int ReturnIndex { get; set; }
+    public int ReturnedPort { get; set; }
 
     private static readonly ProcessPointMetadata[] ProcessPoint =
     [
@@ -97,6 +105,11 @@ public class IfStatement : IExecutableNode, IControlStatement
             return;
         }
 
-        ReturnIndex = boolValue ? 0 : 1;
+        ReturnedPort = boolValue ? 0 : 1;
+    }
+
+    public INode? Clone()
+    {
+        throw new NotImplementedException();
     }
 }
