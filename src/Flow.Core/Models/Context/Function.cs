@@ -41,6 +41,12 @@ public class Function : IFunction, IDisposable
     /// </summary>
     public bool ExitImmediately { get; set; }
 
+    /// <summary>
+    /// Determines whether the function will exit and return immediately
+    /// when the exit reached.
+    /// </summary>
+    public bool ExitImmediately { get; set; } = true;
+
     private bool _isNodeEdited;
     private readonly Dictionary<Guid, INode> _publicNodes = new();
     private readonly Dictionary<Guid, INode> _nodes = new();

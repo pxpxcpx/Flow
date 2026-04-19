@@ -93,7 +93,6 @@ public class Executor : IDisposable
             }
 
             await ExecuteSingle(n);
-            _semaphoreSlim.Release(1);
             _current = n;
 
             var nextIds = MoveNext(n);
@@ -156,7 +155,7 @@ public class Executor : IDisposable
                     success = false;
                     OnNodeError(ex, en);
                 }
-
+                OnNodeCompleted(en);
                 break;
             }
 
@@ -226,19 +225,11 @@ public class Executor : IDisposable
         }
 
         // It isn't:
-        // Enqueue next nodes.
-        EnqueueSubsequentNode(node);
         // Call function Execute(...) to execute.
-        _semaphoreSlim.Release(1);
+        _semaphoreSlim.Release();
 #if DEBUG
         Debug.WriteLine($"Completed node: {node.RuntimeId}\nSemaphoreSlim: {_semaphoreSlim.CurrentCount}");
 #endif
-    }
-
-    private void EnqueueSubsequentNode(INode node)
-    {
-        var nextIds = MoveNext(node);
-        EnqueueNodes(nextIds!);
     }
 
     private void EnqueueNodes(Guid[] nextIds)

@@ -19,7 +19,7 @@ public abstract class Node : INode, IEquatable<INode>
     public Guid RuntimeId { get; init; }
 
     /// <inheritdoc/>
-    public bool IsEnabled { get; set; }
+    public bool IsEnabled { get; set; } = true;
 
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
