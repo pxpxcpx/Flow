@@ -29,7 +29,7 @@ public class LogicalSpecificationNode : IExecutableNode
     public Guid RuntimeId { get; init; }
 
     /// <inheritdoc />
-    public bool IsEnabled { get; }
+    public bool IsEnabled { get; set; }
 
     /// <inheritdoc />
     public NodeStatus Status { get; set; }
@@ -137,7 +137,7 @@ public class LogicalSpecificationNode : IExecutableNode
         Outputs![0] = result;
     }
 
-    public INode? Clone()
+    public INode Clone()
     {
         throw new NotImplementedException();
     }

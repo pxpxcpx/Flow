@@ -34,6 +34,12 @@ public class Function : IFunction, IDisposable
     public IExecutableNode Exit => _exit; // TODO
 
     private readonly ExitNode _exit;
+    
+    /// <summary>
+    /// Determines whether the function will exit and return immediately
+    /// when the exit reached.
+    /// </summary>
+    public bool ExitImmediately { get; set; }
 
     private bool _isNodeEdited;
     private readonly Dictionary<Guid, INode> _publicNodes = new();
@@ -115,8 +121,11 @@ public class Function : IFunction, IDisposable
         RuntimeId = Guid.NewGuid();
         Metadata = old.Metadata;
 
-        _entry = (EntryNode)old._entry.Clone(); // !!!
-        _exit = (ExitNode)old._exit.Clone();
+        // !!!
+        if ((old._entry.Clone() as EntryNode) is not { } entry || (old._exit.Clone() as ExitNode) is not { } exit)
+            return;
+        _entry = entry;
+        _exit = exit;
         _entry.Function = this;
         _exit.Function = this;
 

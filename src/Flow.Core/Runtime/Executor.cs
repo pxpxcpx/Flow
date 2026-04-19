@@ -19,11 +19,14 @@ public class Executor : IDisposable
 
     [NotNull] private Queue<INode>? _currentPendingNodes;
 
+    // To solve the problem of exiting directly before asynchronous nodes have been executed.
+    private int _executingNodesCount;
+
     private readonly Stack<KeyValuePair<Function, Queue<INode>>> _backupStack;
 
     private readonly SemaphoreSlim _semaphoreSlim = new(1);
 
-    // TODO: Context manager?How it works???
+    // TODO: Context manager? How it works???
     private readonly ContextManager<Guid> _contextManager;
 
     public ProcessorStatus Status { get; private set; }
@@ -47,7 +50,7 @@ public class Executor : IDisposable
     /// Check if this is the exit.
     /// </summary>
     /// <returns></returns>
-    public bool IsExit(INode node)
+    private bool IsExit(INode node)
         => Equals(_function.Exit, node);
 
     /// <summary>
@@ -57,7 +60,7 @@ public class Executor : IDisposable
     {
         if (_function.Entry is null)
             return;
-        
+
         await Execute(_function.Entry);
     }
 
@@ -74,14 +77,14 @@ public class Executor : IDisposable
         {
             await _semaphoreSlim.WaitAsync();
 
-            if (_completed) 
+            if (_completed)
                 break;
 
             if (Status.HasFlag(ProcessorStatus.Paused) || Status.HasFlag(ProcessorStatus.Cancelled))
                 return;
 
             var n = _currentPendingNodes.Dequeue();
-            
+
             if (IsExit(n))
             {
                 ReturnToPreviousFunction();
@@ -111,7 +114,7 @@ public class Executor : IDisposable
     {
         if (!node.IsEnabled)
             return ValueTask.CompletedTask;
-        
+
         // If the node has unfilled values:
         if (Node.GetUnfilledRequiredValues(node).Any())
         {
@@ -143,6 +146,7 @@ public class Executor : IDisposable
             // If possible, execute this method on the node.
             case IExecutableNode en:
             {
+                Interlocked.Increment(ref _executingNodesCount);
                 try
                 {
                     en.Execute();
@@ -159,13 +163,17 @@ public class Executor : IDisposable
             // Execute asynchronously if the node implements the IAsyncExecutableNode.
             case IAsyncExecutableNode aen:
             {
+                Interlocked.Increment(ref _executingNodesCount);
                 aen.ExecuteAsync()
                     .Await(ex =>
                         {
                             success = false;
                             OnNodeError(ex, aen);
                         },
-                        () => { OnNodeCompleted(aen); });
+                        () =>
+                        {
+                            OnNodeCompleted(aen);
+                        });
                 break;
             }
 
@@ -202,13 +210,15 @@ public class Executor : IDisposable
     private void OnNodeCompleted(INode node)
     {
         if (_completed) return;
+        Interlocked.Decrement(ref _executingNodesCount);
 
         // When a (async) node completed its execution, we only need to check if the node is the exit.
         // If it is one exit:
         if (IsExit(node))
         {
             // Set the _completed to true.
-            _completed = true;
+            if (_executingNodesCount == 0 || _function.ExitImmediately)
+                _completed = true;
 
             // And call function Execute(...) to finish.
             _semaphoreSlim.Release(1);
@@ -220,6 +230,9 @@ public class Executor : IDisposable
         EnqueueSubsequentNode(node);
         // Call function Execute(...) to execute.
         _semaphoreSlim.Release(1);
+#if DEBUG
+        Debug.WriteLine($"Completed node: {node.RuntimeId}\nSemaphoreSlim: {_semaphoreSlim.CurrentCount}");
+#endif
     }
 
     private void EnqueueSubsequentNode(INode node)
