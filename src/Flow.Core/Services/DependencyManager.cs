@@ -1,4 +1,4 @@
-﻿using Flow.SDK.Dependency.Attributes;
+﻿using Flow.SDK.Attributes;
 using Flow.Shared.Metadata;
 using System.IO.Compression;
 using System.Reflection;

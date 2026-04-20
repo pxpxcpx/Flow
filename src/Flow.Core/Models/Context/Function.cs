@@ -34,12 +34,6 @@ public class Function : IFunction, IDisposable
     public IExecutableNode Exit => _exit; // TODO
 
     private readonly ExitNode _exit;
-    
-    /// <summary>
-    /// Determines whether the function will exit and return immediately
-    /// when the exit reached.
-    /// </summary>
-    public bool ExitImmediately { get; set; }
 
     /// <summary>
     /// Determines whether the function will exit and return immediately

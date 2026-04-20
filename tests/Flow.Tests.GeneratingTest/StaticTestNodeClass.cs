@@ -1,4 +1,4 @@
-﻿using Flow.SDK.Dependency.Attributes;
+﻿using Flow.SDK.Attributes;
 
 namespace Flow.Tests.GenerationTest;
 

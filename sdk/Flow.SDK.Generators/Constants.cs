@@ -1,4 +1,4 @@
-﻿namespace Flow.SDK.Dependency.Generators;
+﻿namespace Flow.SDK.Generators;
 
 internal static class Constants
 {
@@ -18,15 +18,15 @@ using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
 using Flow.Shared.Models;
-using Flow.SDK.Dependency;
-using Flow.SDK.Dependency.Attributes;
+using Flow.SDK;
+using Flow.SDK.Attributes;
 using Flow.Shared;
 
 #nullable enable
 """;
 
     internal const string StaticNodeAttributeDisplayString 
-        = "Flow.SDK.Dependency.Attributes.StaticNodeAttribute";
+        = "Flow.SDK.Attributes.StaticNodeAttribute";
 
     internal const string InputMetadataTemplate =
 """

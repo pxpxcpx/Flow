@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\sdk\Flow.SDK.Dependency\Flow.SDK.Dependency.csproj" />
+    <ProjectReference Include="..\..\sdk\Flow.SDK\Flow.SDK.csproj" />
     <ProjectReference Include="..\..\src\Flow.Shared\Flow.Shared.csproj" />
   </ItemGroup>
 

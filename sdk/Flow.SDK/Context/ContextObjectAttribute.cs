@@ -1,6 +1,6 @@
-﻿using Flow.SDK.Dependency.Attributes;
+﻿using Flow.SDK.Attributes;
 
-namespace Flow.SDK.Dependency.Context;
+namespace Flow.SDK.Context;
 
 /// <summary>
 /// Tag the required context objects, which will be managed and stored in the ContextManager

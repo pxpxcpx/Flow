@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Flow.SDK.Dependency.Generators;
+namespace Flow.SDK.Generators;
 
 #nullable enable
 
