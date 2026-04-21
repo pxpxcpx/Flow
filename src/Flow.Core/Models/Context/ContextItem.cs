@@ -37,7 +37,7 @@ public sealed record ContextItem
     public object Value { get; set; }
     
     /// <summary>
-    /// An item in the <see cref="ContextManager{TKey}"/>.
+    /// An item in the <see cref="InstanceManager{TKey}"/>.
     /// </summary>
     /// <param name="type">type of the <see cref="Value"/></param>
     /// <param name="value">Data of the item</param>

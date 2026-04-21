@@ -4,8 +4,8 @@ using Flow.Core.Abstractions;
 using Flow.Core.Models.Context;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
-using Flow.Shared.Models;
 using Flow.Shared.Results;
+using Flow.Shared.Utils;
 
 namespace Flow.Core.Runtime;
 
@@ -27,16 +27,16 @@ public class Executor : IDisposable
     private readonly SemaphoreSlim _semaphoreSlim = new(1);
 
     // TODO: Context manager? How it works???
-    private readonly ContextManager<Guid> _contextManager;
+    private readonly InstanceManager<Guid> _instanceManager;
 
     public ProcessorStatus Status { get; private set; }
 
     public Result? Result { get; private set; }
 
-    public Executor(Function function, ContextManager<Guid>? contextManager = null)
+    public Executor(Function function, InstanceManager<Guid>? instanceManager = null)
     {
         _currentPendingNodes = new Queue<INode>();
-        _contextManager = contextManager ?? new ContextManager<Guid>();
+        _instanceManager = instanceManager ?? new InstanceManager<Guid>();
         _function = function ?? throw new ArgumentNullException(nameof(function));
 
         _backupStack = new Stack<KeyValuePair<Function, Queue<INode>>>();
@@ -115,11 +115,11 @@ public class Executor : IDisposable
             return ValueTask.CompletedTask;
 
         // If the node has unfilled values:
-        if (Node.GetUnfilledRequiredValues(node).Any())
+        if (NodeExtensions.GetUnfilledRequiredValues(node).Any())
         {
             if (!TryGetValueFromSource(node))
             {
-                Node.MarkAs(node, NodeStatus.Waiting);
+                NodeExtensions.MarkAs(node, NodeStatus.Waiting);
                 return ValueTask.CompletedTask;
             }
         }
@@ -129,7 +129,7 @@ public class Executor : IDisposable
         {
             if (!TryPassContextToNode(node))
             {
-                Node.MarkAs(node, NodeStatus.Waiting);
+                NodeExtensions.MarkAs(node, NodeStatus.Waiting);
                 return ValueTask.CompletedTask;
             }
         }
@@ -340,8 +340,8 @@ public class Executor : IDisposable
             if (node is IFunction fn)
                 targetNode = fn.Entry;
 
-            var value = Node.GetOutput(node, p.Index);
-            if (!Node.Assign(targetNode, p.Index, value))
+            var value = NodeExtensions.GetOutput(node, p.Index);
+            if (!NodeExtensions.Assign(targetNode, p.Index, value))
             {
                 success = false;
                 continue;
@@ -378,10 +378,10 @@ public class Executor : IDisposable
             }
             else
             {
-                value = Node.GetOutput(sn, p.Source.Index);
+                value = NodeExtensions.GetOutput(sn, p.Source.Index);
             }
 
-            if (!Node.Assign(node, p.Target.Index, value))
+            if (!NodeExtensions.Assign(node, p.Target.Index, value))
                 success = false;
         }
 
@@ -389,7 +389,7 @@ public class Executor : IDisposable
     }
 
     /// <summary>
-    /// Try to get a context from the ContextManager, and pass it to the node.
+    /// Try to get a context from the InstanceManager, and pass it to the node.
     /// <remarks>The node must implements <see cref="IInstanceRequired"/>.</remarks>
     /// </summary>
     /// <param name="node"></param>
@@ -401,7 +401,7 @@ public class Executor : IDisposable
 
         try
         {
-            ((IInstanceRequired)node).Instance = _contextManager.TryFindContextObject(rc);
+            ((IInstanceRequired)node).Instance = _instanceManager.TryFindContextObject(rc);
             return true;
         }
         catch
@@ -464,7 +464,7 @@ public class Executor : IDisposable
 
     public void Dispose()
     {
-        _contextManager.Dispose();
+        _instanceManager.Dispose();
         _function.Dispose();
         _semaphoreSlim.Dispose();
 

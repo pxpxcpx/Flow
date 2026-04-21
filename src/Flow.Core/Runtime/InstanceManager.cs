@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace Flow.Core.Runtime;
 
-public class ContextManager<TKey>: IDisposable where TKey : IEquatable<TKey>
+public class InstanceManager<TKey>: IDisposable where TKey : IEquatable<TKey>
 {
     // TODO: We need to build a helper for the ConcurrentDictionary. Dictionary helper doesn't help:(
     /// <summary>
@@ -15,10 +15,10 @@ public class ContextManager<TKey>: IDisposable where TKey : IEquatable<TKey>
     /// </remarks>
     public ConcurrentDictionary<TKey, ContextItem?> Contexts { get; }
 
-    public ContextManager()
+    public InstanceManager()
         : this(new ConcurrentDictionary<TKey, ContextItem?>()) { }
 
-    public ContextManager(ConcurrentDictionary<TKey, ContextItem?> contexts)
+    public InstanceManager(ConcurrentDictionary<TKey, ContextItem?> contexts)
         => Contexts = contexts ?? throw new ArgumentNullException(nameof(contexts), "Contexts cannot be null.");
 
     #region CRUD Operations
