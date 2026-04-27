@@ -2,13 +2,25 @@
 
 namespace Flow.Shared.Metadata;
 
-public readonly record struct ProcessPointMetadata(
-    int Index, string Name, string Description)
-    : IRecognizable
+public record struct ProcessPointMetadata : IRecognizable
 {
-    public int Index { get; } = Index;
+    public ProcessPointMetadata(int Index, string Name, string Description)
+    {
+        this.Index = Index;
+        this.Name = Name;
+        this.Description = Description;
+    }
 
-    public string Name { get; } = Name;
+    public int Index { get; set; }
 
-    public string Description { get; } = Description;
+    public string Name { get; set; }
+
+    public string Description { get; set; }
+
+    public readonly void Deconstruct(out int index, out string name, out string description)
+    {
+        index = Index;
+        name = Name;
+        description = Description;
+    }
 }

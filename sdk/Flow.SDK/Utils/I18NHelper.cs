@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
 using System.Text.Json;
+using Flow.Shared.Abstractions;
+using Flow.Shared.Metadata;
 
-namespace Flow.Shared.Utils;
+namespace Flow.SDK.Utils;
 
 /// <summary>
 /// Helper for text resources' i18n.
@@ -63,14 +65,36 @@ public class I18NHelper
     }
 
     // Or here is ietf language tag?
-    public string Translate(string key, CultureInfo? targetCulture)
+    public string Translate(string key, CultureInfo? targetCulture = null)
         => Translate(key, targetCulture?.Name);
 
-    public string Translate(string key, string? targetCulture)
+    public string Translate(string key, string? targetCulture = null)
     {
         if (!I18NDict.TryGetValue(key, out var strRes))
             return key;
 
         return strRes.GetValueOrDefault(targetCulture ?? TargetCulture, key);
+    }
+
+    public void TranslateAndModify(ref string key, string? targetCulture = null)
+        => key = Translate(key, targetCulture);
+
+    public void TranslateAndModifyRecognizableObject<TRecognizable>(ref TRecognizable recognizableObj,
+        string? targetCulture = null)
+        where TRecognizable : IRecognizable
+    {
+        recognizableObj.Name = Translate(recognizableObj.Name, targetCulture);
+        recognizableObj.Description = Translate(recognizableObj.Description, targetCulture);
+    }
+
+    public void TranslateAndModifyRecognizableObjects<TRecognizable>(
+        ref TRecognizable[] recognizableObjs, // To avoid the value object
+        string? targetCulture = null)
+        where TRecognizable : IRecognizable
+    {
+        for (var i = 0; i < recognizableObjs.Length; i++)
+        {
+            TranslateAndModifyRecognizableObject(ref recognizableObjs[i], targetCulture);
+        }
     }
 }

@@ -6,22 +6,22 @@ namespace Flow.Shared.Metadata;
 /// Represents a parameter or an output in the node.
 /// Immutable identifier used within a variable.
 /// </summary>
-public readonly record struct ParameterMetadata :IRecognizable
+public record ParameterMetadata :IRecognizable
 {
     /// <summary>
     /// The index of this variable in the node.
     /// </summary>
-    public required int Index { get; init; }
+    public required int Index { get; set; }
 
     /// <summary>
     /// Name of the variable.
     /// </summary>
-    public required string Name { get; init; }
+    public required string Name { get; set; }
 
     /// <summary>
     /// Description of the variable.
     /// </summary>
-    public required string Description { get; init; }
+    public required string Description { get; set; }
 
     /// <summary>
     /// The type of the value.

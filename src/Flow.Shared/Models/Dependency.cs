@@ -10,44 +10,29 @@ namespace Flow.Shared.Models;
 /// </summary>
 public abstract class Dependency : IDependency
 {
-    /// <summary>
-    /// Script dependency.
-    /// </summary>
-    protected Dependency(bool isRequired,
-        DependencyMetadata target,
-        DependencyMetadata current,
-        DependencyConditionType conditionType,
-        Version? minVersion,
-        Predicate<(DependencyMetadata, DependencyMetadata)>? condition = null)
-    {
-        IsRequired = isRequired;
-        Target = target;
-        Current = current;
-        ConditionType = conditionType;
-        MinVersion = minVersion;
-        Condition = condition;
-    }
+    /// <inheritdoc/>
+    public abstract bool IsRequired { get; set; }
 
     /// <inheritdoc/>
-    public bool IsRequired { get; set; }
+    public abstract DependencyMetadata Target { get; set; }
 
     /// <inheritdoc/>
-    public DependencyMetadata Target { get; set; }
+    public abstract DependencyMetadata Current { get; set; }
 
     /// <inheritdoc/>
-    public DependencyMetadata Current { get; set; }
+    public abstract DependencyConditionType ConditionType { get; set; }
 
     /// <inheritdoc/>
-    public DependencyConditionType ConditionType { get; set; }
+    public abstract Version? MinVersion { get; set; }
 
     /// <inheritdoc/>
-    public Version? MinVersion { get; set; }
+    public abstract Predicate<(DependencyMetadata, DependencyMetadata)>? Condition { get; set; }
 
-    protected static I18NHelper? I18NHelper; 
-
+    public abstract Dictionary<NodeMetadata, Type> NodeTypes { get; }
+    
     /// <inheritdoc/>
-    public Predicate<(DependencyMetadata, DependencyMetadata)>? Condition { get; set; }
+    public abstract Task Initialize();
 
-    public bool IsSatisfied()
+    public virtual bool IsSatisfied()
         => Current.IsSatisfiedBy(Target, ConditionType, Condition, MinVersion);
 }

@@ -4,7 +4,7 @@ using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Tests.UnitTests.TestModels;
 
-namespace Flow.Tests.UnitTests.RuntimeTests.Executor;
+namespace Flow.Tests.UnitTests.RuntimeTests;
 
 [TestClass]
 public class SimpleFuncExecutorTests

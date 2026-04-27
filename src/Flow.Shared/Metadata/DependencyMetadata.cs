@@ -15,9 +15,9 @@ namespace Flow.Shared.Metadata;
 /// <code>
 /// var dict = new Dictionary&lt;Guid, NodeMetadata&gt;
 /// {
-///     {Guid.Parse("Guid 1"), Metadata1},
-///     {Guid.Parse("Guid 2"), Metadata2},
-///     {Guid.Parse("Guid 3"), Metadata3},
+///     {Guid.Parse("Guid 1"), Metadata_1},
+///     {Guid.Parse("Guid 2"), Metadata_2},
+///     {Guid.Parse("Guid 3"), Metadata_3},
 ///     ...
 /// };
 /// </code>
@@ -44,12 +44,8 @@ namespace Flow.Shared.Metadata;
 /// 3. Parse this metadata into JSON and save it as "Plugin.json" in the root directory.
 /// </example>
 [Serializable]
-public record struct DependencyMetadata : IRecognizable
+public record DependencyMetadata : IRecognizable
 {
-    public DependencyMetadata()
-    {
-    }
-
     /// <summary>
     /// ID of the plugin.
     /// <b>Do NOT regenerate</b> or modify during the plugin lifecycle.

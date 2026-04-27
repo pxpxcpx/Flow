@@ -8,7 +8,8 @@ namespace Flow.Shared.Utils;
 public static class NodeExtensions
 {
     // So why is this indentation so wired? XD
-    extension(INode node)
+    extension<TNode>(TNode node)
+        where TNode: INode
     {
         /// <summary>
         /// Get the snapshot of input arguments of node at the specific time.

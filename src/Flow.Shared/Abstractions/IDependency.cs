@@ -34,6 +34,12 @@ public interface IDependency
     Version? MinVersion { get; set; }
     
     /// <summary>
+    /// Initialize dependency, services, resources, etc.
+    /// </summary>
+    /// <returns></returns>
+    Task Initialize();
+    
+    /// <summary>
     /// Predicate for evaluating custom conditions.
     /// Triggers only when <see cref="ConditionType"/>
     /// contains <see cref="DependencyConditionType.Predicate"/>.

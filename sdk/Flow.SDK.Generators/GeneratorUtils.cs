@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -26,27 +27,38 @@ internal static class GeneratorUtils
         };
     }
 
-    internal static bool IsSyntaxTargetForGeneration(SyntaxNode node)
-        => node is MethodDeclarationSyntax { AttributeLists.Count: > 0 };
-
-    internal static MethodDeclarationSyntax GetSemanticTargetForGeneration(GeneratorSyntaxContext context, string target)
+    internal static IncrementalValuesProvider<TDeclaration> GetDeclarations<TDeclaration>(
+        IncrementalGeneratorInitializationContext context, params string[] targetAttributeDisplayName)
+        where TDeclaration : MemberDeclarationSyntax
     {
-        var methodDeclaration = (MethodDeclarationSyntax)context.Node;
-        
+        return context.SyntaxProvider
+            .CreateSyntaxProvider(
+                predicate: static (sn, _) => sn is TDeclaration { AttributeLists.Count: > 0 },
+                transform: (ctx, _) =>
+                    GetSemanticTargetForGeneration<TDeclaration>(ctx, targetAttributeDisplayName)!)
+            .Where(static c => c is not null);
+    }
+
+    internal static T GetSemanticTargetForGeneration<T>(GeneratorSyntaxContext context, params string[] target)
+        where T : MemberDeclarationSyntax
+    {
+        var methodDeclaration = (T)context.Node;
+
         foreach (var attributeList in methodDeclaration.AttributeLists)
         {
             foreach (var attribute in attributeList.Attributes)
             {
                 if (context.SemanticModel.GetSymbolInfo(attribute).Symbol is not IMethodSymbol attributeSymbol)
                     continue;
-                
+
                 var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
                 var fullName = attributeContainingTypeSymbol.ToDisplayString();
 
-                if (fullName == target)
+                if (target.Contains(fullName))
                     return methodDeclaration;
             }
         }
+
         return null;
     }
 
@@ -74,9 +86,55 @@ internal static class GeneratorUtils
 
     internal static string AlignWithIndent(this string rawString, int indent)
     {
-        var i = new string(' ', indent);
+        var intent = new string(' ', indent);
 
-        return string.Join("\n", 
-            rawString.Split('\n').Select(line => i + line));
+        return string
+            .Join("\n", rawString
+                .Split(["\r\n", "\n"], StringSplitOptions.None)
+                .Select(line => intent + line));
+    }
+    
+    public static string NormalizeIndent(this string code, int indent)
+    {
+        if (string.IsNullOrEmpty(code))
+            return code;
+
+        var desiredIndent = new string(' ', indent);
+        var lines = code.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+        
+        int minLeadingSpaces = int.MaxValue;
+        foreach (var line in lines)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+            
+            var match = Regex.Match(line, @"^[ \t]+");
+            if (match.Success)
+            {
+                int leadingLength = match.Length;
+                if (leadingLength < minLeadingSpaces)
+                    minLeadingSpaces = leadingLength;
+            }
+            else
+            {
+                minLeadingSpaces = 0;
+                break;
+            }
+        }
+
+        if (minLeadingSpaces == int.MaxValue)
+            minLeadingSpaces = 0;
+        
+        var normalizedLines = lines.Select(line =>
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                return line;
+
+            if (line.Length >= minLeadingSpaces)
+                line = line.Substring(minLeadingSpaces);
+            return desiredIndent + line;
+        });
+
+        return string.Join("\r\n", normalizedLines);
     }
 }

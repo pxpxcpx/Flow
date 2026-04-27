@@ -4,7 +4,7 @@ using Flow.Shared.Metadata;
 using Flow.Shared.Models;
 using JetBrains.Annotations;
 
-namespace Flow.Tests.UnitTests;
+namespace Flow.Tests.UnitTests.RuntimeTests;
 
 [TestClass]
 [TestSubject(typeof(Function))]
