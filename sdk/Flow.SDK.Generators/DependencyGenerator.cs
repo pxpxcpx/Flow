@@ -18,10 +18,6 @@ namespace Flow.SDK.Generators;
 
 #nullable enable
 
-// ATTENTION!
-// Compile this file with Roslyn 4.13.0 or EARLIER VERSION (Microsoft.CodeAnalysis <= 4.13.0);
-// otherwise, the correct generator name will not be displayed in some situation.
-
 /// <summary>
 /// Source generator used to attend required fields & properties for dependencies.
 /// </summary>
@@ -215,7 +211,7 @@ public class DependencyGenerator : IIncrementalGenerator
             if (node is null) continue;
             sb.AppendLine(Constants.I18NInitializeMethodBodySourceTemplate
                 .Replace("$i18nInitRequiredObj", $"{node.ContainingType}.{node.Name}Node")
-                .NormalizeIndent(4));
+                .AlignWithIndent(4));
         }
 
         return Constants.I18NInitializeMethodHeader

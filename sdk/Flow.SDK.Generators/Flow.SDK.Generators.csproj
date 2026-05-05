@@ -1,9 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<!--
+Notice: 
+Compile this project with Roslyn 4.13.0 or EARLIER VERSION (Microsoft.CodeAnalysis <= 4.13.0);
+otherwise, the correct generator name will not be displayed in some situation.
+-->
+
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
 	<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-	<!--<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>-->
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 

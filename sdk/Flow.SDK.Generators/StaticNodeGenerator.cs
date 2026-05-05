@@ -17,10 +17,6 @@ namespace Flow.SDK.Generators;
 
 #nullable enable
 
-// ATTENTION!
-// Compile this file with Roslyn 4.13.0 or EARLIER VERSION (Microsoft.CodeAnalysis <= 4.13.0);
-// otherwise, the correct generator name will not be displayed in some situation.
-
 /// <summary>
 /// Source generator which turn static methods into nodes.
 /// </summary>
@@ -46,8 +42,7 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
     {
         if (methods.IsDefaultOrEmpty)
             return;
-
-        // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+        
         foreach (var methodSyntax in methods)
         {
             var semanticModel = compilation.GetSemanticModel(methodSyntax.SyntaxTree);
@@ -130,7 +125,7 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
             .Replace("$inputMetadata", inputMetadata.ToString().AlignWithIndent(16))
             .Replace("$outputMetadata", outputMetadata.ToString().AlignWithIndent(16))
             .Replace("$ctor", ctorBody.AlignWithIndent(12))
-            .Replace("$executeMethodBody", executeMethodBody)
+            .Replace("$executeMethodBody", executeMethodBody.AlignWithIndent(20))
             .Replace("$method_name", methodSymbol.Name);
     }
 
@@ -143,41 +138,40 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
         for (var i = 0; i < methodSymbol.Parameters.Length; i++)
         {
             var parameter = methodSymbol.Parameters[i];
-            parameters.Add($"({parameter.Type.ToDisplayString()})Inputs![{i}]!");
+            parameters.Add(Constants.StaticNodeExecuteParamTemplate
+                .Replace("$index", i.ToString())
+                .Replace("$paramType", parameter.Type.ToDisplayString()));
+            // parameters.Add($"({parameter.Type.ToDisplayString()})Inputs![{i}]!");
         }
 
         var parametersString = string.Join(", ", parameters);
 
         if (methodSymbol.ReturnType.SpecialType == SpecialType.System_Void)
         {
-            sb.AppendLine($"{methodSymbol.Name}({parametersString});");
+            sb.AppendLine(Constants.StaticNodeExecuteCallVoidOriginTemplate
+                .Replace("$originMethodName",  methodSymbol.Name)
+                .Replace("$paramString", parametersString));
         }
         else
         {
-            sb.AppendLine($"var result = {methodSymbol.Name}({parametersString});");
-            sb.AppendLine("                    Outputs[0] = result;");
+            sb.AppendLine(Constants.StaticNodeExecuteCallNonVoidOriginTemplate
+                .Replace("$originMethodName",  methodSymbol.Name)
+                .Replace("$paramString", parametersString)); ;
         }
 
-        sb.Append(
-            "                    Result = new Result(IsCompleted: true, IsSuccess: true, Message: \"Operation completed successfully.\");");
+        sb.Append(Constants.StaticNodeExecuteSuccessfullyResult);
 
         return sb.ToString();
     }
 
     private static string GenerateCtor(string className, IMethodSymbol methodSymbol)
     {
-        var sb = new StringBuilder();
-
-        sb.AppendLine($"public {className}(): base(NodeMetadata, InputMetadata, OutputMetadata)\n" +
-                      $"{{");
-
         var inputLength = methodSymbol.Parameters.Length;
         const int outputLength = 1;
 
-        sb.AppendLine($"    Inputs = new object?[{inputLength}];");
-        sb.AppendLine($"    Outputs = new object?[{outputLength}];");
-        sb.AppendLine("}");
-
-        return sb.ToString();
+        return Constants.StaticNodeCtorTemplate
+            .Replace("$className", className)
+            .Replace("$inputLength", inputLength.ToString())
+            .Replace("$outputLength", outputLength.ToString());
     }
 }

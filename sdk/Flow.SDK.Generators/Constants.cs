@@ -4,6 +4,16 @@ namespace Flow.SDK.Generators;
 
 internal static class Constants
 {
+    internal const string NewLine =
+#if UNIX || IOS
+        "\r\n";
+#elif WINDOWS
+        "\n";
+#else
+        "\n";
+#endif
+
+
     internal const string GeneratorError =
         """
         /*
@@ -89,6 +99,30 @@ internal static class Constants
         },
         """;
 
+    internal const string StaticNodeExecuteParamTemplate =
+        "($paramType)Inputs![($index)]!";
+
+    internal const string StaticNodeExecuteCallVoidOriginTemplate =
+        "$originMethodName($paramString)";
+
+    internal const string StaticNodeExecuteCallNonVoidOriginTemplate =
+        """
+        var result = $originMethodName($paramString);
+        Outputs[0] = result;
+        """;
+
+    internal const string StaticNodeExecuteSuccessfullyResult =
+        "Result = new Result(IsCompleted: true, IsSuccess: true, Message: \"Operation completed successfully.\");";
+
+    internal const string StaticNodeCtorTemplate =
+        """
+        public $className() : base(NodeMetadata, InputMetadata, OutputMetadata)
+        {
+            Inputs = new object?[$inputLength];
+            Outputs = new object?[$outputLength];
+        }
+        """;
+
     internal const string StaticNodeSourceTemplate =
         """
         // Generated at $generatedTimestamp
@@ -124,7 +158,7 @@ internal static class Constants
                     {
                         try
                         {
-                            $executeMethodBody
+        $executeMethodBody
                         }
                         catch (Exception ex)
                         {
