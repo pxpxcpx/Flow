@@ -6,7 +6,7 @@ using Flow.Shared.Metadata;
 namespace Flow.Tests.GenerationTest;
 
 [Dependency]
-[I18NRequired("$$Dependency_I18N:")]
+[I18NRequired("$dpI18N:")]
 public partial class DependencyClass
 {
     public override bool IsRequired { get; set; }

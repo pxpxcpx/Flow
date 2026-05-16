@@ -12,4 +12,13 @@ public partial class StaticTestNode
         
         return a + b;
     }
+    
+    [StaticAsyncNode("Test Node1", "Node for Add method")]
+    public static int TestAsyncMethod1(
+        [Input("", " ")] int a,
+        [Input("", " ")] int b)
+    {
+        
+        return a + b;
+    }
 }

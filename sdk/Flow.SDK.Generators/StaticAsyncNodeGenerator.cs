@@ -1,7 +1,6 @@
 ﻿// #define ROSLYN_DEBUG
 
 // ReSharper disable once RedundantUsingDirective
-
 using System.Diagnostics;
 using System;
 using System.Collections.Generic;
@@ -18,19 +17,18 @@ namespace Flow.SDK.Generators;
 #nullable enable
 
 /// <summary>
-/// Source generator which turn static methods into nodes.
+/// Source generator which turn static async methods into async nodes.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-public sealed class StaticNodeGenerator : IIncrementalGenerator
+public class StaticAsyncNodeGenerator : IIncrementalGenerator
 {
-    /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
 #if ROSLYN_DEBUG
         Debugger.Launch();
 #endif
         var methodsDeclarations =
-            GeneratorUtils.GetDeclarations<MethodDeclarationSyntax>(context, Constants.StaticNodeAttributeString);
+            GeneratorUtils.GetDeclarations<MethodDeclarationSyntax>(context, Constants.StaticAsyncNodeAttributeString);
 
         var compilation = context.CompilationProvider.Combine(methodsDeclarations.Collect());
 
@@ -54,20 +52,20 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
             // Get StaticNodeAttribute
             var staticNodeAttribute = methodSymbol
                 .GetAttributes()
-                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == Constants.StaticNodeAttributeString);
+                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == Constants.StaticAsyncNodeAttributeString);
 
             if (staticNodeAttribute is null)
                 continue;
 
             // Generate
             var source = GenerateNodeClass(methodSymbol, staticNodeAttribute);
-            context.AddSource($"{methodSymbol.Name}Node.g.cs", SourceText.From(source, Encoding.UTF8));
+            context.AddSource($"{methodSymbol.Name}AsyncNode.g.cs", SourceText.From(source, Encoding.UTF8));
         }
     }
-
-    private static string GenerateNodeClass(IMethodSymbol methodSymbol, AttributeData staticNodeAttribute)
+    
+        private static string GenerateNodeClass(IMethodSymbol methodSymbol, AttributeData staticNodeAttribute)
     {
-        var className = $"{methodSymbol.Name}Node";
+        var className = $"{methodSymbol.Name}AsyncNode";
         var namespaceName = methodSymbol.ContainingNamespace.ToDisplayString();
 
         // Node metadata
@@ -81,7 +79,7 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
         {
             var parameter = methodSymbol.Parameters[i];
             var inputAttribute = parameter.GetAttributes()
-                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == Constants.StaticNodeAttributeString);
+                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == Constants.StaticAsyncNodeAttributeString);
 
             var paramName = GeneratorUtils.GetAttributeArgumentValue(inputAttribute, "name", parameter.Name);
             var paramDescription =
@@ -113,9 +111,9 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
         var guid = GeneratorUtils.GenerateDeterministicGuid(namespaceName, methodSymbol.ContainingType.Name,
             methodSymbol.Name);
 
-        return Constants.StaticNodeSourceTemplate
+        return Constants.StaticAsyncNodeSourceTemplate
             .Replace("$generatedTimestamp", DateTime.Now.ToString(CultureInfo.InvariantCulture))
-            .Replace("$sourceHeader", Constants.StaticNodeSourceHeader)
+            .Replace("$sourceHeader", Constants.StaticAsyncNodeSourceHeader)
             .Replace("$namespace", namespaceName)
             .Replace("$collectionName", methodSymbol.ContainingType.Name)
             .Replace("$nodeClassName", className)
@@ -128,7 +126,7 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
             .Replace("$executeMethodBody", executeMethodBody.AlignWithIndent(20))
             .Replace("$method_name", methodSymbol.Name);
     }
-
+        
     private static string GenerateExecuteMethodBody(IMethodSymbol methodSymbol)
     {
         var sb = new StringBuilder();
@@ -138,17 +136,16 @@ public sealed class StaticNodeGenerator : IIncrementalGenerator
         for (var i = 0; i < methodSymbol.Parameters.Length; i++)
         {
             var parameter = methodSymbol.Parameters[i];
-            parameters.Add(Constants.StaticNodeExecuteParamTemplate
+            parameters.Add(Constants.StaticAsyncNodeExecuteParamTemplate
                 .Replace("$index", i.ToString())
                 .Replace("$paramType", parameter.Type.ToDisplayString()));
-            // parameters.Add($"({parameter.Type.ToDisplayString()})Inputs![{i}]!");
         }
 
         var parametersString = string.Join(", ", parameters);
 
         if (methodSymbol.ReturnType.SpecialType == SpecialType.System_Void)
         {
-            sb.AppendLine(Constants.StaticNodeExecuteCallVoidOriginTemplate
+            sb.AppendLine(Constants.StaticAsyncNodeExecuteCallVoidOriginTemplate
                 .Replace("$originMethodName",  methodSymbol.Name)
                 .Replace("$paramString", parametersString));
         }

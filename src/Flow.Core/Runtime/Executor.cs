@@ -115,11 +115,11 @@ public class Executor : IDisposable
             return ValueTask.CompletedTask;
 
         // If the node has unfilled values:
-        if (NodeExtensions.GetUnfilledRequiredValues(node).Any())
+        if (node.GetUnfilledRequiredValues().Any())
         {
             if (!TryGetValueFromSource(node))
             {
-                NodeExtensions.MarkAs(node, NodeStatus.Waiting);
+                node.MarkAs(NodeStatus.Waiting);
                 return ValueTask.CompletedTask;
             }
         }
@@ -129,7 +129,7 @@ public class Executor : IDisposable
         {
             if (!TryPassContextToNode(node))
             {
-                NodeExtensions.MarkAs(node, NodeStatus.Waiting);
+                node.MarkAs(NodeStatus.Waiting);
                 return ValueTask.CompletedTask;
             }
         }
@@ -340,8 +340,8 @@ public class Executor : IDisposable
             if (node is IFunction fn)
                 targetNode = fn.Entry;
 
-            var value = NodeExtensions.GetOutput(node, p.Index);
-            if (!NodeExtensions.Assign(targetNode, p.Index, value))
+            var value = node.GetOutput(p.Index);
+            if (!targetNode.Assign(p.Index, value))
             {
                 success = false;
                 continue;
@@ -378,10 +378,10 @@ public class Executor : IDisposable
             }
             else
             {
-                value = NodeExtensions.GetOutput(sn, p.Source.Index);
+                value = sn.GetOutput(p.Source.Index);
             }
 
-            if (!NodeExtensions.Assign(node, p.Target.Index, value))
+            if (!node.Assign(p.Target.Index, value))
                 success = false;
         }
 

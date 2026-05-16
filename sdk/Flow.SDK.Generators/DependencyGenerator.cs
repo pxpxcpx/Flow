@@ -3,7 +3,6 @@
 // #define FORCE_THROW_WHEN_GENERATE
 
 // ReSharper disable once RedundantUsingDirective
-
 using System.Diagnostics;
 using System;
 using System.Collections.Generic;
@@ -101,7 +100,7 @@ public class DependencyGenerator : IIncrementalGenerator
         var className = $"{classSymbol.Name}";
         var namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
 #if FORCE_THROW_WHEN_GENERATE
-        return Constants.GeneratorError.Replace("$error", e.Message);
+        return Constants.GeneratorError.Replace("$error", "Manually throw by generator.".AlignWithIndent(8));
 #endif
         try
         {
