@@ -13,7 +13,7 @@ namespace Flow.Shared.Enums;
 /// <c>Name | Guid</c>
 /// </example>
 [Flags]
-public enum DependencyConditionType
+public enum PluggableConditionType
 {
     /// <summary>
     /// Compare all properties.

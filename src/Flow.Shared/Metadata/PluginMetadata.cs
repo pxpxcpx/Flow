@@ -1,7 +1,6 @@
 ﻿using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Models;
-using System.Text.Json.Serialization;
 
 namespace Flow.Shared.Metadata;
 

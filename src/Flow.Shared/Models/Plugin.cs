@@ -1,14 +1,21 @@
-﻿using Flow.Shared.Metadata;
+﻿using Flow.Shared.Abstractions;
+using Flow.Shared.Metadata;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Flow.Shared.Models;
 
-public abstract class Plugin : IDisposable
+public abstract class Plugin : IPlugin
 {
     private bool _disposed;
 
     public abstract PluginMetadata Metadata { get; }
     
     public abstract object?[]? Dependencies { get; set; }
+    
+    public HostBuilderContext HostBuilderContext { get; } 
+    
+    public IServiceCollection Services { get; set; }
 
     public abstract Task Initialize();
 

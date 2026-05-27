@@ -6,7 +6,7 @@ namespace Flow.Shared.Abstractions;
 /// <summary>
 /// Interface for script dependencies.
 /// </summary>
-public interface IDependency
+public interface IDependency : IPluggable
 {
     /// <summary>
     /// Indicates whether it is required.
@@ -26,7 +26,7 @@ public interface IDependency
     /// <summary>
     /// Used as the basis for determining whether the conditions have been met since then.
     /// </summary>
-    DependencyConditionType ConditionType { get; set; }
+    PluggableConditionType ConditionType { get; set; }
     
     /// <summary>
     /// Min version of the plugin.
@@ -34,15 +34,9 @@ public interface IDependency
     Version? MinVersion { get; set; }
     
     /// <summary>
-    /// Initialize dependency, services, resources, etc.
-    /// </summary>
-    /// <returns></returns>
-    Task Initialize();
-    
-    /// <summary>
     /// Predicate for evaluating custom conditions.
     /// Triggers only when <see cref="ConditionType"/>
-    /// contains <see cref="DependencyConditionType.Predicate"/>.
+    /// contains <see cref="PluggableConditionType.Predicate"/>.
     /// </summary>
     /// <remarks>
     /// Gives a tuple contains two elements,

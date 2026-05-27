@@ -5,6 +5,8 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
 using Flow.Shared.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Flow.Core.Services;
 
@@ -20,6 +22,10 @@ public sealed class PluginManager : IDisposable
     public string FolderPath { get; init; }
 
     public IServiceProvider ServiceProvider { get; init; }
+    
+    public IServiceCollection ServiceCollection { get; init; }
+    
+    public HostBuilderContext HostBuilderContext { get; init; }
 
     /// <summary>
     /// Plugins' extension.
@@ -99,7 +105,7 @@ public sealed class PluginManager : IDisposable
             if (a is not { } assembly)
                 return;
 
-            // Get the plugin main class.
+            // Get the plugin main class
             var pluginType = assembly.GetType(metadata.ClassType.ToString());
             if (pluginType is null || !typeof(Plugin).IsAssignableFrom(pluginType))
                 return;
@@ -157,6 +163,8 @@ public sealed class PluginManager : IDisposable
                 plugin.Value.Dependencies?[i] = service;
             }
 
+            plugin.Value.Services = ServiceCollection;
+            
             plugin.Value.Initialize();
         }
 

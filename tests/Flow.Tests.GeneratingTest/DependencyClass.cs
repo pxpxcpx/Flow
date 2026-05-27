@@ -15,7 +15,7 @@ public partial class DependencyClass
     
     public override DependencyMetadata Current { get; set; }
     
-    public override DependencyConditionType ConditionType { get; set; }
+    public override PluggableConditionType ConditionType { get; set; }
     
     public override Version? MinVersion { get; set; }
 

@@ -14,26 +14,26 @@ public static class DependencyHelper
     /// </summary>
     /// <param name="metadata">Plugins being compared.</param>
     /// <param name="target">Target plugin</param>
-    /// <param name="conditionType"><see cref="DependencyConditionType"/></param>
+    /// <param name="conditionType"><see cref="PluggableConditionType"/></param>
     /// <param name="condition"><see cref="IDependency.Condition"/>, nullable.</param>
     /// <param name="minVersion"><see cref="IDependency.MinVersion"/>, nullable.</param>
     /// <returns></returns>
     public static bool IsSatisfiedBy(
         this DependencyMetadata metadata, DependencyMetadata target,
-        DependencyConditionType conditionType, Predicate<(DependencyMetadata, DependencyMetadata)>? condition, Version? minVersion)
+        PluggableConditionType conditionType, Predicate<(DependencyMetadata, DependencyMetadata)>? condition, Version? minVersion)
     {
-        if (conditionType == DependencyConditionType.All)
+        if (conditionType == PluggableConditionType.All)
             return metadata == target;
         
         var isSatisfied = false;
         
-        if (conditionType.HasFlag(DependencyConditionType.Name))
+        if (conditionType.HasFlag(PluggableConditionType.Name))
             isSatisfied |= metadata.Name == target.Name;
-        if (conditionType.HasFlag(DependencyConditionType.Guid))
+        if (conditionType.HasFlag(PluggableConditionType.Guid))
             isSatisfied |= metadata.Guid == target.Guid;
-        if (conditionType.HasFlag(DependencyConditionType.Version))
+        if (conditionType.HasFlag(PluggableConditionType.Version))
             isSatisfied |= metadata.Version >= (minVersion ?? target.Version);
-        if (conditionType.HasFlag(DependencyConditionType.Predicate))
+        if (conditionType.HasFlag(PluggableConditionType.Predicate))
             isSatisfied |= condition?.Invoke((metadata, target)) ?? false;
 
         return isSatisfied;

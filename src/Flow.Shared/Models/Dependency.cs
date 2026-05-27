@@ -10,6 +10,8 @@ namespace Flow.Shared.Models;
 /// </summary>
 public abstract class Dependency : IDependency
 {
+    private bool _disposed;
+    
     /// <inheritdoc/>
     public abstract bool IsRequired { get; set; }
 
@@ -19,8 +21,10 @@ public abstract class Dependency : IDependency
     /// <inheritdoc/>
     public abstract DependencyMetadata Current { get; set; }
 
+    public object?[]? Dependencies { get; }
+    
     /// <inheritdoc/>
-    public abstract DependencyConditionType ConditionType { get; set; }
+    public abstract PluggableConditionType ConditionType { get; set; }
 
     /// <inheritdoc/>
     public abstract Version? MinVersion { get; set; }
@@ -35,4 +39,20 @@ public abstract class Dependency : IDependency
 
     public virtual bool IsSatisfied()
         => Current.IsSatisfiedBy(Target, ConditionType, Condition, MinVersion);
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        // TODO: Release unmanaged resources here.
+
+        _disposed = true;
+    }
+    
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 }
