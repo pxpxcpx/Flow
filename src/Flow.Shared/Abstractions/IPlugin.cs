@@ -11,4 +11,12 @@ public interface IPlugin : IPluggable
     HostBuilderContext HostBuilderContext { get; }
     
     IServiceCollection Services { get; }
+    
+    /// <summary>
+    /// Initialize dependency, services, resources, etc.
+    /// </summary>
+    /// <returns></returns>
+    Task Initialize();
+    
+    object?[]? Dependencies { get; }
 }

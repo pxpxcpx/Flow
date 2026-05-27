@@ -1,12 +1,4 @@
 namespace Flow.Shared.Abstractions;
 
-public interface IPluggable : IDisposable
-{
-    /// <summary>
-    /// Initialize dependency, services, resources, etc.
-    /// </summary>
-    /// <returns></returns>
-    Task Initialize();
-    
-    object?[]? Dependencies { get; }
-}
+// So you can simply regard this interface as just an attribute... 
+public interface IPluggable : IDisposable;

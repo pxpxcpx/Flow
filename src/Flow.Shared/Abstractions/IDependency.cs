@@ -24,6 +24,14 @@ public interface IDependency : IPluggable
     DependencyMetadata Current { get; set; }
     
     /// <summary>
+    /// Initialize dependency, services, resources, etc.
+    /// </summary>
+    /// <returns></returns>
+    Task Initialize();
+    
+    object?[]? Dependencies { get; }
+    
+    /// <summary>
     /// Used as the basis for determining whether the conditions have been met since then.
     /// </summary>
     PluggableConditionType ConditionType { get; set; }
