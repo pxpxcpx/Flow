@@ -2,9 +2,9 @@
 using Flow.Core.Models.Context;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
-using Flow.Tests.UnitTests.TestModels;
+using Flow.UnitTests.TestModels;
 
-namespace Flow.Tests.UnitTests.RuntimeTests;
+namespace Flow.UnitTests.CoreTests.Runtime;
 
 [TestClass]
 public class SimpleFuncExecutorTests
@@ -108,12 +108,10 @@ public class SimpleFuncExecutorTests
         Assert.IsTrue(_syncNode2.Executed);
     }
 
-    // 注意：以下测试需要更完整的模拟，包括 PassResults 等，因时间关系仅展示结构
+    // TODO
     [TestMethod]
     public async Task Execute_WithSubFunction_ShouldSwitchAndReturn()
     {
-        // 需要模拟 IFunction 节点以及备份栈逻辑，较为复杂
-        // 建议后续集成测试覆盖
         Assert.Inconclusive("需要完整模拟子函数调用");
     }
 

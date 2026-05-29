@@ -3,7 +3,7 @@ using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Models;
 
-namespace Flow.Tests.UnitTests.TestModels;
+namespace Flow.UnitTests.TestModels;
 
 internal class TestSyncNode : Node, IExecutableNode
 {
