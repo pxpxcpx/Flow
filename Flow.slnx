@@ -1,8 +1,8 @@
 <Solution>
   <Folder Name="/App/" />
   <Folder Name="/Plugins/">
-    <Project Path="plugins/Flow.BuiltIn.ControlStatements/Flow.BuiltIn.ControlStatements.csproj" />
-    <Project Path="plugins/Flow.BuiltIn.Nodes/Flow.BuiltIn.Nodes.csproj" />
+    <Project Path="plugins/Flow.BuiltIn/Flow.BuiltIn.csproj" Id="0a4c61cc-53f1-4597-a4d0-08e531a2f543" />
+    <Project Path="plugins/Flow.Extensions/Flow.Extensions.csproj" Id="ef0d6175-975f-4dbc-af35-acf0854874fb" />
   </Folder>
   <Folder Name="/SDK/">
     <Project Path="sdk/Flow.SDK.Generators/Flow.SDK.Generators.csproj" />

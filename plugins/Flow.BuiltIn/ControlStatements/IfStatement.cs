@@ -10,8 +10,6 @@ namespace Flow.BuiltIn.ControlStatements;
 /// </summary>
 public class IfStatement : IExecutableNode, IControlStatement
 {
-    #region Metadata
-
     private static readonly NodeMetadata NodeMetadata = new()
     {
         Id = new Guid("7AE6EB1F-5B2C-4495-99D1-855CCF8B6FD0"),
@@ -21,10 +19,6 @@ public class IfStatement : IExecutableNode, IControlStatement
     
     /// <inheritdoc />
     public NodeMetadata Metadata => NodeMetadata;
-
-    #endregion
-
-    #region Runtime Info
 
     /// <inheritdoc />
     public Guid RuntimeId { get; init; }
@@ -37,10 +31,6 @@ public class IfStatement : IExecutableNode, IControlStatement
     
     /// <inheritdoc />
     public Result? Result { get; private set; }
-
-    #endregion
-    
-    #region IO
 
     private static readonly ParameterMetadata[]? InputMetadata =
     [
@@ -67,14 +57,10 @@ public class IfStatement : IExecutableNode, IControlStatement
     /// <inheritdoc />
     public object?[]? Outputs { get; init; } = null;
 
-    #endregion
-
     private IfStatement(IfStatement old)
     {
 
     }
-
-    #region Process Point Controlling
 
     /// <inheritdoc />
     public int ReturnedPort { get; set; }
@@ -87,8 +73,6 @@ public class IfStatement : IExecutableNode, IControlStatement
     
     /// <inheritdoc />
     public ProcessPointMetadata[] ProcessPointMetadata => ProcessPoint;
-
-    #endregion
 
     /// <inheritdoc />
     public void Execute()
