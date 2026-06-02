@@ -9,45 +9,45 @@ internal class TestSyncNode : Node, IExecutableNode
 {
     public bool Executed { get; private set; }
 
-    private static readonly ParameterMetadata[] In = new ParameterMetadata[]
-    {
-        new ParameterMetadata
+    private static readonly ParameterMetadata[] In =
+    [
+        new()
         {
             Index = 0,
-            Name = null,
-            Description = null,
-            Type = null,
+            Name = null!,
+            Description = null!,
+            Type = null!,
             IsRequired = false
         }
-    };
+    ];
 
-    private static readonly ParameterMetadata[] Out = new ParameterMetadata[]
-    {
-        new ParameterMetadata
+    private static readonly ParameterMetadata[] Out =
+    [
+        new()
         {
             Index = 0,
-            Name = null,
-            Description = null,
-            Type = null,
+            Name = null!,
+            Description = null!,
+            Type = null!,
             IsRequired = false
         },
-        new ParameterMetadata
+        new()
         {
             Index = 0,
-            Name = null,
-            Description = null,
-            Type = null,
+            Name = null!,
+            Description = null!,
+            Type = null!,
             IsRequired = false
         },
-        new ParameterMetadata
+        new()
         {
             Index = 0,
-            Name = null,
-            Description = null,
-            Type = null,
+            Name = null!,
+            Description = null!,
+            Type = null!,
             IsRequired = false
         }
-    };
+    ];
 
     public void Execute()
     {
@@ -60,8 +60,8 @@ internal class TestSyncNode : Node, IExecutableNode
 internal class TestAsyncNode : Node, IAsyncExecutableNode
 {
     public bool Executed { get; private set; }
-    
-    private Random _random = new(); 
+
+    private Random _random = new();
 
     public async Task ExecuteAsync()
     {
@@ -75,7 +75,7 @@ internal class TestAsyncNode : Node, IAsyncExecutableNode
 internal class TestDelegateNode : Node, IExecutableNode
 {
     public required Action<TestDelegateNode> Action { get; init; }
-    
+
     public void Execute()
     {
         Action.Invoke(this);

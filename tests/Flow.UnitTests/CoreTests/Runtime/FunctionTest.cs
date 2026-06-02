@@ -32,7 +32,7 @@ public class FunctionTest
     }
 
     [TestMethod]
-    public void AddNodeTest()
+    public void Data_AddNode()
     {
         var n = new TestNode();
         _function.AddNode(n);
@@ -46,9 +46,9 @@ public class FunctionTest
     }
 
     [TestMethod]
-    public void AddConnectionTest()
+    public void Data_AddConnection()
     {
-        AddNodeTest();
+        Data_AddNode();
 
         _function.AddProcessConnection(new ProcessConnection()
         {
@@ -68,9 +68,9 @@ public class FunctionTest
     }
 
     [TestMethod]
-    public void ReGetNodesTest()
+    public void FlowControl_ReGetNodes()
     {
-        AddNodeTest();
+        Data_AddNode();
         Console.WriteLine(_function.Nodes.Count);
 
         foreach (var nf in _function.Nodes)
@@ -80,15 +80,15 @@ public class FunctionTest
 
         Console.WriteLine(_function.Nodes.Count);
 
-        AddNodeTest();
+        Data_AddNode();
         Console.WriteLine(_function.Nodes.Count);
         Assert.HasCount(3, _function.Nodes);
     }
 
     [TestMethod]
-    public void GetProcessNextTest()
+    public void FlowControl_GetProcessNext()
     {
-        AddConnectionTest();
+        Data_AddConnection();
 
         var sid = _function[
             _function.Nodes.Where(x => x.Value.Metadata.Id == Guid.Parse("B522839C-3BA1-4CDD-B128-6BDFE09A1022"))
@@ -102,7 +102,5 @@ public class FunctionTest
         Assert.AreEqual(rid, id);
     }
 
-    private class TestNode : Node
-    {
-    }
+    private class TestNode : Node;
 }
