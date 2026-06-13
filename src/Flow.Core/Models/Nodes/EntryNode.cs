@@ -45,7 +45,7 @@ internal sealed class EntryNode : IExecutableNode
     public object?[] Outputs => _inputs.ToArray();
 
     /// <inheritdoc />
-    public Result? Result { get; private set; }
+    public VoidResult? Result { get; private set; }
 
     internal EntryNode(Function function)
     {
@@ -68,16 +68,16 @@ internal sealed class EntryNode : IExecutableNode
     {
         if (Function.Inputs == null || Function.Inputs.Length == 0)
         {
-            Result = Result.Completed;
+            Result = VoidResult.Ok();
             return;
         }
 
         foreach (var input in Function.Inputs)
             _inputs.Add(input);
         
-        Result = Result.Completed;
+        Result = VoidResult.Ok();
     }
 
-    public INode? Clone()
+    public INode Clone()
         => new EntryNode(this);
 }

@@ -45,7 +45,7 @@ internal sealed class ExitNode : IExecutableNode
     private readonly List<object?> _outputs;
     
     /// <inheritdoc />
-    public Result? Result { get; private set; }
+    public VoidResult? Result { get; private set; }
 
     internal ExitNode(Function function)
     {
@@ -68,16 +68,16 @@ internal sealed class ExitNode : IExecutableNode
     {
         if (Function.Outputs == null || Function.Outputs.Length == 0)
         {
-            Result = Result.Completed;
+            Result = VoidResult.Ok();
             return;
         }
 
         foreach (var output in Function.Outputs)
             _outputs.Add(output);
         
-        Result = Result.Completed;
+        Result = VoidResult.Ok();
     }
 
-    public INode? Clone()
+    public INode Clone()
         => new ExitNode(this);
 }

@@ -5,6 +5,8 @@ using Flow.Shared.Models;
 
 namespace Flow.UnitTests.TestModels;
 
+internal class TestNode : Node;
+
 internal class TestSyncNode : Node, IExecutableNode
 {
     public bool Executed { get; private set; }

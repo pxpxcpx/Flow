@@ -62,7 +62,7 @@ public partial class StaticNodeExampleV2
         public ParameterMetadata[]? OutputVariableMetadata => OutputMetadata;
         public object?[]? Outputs { get; init; }
         
-        public Result? Result { get; private set; }
+        public VoidResult? Result { get; private set; }
         
         public void Execute()
         {
@@ -72,11 +72,7 @@ public partial class StaticNodeExampleV2
             }
             catch (Exception ex)
             {
-                Result = new Result(
-                    IsCompleted: false, 
-                    IsSuccess: false, 
-                    Exception: ex, 
-                    Message: "Failed to calculate the result.");
+                Result = VoidResult.Err(ex);
             }
         }
 

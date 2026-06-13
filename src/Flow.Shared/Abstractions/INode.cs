@@ -56,5 +56,5 @@ public interface INode : ICloneable<INode>
     /// <summary>
     /// Used as an alternative to throwing exceptions.
     /// </summary>
-    Result? Result { get; }
+    VoidResult? Result { get; }
 }

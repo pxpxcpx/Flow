@@ -34,6 +34,7 @@ public class FunctionTest
     [TestMethod]
     public void Data_AddNode()
     {
+        
         var n = new TestNode();
         _function.AddNode(n);
 

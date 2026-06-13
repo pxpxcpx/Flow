@@ -10,7 +10,7 @@ namespace Flow.Shared.Models;
 /// Base class for common implementations of <see cref="INode"/>.
 /// Also provides node utils.
 /// </summary>
-public abstract class Node : INode, IEquatable<INode>
+public abstract class Node : INode, IEquatable<INode>, ICloneable
 {
     /// <inheritdoc />
     public NodeMetadata Metadata { get; init; }
@@ -42,7 +42,7 @@ public abstract class Node : INode, IEquatable<INode>
     public virtual object?[]? Outputs { get; set; }
 
     /// <inheritdoc />
-    public virtual Result? Result { get; protected set; }
+    public virtual VoidResult? Result { get; protected set; }
 
     protected Node(): this(NodeMetadata.Empty, [], [])
     {
@@ -97,7 +97,7 @@ public abstract class Node : INode, IEquatable<INode>
     {
         return 
             $"""
-            Type: {this.GetType().Name}", 
+            Type: {GetType().Name}", 
             RuntimeId: {RuntimeId},
             Metadata:{Metadata}
             """;
@@ -128,8 +128,11 @@ public abstract class Node : INode, IEquatable<INode>
     /// <exception cref="NotImplementedException">
     /// <see cref="Node"/> is an abstract class, throws when calling without overriding.
     /// </exception>
-    public virtual INode? Clone() 
+    public virtual INode Clone() 
         => throw new NotImplementedException("The base class did not implement the Clone() method.");
+
+    object ICloneable.Clone()
+        => Clone();
 
     public override bool Equals(object? obj)
     {

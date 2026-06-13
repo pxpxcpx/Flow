@@ -1,6 +1,6 @@
 ﻿using Flow.Automation.Messaging;
 using Flow.Automation.Services.Listeners;
-using Flow.Shared.Results;
+using Flow.Shared.Utils;
 using Microsoft.Extensions.Hosting;
 
 namespace Flow.Automation.Services;

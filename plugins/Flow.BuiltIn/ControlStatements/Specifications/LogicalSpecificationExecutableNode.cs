@@ -35,7 +35,7 @@ public class LogicalSpecificationNode : IExecutableNode
     public NodeStatus Status { get; set; }
 
     /// <inheritdoc />
-    public Result? Result { get; private set; }
+    public VoidResult? Result { get; private set; }
 
     #endregion
 
@@ -112,10 +112,7 @@ public class LogicalSpecificationNode : IExecutableNode
         }
         catch (Exception ex)
         {
-            Result = new Result(false,
-                false,
-                ex,
-                "Failed to calculate the result.");
+            Result = VoidResult.Err(ex);
         }
 
         bool result;
@@ -127,10 +124,7 @@ public class LogicalSpecificationNode : IExecutableNode
         }
         catch (Exception ex)
         {
-            Result = new Result(false,
-                false,
-                ex,
-                ex.Message);
+            Result = VoidResult.Err(ex);
             return;
         }
 

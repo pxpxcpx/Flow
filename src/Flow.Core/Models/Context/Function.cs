@@ -64,6 +64,7 @@ public class Function : IFunction, IDisposable
 
     public Guid? this[INode node]
     {
+        // ReSharper disable once ArrangeAccessorOwnerBody
         get => GetRuntimeGuid(node);
     }
 
@@ -83,13 +84,13 @@ public class Function : IFunction, IDisposable
     public ParameterMetadata[]? OutputVariableMetadata { get; } = [];
 
     /// <inheritdoc />
-    public object?[]? Inputs { get; init; }
+    public object?[]? Inputs { get; set; }
 
     /// <inheritdoc />
-    public object?[]? Outputs { get; init; }
+    public object?[]? Outputs { get; set; }
 
     /// <inheritdoc />
-    public Result? Result { get; }
+    public VoidResult? Result { get; }
 
     protected Function()
         : this(NodeMetadata.Empty)
@@ -449,6 +450,8 @@ public class Function : IFunction, IDisposable
 
     public void AddInput(ParameterMetadata parameterMetadata)
     {
+        
+        // TODO
     }
 
     public void Dispose()

@@ -30,7 +30,7 @@ public class IfStatement : IExecutableNode, IControlStatement
     public NodeStatus Status { get; set; }
     
     /// <inheritdoc />
-    public Result? Result { get; private set; }
+    public VoidResult? Result { get; private set; }
 
     private static readonly ParameterMetadata[]? InputMetadata =
     [
@@ -85,14 +85,14 @@ public class IfStatement : IExecutableNode, IControlStatement
         }
         catch(Exception ex)
         {
-            Result = new Result(false, false, ex, "Failed to calculate the result.");
+            Result = VoidResult.Err(ex);
             return;
         }
 
         ReturnedPort = boolValue ? 0 : 1;
     }
 
-    public INode? Clone()
+    public INode Clone()
     {
         throw new NotImplementedException();
     }
