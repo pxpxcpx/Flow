@@ -50,19 +50,19 @@ public readonly struct Result<T, E> : IResult<T, E>
         => new(err);
 
     /// <inheritdoc/>
-    public T Unwrap()
+    public T? Unwrap()
     {
         if (!_isOk)
             throw new InvalidOperationException("Called Unwrap on Err");
-        return _value!;
+        return _value;
     }
 
     /// <inheritdoc/>
-    public E UnwrapErr()
+    public E? UnwrapErr()
     {
         if (_isOk)
             throw new InvalidOperationException("Called UnwrapErr on Ok");
-        return _err!;
+        return _err;
     }
 
     /// <inheritdoc/>

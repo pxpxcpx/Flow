@@ -114,7 +114,7 @@ internal static class Constants
         """;
 
     internal const string StaticNodeExecuteSuccessfullyResult =
-        "Result = new Result(IsCompleted: true, IsSuccess: true, Message: \"Operation completed successfully.\");";
+        "Result = VoidResult.Ok();";
 
     internal const string StaticNodeCtorTemplate =
         """
@@ -164,11 +164,7 @@ internal static class Constants
                         }
                         catch (Exception ex)
                         {
-                            Result = new Result(
-                                IsCompleted: false, 
-                                IsSuccess: false, 
-                                Exception: ex, 
-                                Message: "Failed to execute $methodName operation.");
+                            Result = VoidResult.Err(ex);
                         }
                     }
                 }
@@ -274,11 +270,7 @@ internal static class Constants
                         }
                         catch (Exception ex)
                         {
-                            Result = new Result(
-                                IsCompleted: false, 
-                                IsSuccess: false, 
-                                Exception: ex, 
-                                Message: "Failed to execute $methodName operation.");
+                            Result = VoidResult.Err(ex);
                         }
                     }
                 }

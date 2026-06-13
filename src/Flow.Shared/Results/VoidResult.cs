@@ -16,83 +16,108 @@ namespace Flow.Shared.Results;
 /// </summary>
 public readonly struct VoidResult : IResult<bool, Exception>
 {
-    private readonly bool _isOk = false;
+    private readonly bool _isCompleted = false;
 
-    private readonly bool _value = false;
+    private readonly bool _isOk = false;
 
     private readonly Exception? _err = null;
 
     /// <inheritdoc/>
-    public bool IsOk => _isOk;
+    [Obsolete("Use property IsCompleted instead.", false)]
+    public bool IsOk => _isCompleted;
+    
+    /// <summary>
+    /// Indicates whether the operation completed.
+    /// </summary>
+    /// <remarks>
+    /// To determine whether the operation was succeeded,
+    /// use <see cref="Value"/>
+    /// </remarks>
+    public bool IsCompleted => _isCompleted;
 
     /// <inheritdoc/>
-    public bool IsErr => !IsOk;
+    public bool IsErr => !_isCompleted;
 
-    /// <inheritdoc/>
-    public bool Value => _value;
+    /// <summary>
+    /// Indicates whether the operation succeeded.
+    /// </summary>
+    /// <remarks>
+    /// To determine whether the operation was completed,
+    /// use <see cref="IsCompleted"/>
+    /// </remarks>
+    public bool Value => _isOk;
 
     /// <inheritdoc/>
     public Exception? Error => _err;
 
     private VoidResult(bool isSuccess = false)
     {
-        _isOk = true;
-        _value = isSuccess;
+        _isCompleted = true;
+        _isOk = isSuccess;
     }
 
     private VoidResult(Exception? err)
     {
+        _isCompleted = false;
         _isOk = false;
-        _value = false;
         _err = err;
     }
 
-    public static VoidResult Ok(bool value = true)
-        => new(value);
+    public static VoidResult Ok()
+        => new(true);
 
     public static VoidResult Err(Exception? err)
         => new(err);
 
-    public static VoidResult Completed(bool isSuccess = false) 
+    public static VoidResult Completed(bool isSuccess = false)
         => new(isSuccess);
 
     /// <inheritdoc/>
     public bool Unwrap()
     {
-        if (!_isOk)
+        if (!_isCompleted)
             throw new InvalidOperationException("Called Unwrap on Err");
-        return _value;
+        return _isOk;
     }
 
     /// <inheritdoc/>
-    public Exception UnwrapErr()
+    public Exception? UnwrapErr()
     {
-        throw new NotImplementedException();
+        if(_isCompleted)
+            throw new InvalidOperationException("Called UnwrapErr on Ok");
+        return _err;
     }
 
     /// <inheritdoc/>
     public Result<TResult, Exception> Map<TResult>(Func<bool, TResult> map)
         where TResult : notnull
-    {
-        throw new NotImplementedException();
-    }
+        => IsCompleted
+            ? Result<TResult, Exception>.Ok(map(_isOk))
+            : Result<TResult, Exception>.Err(_err);
 
     /// <inheritdoc/>
     public Result<bool, F> MapErr<F>(Func<Exception, F> map)
         where F : notnull
-    {
-        throw new NotImplementedException();
-    }
+        => IsErr
+            ? Result<bool, F>.Err(map(_err!))
+            : Result<bool, F>.Ok(_isOk);
 
     /// <inheritdoc/>
     public void Match(Action<Result<bool, Exception>> ok, Action<Result<bool, Exception>> err)
     {
-        throw new NotImplementedException();
+        if(IsCompleted)
+            ok(this);
+        else
+            err(this);
     }
 
+    /// <inheritdoc cref="IResult{T,E}.Match"/>
     public void Match(Action<VoidResult> ok, Action<VoidResult> err)
     {
-        throw new NotImplementedException();
+        if(IsCompleted)
+            ok(this);
+        else
+            err(this);
     }
 
     /// <summary>
@@ -101,7 +126,7 @@ public readonly struct VoidResult : IResult<bool, Exception>
     /// <param name="result"></param>
     /// <returns></returns>
     public static implicit operator Result<bool, Exception>(VoidResult result)
-        => result.IsOk
+        => result.IsCompleted
             ? Result<bool, Exception>.Ok(result.Value)
             : Result<bool, Exception>.Err(result.Error);
 
@@ -111,16 +136,16 @@ public readonly struct VoidResult : IResult<bool, Exception>
     /// </summary>
     /// <param name="result"></param>
     /// <returns></returns>
-    public static implicit operator VoidResult(Result<bool, Exception> result)
-        => result.IsOk
-            ? Ok(result.Value)
-            : Err(result.Error);
+    public static implicit operator VoidResult(Result<bool, Exception> result) 
+        => result.IsErr                // common Result<T, E> only have two values
+            ? Err(result.Error)        // error
+            : Completed(result.Value); // no error, means result is completed, and the value is the success status.
 
     /// <inheritdoc/>
     public IResult<bool, Exception> Clone()
-        => _value switch
+        => _isOk switch
         {
-            true => Ok(true),
-            false => Ok(),
+            true => Ok(),
+            false => Completed(),
         };
 }

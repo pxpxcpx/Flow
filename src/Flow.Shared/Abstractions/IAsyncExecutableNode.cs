@@ -3,7 +3,4 @@
 /// <summary>
 /// A node can be executed asynchronously.
 /// </summary>
-public interface IAsyncExecutableNode : INode, IAsyncExecutable
-{
-    Task ExecuteAsync();
-}
+public interface IAsyncExecutableNode : INode, IAsyncExecutable;

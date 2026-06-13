@@ -4,6 +4,7 @@ using Flow.Core.Abstractions;
 using Flow.Core.Models.Context;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
+using Flow.Shared.Exceptions;
 using Flow.Shared.Results;
 using Flow.Shared.Utils;
 
@@ -31,7 +32,7 @@ public class Executor : IDisposable
 
     public ProcessorStatus Status { get; private set; }
 
-    public Result? Result { get; private set; }
+    public VoidResult? Result { get; private set; }
 
     public Executor(Function function, InstanceManager<Guid>? instanceManager = null)
     {
@@ -43,9 +44,7 @@ public class Executor : IDisposable
 
         Status = ProcessorStatus.Ready;
     }
-
-    #region Execution
-
+    
     /// <summary>
     /// Check if this is the exit.
     /// </summary>
@@ -194,7 +193,7 @@ public class Executor : IDisposable
         }
 
         if (!PassResults(node))
-            Result = new Result(false, false, null, $"Value transfer error occurred on node: {node.RuntimeId}");
+            Result = VoidResult.Err(new ValuePassingException());
 
         return ValueTask.CompletedTask;
     }
@@ -319,10 +318,6 @@ public class Executor : IDisposable
     private static Queue<INode> Clone(Queue<INode> nodes)
         => new(nodes);
 
-    #endregion
-
-    #region Variable Utils
-
     /// <summary>
     /// Get results from a node, and pass them according to connections. (Actively pass values)
     /// </summary>
@@ -432,10 +427,6 @@ public class Executor : IDisposable
         return true;
     }
 
-    #endregion
-
-    #region Process Control
-
     private void Pause()
     {
         Status |= ProcessorStatus.Paused;
@@ -459,8 +450,6 @@ public class Executor : IDisposable
         _completed = true;
         Dispose();
     }
-
-    #endregion
 
     public void Dispose()
     {

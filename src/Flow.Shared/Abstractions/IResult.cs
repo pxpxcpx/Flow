@@ -6,10 +6,11 @@ namespace Flow.Shared.Abstractions;
 // Learn more: https://github.com/SlimeNull/RustSharp
 
 /// <summary>
-/// Represent the result of a method's execution.
+/// Represent a result of a method's execution,
+/// wrapped the result or error information.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-/// <typeparam name="E"></typeparam>
+/// <typeparam name="T">Type of <see cref="Value"/></typeparam>
+/// <typeparam name="E">Type of <see cref="Error"/></typeparam>
 public interface IResult<T, E> : ICloneable<IResult<T, E>>
     where T : notnull
     where E : notnull
@@ -38,13 +39,13 @@ public interface IResult<T, E> : ICloneable<IResult<T, E>>
     /// Get the <see cref="Value"/> if <see cref="IsOk"/>
     /// </summary>
     /// <returns></returns>
-    T Unwrap();
+    T? Unwrap();
 
     /// <summary>
     /// Get the <see cref="Error"/> if <see cref="IsErr"/>
     /// </summary>
     /// <returns></returns>
-    E UnwrapErr();
+    E? UnwrapErr();
 
     /// <summary>
     /// Process <see cref="Value"/> with function.
