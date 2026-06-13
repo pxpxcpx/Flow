@@ -12,4 +12,8 @@
     <ProjectReference Include="..\Flow.Shared\Flow.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Flow.UnitTests" />
+  </ItemGroup>
+
 </Project>

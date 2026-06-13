@@ -1,7 +1,7 @@
 ﻿using Flow.Core.Models.Context;
 using Flow.Core.Models.Positioning;
 using Flow.Shared.Metadata;
-using Flow.Shared.Models;
+using Flow.UnitTests.TestModels;
 using JetBrains.Annotations;
 
 namespace Flow.UnitTests.CoreTests.Runtime;
@@ -46,6 +46,12 @@ public class FunctionTest
     }
 
     [TestMethod]
+    public void Data_RemoveNode()
+    {
+        throw new NotImplementedException();
+    }
+
+    [TestMethod]
     public void Data_AddConnection()
     {
         Data_AddNode();
@@ -65,6 +71,12 @@ public class FunctionTest
         });
 
         Assert.HasCount(1, _function.ProcessConnections);
+    }
+
+    [TestMethod]
+    public void Data_RemoveConnection()
+    {
+        throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -102,5 +114,15 @@ public class FunctionTest
         Assert.AreEqual(rid, id);
     }
 
-    private class TestNode : Node;
+    [TestMethod]
+    public void FlowControl_GetProcessPrevious()
+    {
+        throw new NotImplementedException();
+    }
+
+    [TestMethod]
+    public void Variable_GetVariableTarget()
+    {
+        throw new NotImplementedException();
+    }
 }

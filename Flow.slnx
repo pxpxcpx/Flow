@@ -1,29 +1,35 @@
 <Solution>
-  <Folder Name="/App/">
+  <Folder Name="/app/">
     <Project Path="clients/Flow.App.Shared/Flow.App.Shared.csproj" />
     <Project Path="src/Flow.Automation/Flow.Automation.csproj" />
   </Folder>
-  <Folder Name="/Engine/">
+  <Folder Name="/engine/">
     <Project Path="src/Flow.Core/Flow.Core.csproj" />
   </Folder>
-  <Folder Name="/Plugins/" />
-  <Folder Name="/Plugins/AppPlugins/" />
-  <Folder Name="/Plugins/Dependencies/">
-    <Project Path="plugins/Flow.BuiltIn/Flow.BuiltIn.csproj" Id="0a4c61cc-53f1-4597-a4d0-08e531a2f543" />
-    <Project Path="plugins/Flow.Extensions/Flow.Extensions.csproj" Id="ef0d6175-975f-4dbc-af35-acf0854874fb" />
+  <Folder Name="/plugins/" />
+  <Folder Name="/plugins/AppPlugins/" />
+  <Folder Name="/plugins/Dependencies/">
+    <Project Path="plugins/Flow.BuiltIn/Flow.BuiltIn.csproj" />
+    <Project Path="plugins/Flow.Extensions/Flow.Extensions.csproj" />
   </Folder>
-  <Folder Name="/SDK/" />
-  <Folder Name="/SDK/App/">
+  <Folder Name="/sdk/" />
+  <Folder Name="/sdk/App/">
     <Project Path="sdk/Flow.SDK.App/Flow.SDK.App.csproj" />
   </Folder>
-  <Folder Name="/SDK/Engine/">
+  <Folder Name="/sdk/Engine/">
     <Project Path="sdk/Flow.SDK.Generators/Flow.SDK.Generators.csproj" />
     <Project Path="sdk/Flow.SDK/Flow.SDK.csproj" />
   </Folder>
-  <Folder Name="/Tests/">
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="global.json" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/tests/">
     <Project Path="tests/Flow.Tests.FeasibilityTest/Flow.Tests.FeasibilityTest.csproj" />
     <Project Path="tests/Flow.Tests.GeneratingTest/Flow.Tests.GenerationTest.csproj" />
-    <Project Path="tests/Flow.UnitTests/Flow.UnitTests.csproj" Id="e26874f8-c037-415d-ab77-440e1394c88e" />
+    <Project Path="tests/Flow.UnitTests/Flow.UnitTests.csproj" />
   </Folder>
   <Project Path="src/Flow.Shared/Flow.Shared.csproj" />
 </Solution>
