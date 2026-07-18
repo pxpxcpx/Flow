@@ -4,27 +4,42 @@ using System.Reactive.Subjects;
 namespace Flow.Automation.Messaging;
 
 /// <summary>
-/// Message bus implementation using <see cref="Subject"/> (Rx.NET).
+/// Message bus implementation using <see cref="System.Reactive.Subjects.Subject"/> (Rx.NET).
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class MessageBus<T> : IObserver<T>, IObservable<T>, IDisposable
+public class MessageBus<T> : IObserver<T>, IObservable<T>
 {
-    protected readonly Subject<T> _subject = new();
+    protected readonly Subject<T> Subject = new();
 
-    public IObservable<T> Messages => _subject.AsObservable();
+    public IObservable<T> Messages => Subject.AsObservable();
 
     /// <inheritdoc />
     public virtual void OnNext(T value)
-        => _subject.OnNext(value);
+        => Subject.OnNext(value);
 
+    /// <remarks>
+    /// Process the internal errors of message bus.
+    /// Even if there are errors or completion messages from the IObservable,
+    /// please prioritize using <see cref="OnCompleted"/>.
+    /// </remarks>
     /// <inheritdoc />
     public virtual void OnError(Exception error)
-        => _subject.OnError(error);
+    {
+        Subject.OnError(error);
+        OnCompleted();
+    }
 
+    /// <remarks>
+    /// Terminate the message bus.
+    /// Even if there are errors or completion messages from the IObservable,
+    /// please prioritize using <see cref="OnCompleted"/>.
+    /// </remarks>
     /// <inheritdoc />
     public virtual void OnCompleted()
-        => _subject.OnCompleted();
-
+    {
+        Subject.OnCompleted();
+    }
+    
     /// <inheritdoc />
     public virtual IDisposable Subscribe(IObserver<T> observer)
         => Messages.Subscribe(observer);
@@ -32,9 +47,8 @@ public class MessageBus<T> : IObserver<T>, IObservable<T>, IDisposable
     public virtual IDisposable Subscribe(Action<T> onNext, Action<Exception> onError, Action onCompleted)
         => Messages.Subscribe(onNext, onError, onCompleted);
 
-    public virtual void Dispose()
+    public virtual void Unsubscribe(IObserver<T> observer)
     {
-        _subject.Dispose();
-        GC.SuppressFinalize(this);
+        
     }
 }

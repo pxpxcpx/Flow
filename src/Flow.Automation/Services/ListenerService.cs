@@ -75,7 +75,6 @@ public class ListenerService : BackgroundService, IListenerService
     /// <inheritdoc />
     public override void Dispose()
     {
-        _router.Dispose();
         base.Dispose();
         GC.SuppressFinalize(this);
     }

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\sdk\Flow.SDK\Flow.SDK.csproj" />
+    <ProjectReference Include="..\..\src\Flow.Automation\Flow.Automation.csproj" />
     <ProjectReference Include="..\..\src\Flow.Core\Flow.Core.csproj" />
     <ProjectReference Include="..\..\src\Flow.Shared\Flow.Shared.csproj" />
   </ItemGroup>

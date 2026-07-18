@@ -85,11 +85,4 @@ public class PollingMessageBus : MessageBus<EventMessage>
     /// <inheritdoc cref="List{T}.Clear"/>
     public void ClearTriggers()
         => _triggers.Clear();
-
-    public override void Dispose()
-    {
-        _timer.Dispose();
-        base.Dispose();
-        GC.SuppressFinalize(this);
-    }
 }
