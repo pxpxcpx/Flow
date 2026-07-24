@@ -11,11 +11,11 @@ namespace Flow.Automation.Services;
 public class ListenerService : BackgroundService, IListenerService
 {
     private readonly List<IListener> _listeners;
-    private readonly MessageRouter<IObserver<ListenerEventMessage>> _router;
+    private readonly MessageRouter _router;
     private CancellationTokenSource _cts;
 
     public ListenerService(
-        List<IListener> listeners, MessageRouter<IObserver<ListenerEventMessage>> router, CancellationTokenSource cts)
+        List<IListener> listeners, MessageRouter router, CancellationTokenSource cts)
     {
         _listeners = listeners;
         _router = router;
@@ -45,7 +45,7 @@ public class ListenerService : BackgroundService, IListenerService
         await _cts.CancelAsync();
         await base.StopAsync(cancellationToken);
         
-        _router.OnCompleted();
+        ((IObserver<object>)_router).OnCompleted();
     }
     
     /// <inheritdoc />
@@ -55,8 +55,8 @@ public class ListenerService : BackgroundService, IListenerService
         {
             listener.EventStream.Subscribe(
                 _router.OnNext,
-                _router.OnError,
-                _router.OnCompleted, 
+                ((IObserver<object>)_router).OnError,
+                ((IObserver<object>)_router).OnCompleted, 
                 stoppingToken);
             listener.StartAsync().Await();
         }

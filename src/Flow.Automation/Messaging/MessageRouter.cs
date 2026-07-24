@@ -1,115 +1,230 @@
-﻿using Flow.Automation.Services.Listeners;
+﻿using System.Collections.Concurrent;
+using System.Reactive.Subjects;
 
 namespace Flow.Automation.Messaging;
-
-// TODO: Better way to route the message and the identifier.
 
 /// <summary>
 /// Dispatch the message to handler.
 /// </summary>
-/// <typeparam name="THandler"></typeparam>
-public class MessageRouter<THandler>
-    : IObservable<ListenerEventMessage>, IObserver<ListenerEventMessage>
-    where THandler : IObserver<ListenerEventMessage>
+public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
 {
-    private bool _disposed;
+    private int _isDisposed;
 
-    private MessageBus<ListenerEventMessage> _bus;
+    private Subject<object> _broadcastSubject;
 
-    public IObservable<ListenerEventMessage> Messages => _bus.Messages;
+    private ConcurrentDictionary<Type, ISubjectContainer> _subjects;
 
-    public Exception? Exception { get; private set; }
-
-    /// <summary>
-    /// Event id and its handler.
-    /// </summary>
-    /// <remarks>The ID will be used as a shared key for the condition and its handler.</remarks>
-    /// <seealso cref="IListener.Conditions"/>
-    public Dictionary<Guid, THandler[]> Handlers { get; private set; }
-
-    public MessageRouter(Dictionary<Guid, THandler[]> handlers)
+    public MessageRouter()
     {
-        _bus = new MessageBus<ListenerEventMessage>();
-        _bus.Subscribe(this);
-
-        Handlers = handlers;
+        _isDisposed = 0;
+        _broadcastSubject = new Subject<object>();
+        _subjects = new ConcurrentDictionary<Type, ISubjectContainer>();
     }
 
     /// <summary>
-    /// Call all observers and observables that the router will be shut down.
+    /// Register subject container to handle specific type messages.
     /// </summary>
-    public void OnCompleted()
+    /// <param name="messageType"></param>
+    /// <param name="subjectContainer"></param>
+    public void Register(Type messageType, ISubjectContainer subjectContainer)
+        => _subjects.TryAdd(messageType, subjectContainer);
+
+    /// <summary>
+    /// Create a new subject and register it with specific type to handle messages.
+    /// </summary>
+    /// <typeparam name="TMessage"></typeparam>
+    public void Register<TMessage>()
     {
-        _bus.OnCompleted();
+        var s = new Subject<TMessage>();
+        var sc = new SubjectContainer<TMessage>(s);
+        Register(typeof(TMessage), sc);
     }
 
     /// <summary>
-    /// Call router to handle the error.
-    /// This may shut down the router.
+    /// Register subject to handle specific type messages.
     /// </summary>
-    /// <param name="error"></param>
-    public void OnError(Exception error)
+    /// <param name="subject"></param>
+    /// <typeparam name="TMessage"></typeparam>
+    public void Register<TMessage>(Subject<TMessage> subject)
     {
-        Exception = error;
-        OnCompleted();
+        var sc = new SubjectContainer<TMessage>(subject);
+        Register(typeof(TMessage), sc);
     }
 
     /// <summary>
-    /// Response next message,
-    /// call the observer corresponding to the event id to handle the message.
+    /// Terminate the corresponding subject and remove it from the router.
+    /// The routing of specific messages will be stopped.
     /// </summary>
-    /// <param name="value"></param>
-    public void OnNext(ListenerEventMessage value)
-    {
-        Handlers.TryGetValue(value.EventArgs.EventId, out var handlers);
+    /// <typeparam name="TMessage"></typeparam>
+    /// <returns></returns>
+    public bool RemoveRegistration<TMessage>()
+        => RemoveRegistration(typeof(TMessage));
 
-        if (handlers is not null or { Length: 0 })
+    /// <summary>
+    /// Terminate the corresponding subject and remove it from the router.
+    /// The routing of specific messages will be stopped.
+    /// </summary>
+    /// <param name="messageType"></param>
+    /// <returns></returns>
+    public bool RemoveRegistration(Type messageType)
+    {
+        if (!_subjects.TryGetValue(messageType, out var subjectContainer))
+            return false;
+
+        subjectContainer.OnCompleted();
+        subjectContainer.Dispose();
+        
+        return _subjects.TryRemove(messageType, out _);
+    }
+
+    /// <summary>
+    /// Get subject from the container by using the key.
+    /// </summary>
+    /// <typeparam name="TMessage">Type of Message.</typeparam>
+    /// <returns></returns>
+    /// <exception cref="KeyNotFoundException">Message type not registered.</exception>
+    /// <exception cref="InvalidOperationException">Internal error, the type of the subject doesn't match.</exception>
+    private Subject<TMessage> GetSubjectContainer<TMessage>()
+    {
+        var type = typeof(TMessage);
+
+        if (!_subjects.TryGetValue(type, out var s))
+            throw new KeyNotFoundException();
+
+        if (s.Object is not Subject<TMessage> subject)
+            throw new InvalidOperationException();
+
+        return subject;
+    }
+
+    /// <summary>
+    /// Notifies corresponding subscribed observers about the arrival of the specified element in the sequence.
+    /// </summary>
+    /// <param name="message">The value to send to specific subscribed observers.</param>
+    /// <typeparam name="TMessage">The key to identify observers.</typeparam>
+    public void OnNext<TMessage>(TMessage message)
+        where TMessage : notnull
+    {
+        _broadcastSubject.OnNext(message);
+        GetSubjectContainer<TMessage>().OnNext(message);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TMessage">The key to identify observers.</typeparam>
+    public void OnCompleted<TMessage>()
+        where TMessage : notnull
+        => GetSubjectContainer<TMessage>().OnCompleted();
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    /// <typeparam name="TMessage">The key to identify observers.</typeparam>
+    public void OnError<TMessage>(Exception message)
+        where TMessage : notnull
+        => GetSubjectContainer<TMessage>().OnError(message);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="observer"></param>
+    /// <typeparam name="TMessage">The key to identify observers.</typeparam>
+    /// <returns></returns>
+    public IDisposable Subscribe<TMessage>(IObserver<TMessage> observer)
+        where TMessage : notnull
+        => GetSubjectContainer<TMessage>().Subscribe(observer);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="onNext">Action to handle the message.</param>
+    /// <param name="onError">Action to handle the error.</param>
+    /// <param name="onCompleted">Action to handle the completed signal.</param>
+    /// <typeparam name="TMessage">The key to identify observers.</typeparam>
+    /// <returns></returns>
+    public IDisposable Subscribe<TMessage>(Action<TMessage> onNext, Action<Exception> onError, Action onCompleted)
+        where TMessage : notnull
+        => GetSubjectContainer<TMessage>().Subscribe(onNext, onError, onCompleted);
+
+    /// <summary>
+    /// Disconnect the subscription.
+    /// </summary>
+    /// <param name="subscription"></param>
+    public void Unsubscribe(IDisposable subscription)
+        => subscription.Dispose();
+    
+    /// <summary>
+    /// Send a message to the router. The message will only be broadcasted.
+    /// </summary>
+    void IObserver<object>.OnNext(object value)
+    {
+        _broadcastSubject.OnNext(value);
+        
+        var type = value.GetType();
+        if (!_subjects.TryGetValue(type, out var subjectContainer))
+            return;
+        
+        subjectContainer.OnNext(value);
+    }
+
+    /// <summary>
+    /// Terminate the router.
+    /// This will stop all activities(OnNext, OnError...) of the router.
+    /// </summary>
+    void IObserver<object>.OnCompleted()
+    {
+        _broadcastSubject.OnCompleted();
+        
+        foreach (var subjectContainer in _subjects.Values)
+            subjectContainer.OnCompleted();
+    }
+
+    /// <summary>
+    /// Handle internal error, this may cause the termination of the router.
+    /// </summary>
+    /// <param name="error">Internal error.</param>
+    void IObserver<object>.OnError(Exception error)
+    {
+        _broadcastSubject.OnError(error);
+        
+        foreach (var subjectContainer in _subjects.Values)
+            subjectContainer.OnError(error);
+    }
+
+    /// <summary>
+    /// Ignore the message type, listen to all kinds of messages.
+    /// </summary>
+    /// <remarks><see cref="MessageBus{T}"/> has the same effect.</remarks>
+    /// <param name="observer">Observer listen to all messages.</param>
+    /// <returns></returns>
+    IDisposable IObservable<object>.Subscribe(IObserver<object> observer)
+        => _broadcastSubject.Subscribe(observer);
+
+    /// <summary>
+    /// Disconnect all subscriptions.
+    /// </summary>
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _isDisposed, 1) == 1)
             return;
 
-        foreach (var handler in handlers!)
-            handler.OnNext(value);
-    }
-
-    /// <summary>
-    /// Ignore the event type and id, subscribe all events received.
-    /// </summary>
-    /// <remarks>
-    /// To add specific event type and related handler,
-    /// use <see cref="AddEventHandlerPair"/> or <see cref="AddEventHandlerPairs"/>.
-    /// </remarks>
-    /// <param name="observer"></param>
-    /// <returns></returns>
-    public IDisposable Subscribe(IObserver<ListenerEventMessage> observer)
-        => _bus.Subscribe(observer);
-
-    public IDisposable SubscribeTo(Guid eventId, IObserver<ListenerEventMessage> observer)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Add specific event id and related handlers to handlers list.
-    /// </summary>
-    /// <param name="eventId"></param>
-    /// <param name="handler"></param>
-    public void AddEventHandlerPair(Guid eventId, THandler[] handler) 
-        => Handlers.TryAdd(eventId, handler);
-
-    /// <summary>
-    /// Add multiple events and their related handlers to handlers list.
-    /// </summary>
-    /// <param name="pairs"></param>
-    public void AddEventHandlerPairs(Dictionary<Guid, THandler[]> pairs)
-    {
-        foreach (var pair in pairs) 
-            Handlers.TryAdd(pair.Key, pair.Value);
-    }
-
-    private sealed class MessageRouterDisposableHandle : IDisposable
-    {
-        public void Dispose()
+        foreach (var subjectContainer in _subjects.Values)
         {
-            // TODO 在此释放托管资源
+            try
+            {
+                subjectContainer.OnCompleted();
+                subjectContainer.Dispose();
+            }
+            catch
+            {
+                // ignored
+            }
         }
+        
+        _subjects.Clear();
+        
+        _broadcastSubject.Dispose();
     }
 }

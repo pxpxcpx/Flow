@@ -111,7 +111,7 @@ public class SimpleFuncExecutorTests
     [TestMethod]
     public async Task Execute_WithSubFunction_ShouldSwitchAndReturn()
     {
-        Assert.Inconclusive("需要完整模拟子函数调用");
+        Assert.Inconclusive("Mocking of sub function required.");
     }
 
     [TestMethod]

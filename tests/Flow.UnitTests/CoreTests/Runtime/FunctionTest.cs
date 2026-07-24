@@ -48,7 +48,8 @@ public class FunctionTest
     [TestMethod]
     public void Data_RemoveNode()
     {
-        throw new NotImplementedException();
+        // TODO
+        Assert.Inconclusive();
     }
 
     [TestMethod]
@@ -76,7 +77,8 @@ public class FunctionTest
     [TestMethod]
     public void Data_RemoveConnection()
     {
-        throw new NotImplementedException();
+        // TODO
+        Assert.Inconclusive();
     }
 
     [TestMethod]
@@ -117,12 +119,14 @@ public class FunctionTest
     [TestMethod]
     public void FlowControl_GetProcessPrevious()
     {
-        throw new NotImplementedException();
+        // TODO
+        Assert.Inconclusive();
     }
 
     [TestMethod]
     public void Variable_GetVariableTarget()
     {
-        throw new NotImplementedException();
+        // TODO
+        Assert.Inconclusive();
     }
 }

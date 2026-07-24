@@ -1,12 +1,14 @@
-﻿using Flow.Shared.Results;
+﻿using Flow.Shared.Abstractions;
+using Flow.Shared.Results;
 
 namespace Flow.Shared.Models;
 
 /// <summary>
-/// Container of an object with specific type.
+/// A non-generic container template for a generic object.
 /// Property <see cref="Type"/> will internally always stay related to the <see cref="Object"/>.
+/// Can implement the specific methods of the corresponding type internally.
 /// </summary>
-public class TypedObject
+public abstract class TypedObject : ITypedObject
 {
     private readonly Type _type;
 

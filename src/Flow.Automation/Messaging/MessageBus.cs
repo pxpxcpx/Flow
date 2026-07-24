@@ -39,7 +39,7 @@ public class MessageBus<T> : IObserver<T>, IObservable<T>
     {
         Subject.OnCompleted();
     }
-    
+
     /// <inheritdoc />
     public virtual IDisposable Subscribe(IObserver<T> observer)
         => Messages.Subscribe(observer);
@@ -47,8 +47,13 @@ public class MessageBus<T> : IObserver<T>, IObservable<T>
     public virtual IDisposable Subscribe(Action<T> onNext, Action<Exception> onError, Action onCompleted)
         => Messages.Subscribe(onNext, onError, onCompleted);
 
-    public virtual void Unsubscribe(IObserver<T> observer)
-    {
-        
-    }
+    /// <summary>
+    /// Cancel the subscription.
+    /// </summary>
+    /// <param name="subscription">
+    /// Returned value from <see cref="IObservable{T}.Subscribe">method Subscribe(...)</see>,
+    /// which always used as a handle.
+    /// </param>
+    public virtual void Unsubscribe(IDisposable subscription)
+        => subscription.Dispose();
 }

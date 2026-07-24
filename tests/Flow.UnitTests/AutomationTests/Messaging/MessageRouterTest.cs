@@ -4,10 +4,10 @@ using JetBrains.Annotations;
 namespace Flow.UnitTests.AutomationTests.Messaging;
 
 [TestClass]
-[TestSubject(typeof(MessageRouter<>))]
+[TestSubject(typeof(MessageRouter))]
 public class MessageRouterTest
 {
-    private MessageRouter<TestHandler> _router;
+    private MessageRouter _router;
     
     private TestHandler _handler1 = new();
     private TestHandler _handler2 = new();
@@ -27,6 +27,6 @@ public class MessageRouterTest
             { Guid.Parse("30000000-0000-0000-0000-000000000000"), [_handler4, _handler5] }
         };
         
-        _router = new MessageRouter<TestHandler>(_dict);
+        _router = new MessageRouter();
     }
 }
