@@ -1,33 +1,34 @@
 ﻿using System.Collections.Concurrent;
 using System.Reactive.Subjects;
+using Flow.Automation.Messaging.Abstractions;
 
-namespace Flow.Automation.Messaging;
+namespace Flow.Automation.Messaging.Components;
 
 /// <summary>
 /// Dispatch the message to handler.
 /// </summary>
-public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
+public class MessageRouter : IObservable<object>, IObserver<object>, ISubscriptionManaged, IDisposable
 {
     private int _isDisposed;
 
-    private Subject<object> _broadcastSubject;
+    private readonly Subject<object> _broadcastSubject;
 
-    private ConcurrentDictionary<Type, ISubjectContainer> _subjects;
+    private ConcurrentDictionary<Type, ISubjectWrapper> _subjects;
 
     public MessageRouter()
     {
         _isDisposed = 0;
         _broadcastSubject = new Subject<object>();
-        _subjects = new ConcurrentDictionary<Type, ISubjectContainer>();
+        _subjects = new ConcurrentDictionary<Type, ISubjectWrapper>();
     }
 
     /// <summary>
     /// Register subject container to handle specific type messages.
     /// </summary>
     /// <param name="messageType"></param>
-    /// <param name="subjectContainer"></param>
-    public void Register(Type messageType, ISubjectContainer subjectContainer)
-        => _subjects.TryAdd(messageType, subjectContainer);
+    /// <param name="subjectWrapper"></param>
+    public void Register(Type messageType, ISubjectWrapper subjectWrapper)
+        => _subjects.TryAdd(messageType, subjectWrapper);
 
     /// <summary>
     /// Create a new subject and register it with specific type to handle messages.
@@ -36,7 +37,7 @@ public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
     public void Register<TMessage>()
     {
         var s = new Subject<TMessage>();
-        var sc = new SubjectContainer<TMessage>(s);
+        var sc = new SubjectWrapper<TMessage>(s);
         Register(typeof(TMessage), sc);
     }
 
@@ -47,7 +48,7 @@ public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
     /// <typeparam name="TMessage"></typeparam>
     public void Register<TMessage>(Subject<TMessage> subject)
     {
-        var sc = new SubjectContainer<TMessage>(subject);
+        var sc = new SubjectWrapper<TMessage>(subject);
         Register(typeof(TMessage), sc);
     }
 
@@ -68,12 +69,12 @@ public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
     /// <returns></returns>
     public bool RemoveRegistration(Type messageType)
     {
-        if (!_subjects.TryGetValue(messageType, out var subjectContainer))
+        if (!_subjects.TryGetValue(messageType, out var subjectWrapper))
             return false;
 
-        subjectContainer.OnCompleted();
-        subjectContainer.Dispose();
-        
+        subjectWrapper.OnCompleted();
+        subjectWrapper.Dispose();
+
         return _subjects.TryRemove(messageType, out _);
     }
 
@@ -110,7 +111,7 @@ public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
     }
 
     /// <summary>
-    /// 
+    /// Use the specified type of message to notify the corresponding subject to stop.
     /// </summary>
     /// <typeparam name="TMessage">The key to identify observers.</typeparam>
     public void OnCompleted<TMessage>()
@@ -118,26 +119,26 @@ public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
         => GetSubjectContainer<TMessage>().OnCompleted();
 
     /// <summary>
-    /// 
+    /// Use the specified type of message to notify the corresponding subject to handle the error.
     /// </summary>
-    /// <param name="message"></param>
+    /// <param name="err">Error message.</param>
     /// <typeparam name="TMessage">The key to identify observers.</typeparam>
-    public void OnError<TMessage>(Exception message)
+    public void OnError<TMessage>(Exception err)
         where TMessage : notnull
-        => GetSubjectContainer<TMessage>().OnError(message);
+        => GetSubjectContainer<TMessage>().OnError(err);
 
     /// <summary>
-    /// 
+    /// Subscribe to messages of a specific type.
     /// </summary>
-    /// <param name="observer"></param>
+    /// <param name="observer">Observer.</param>
     /// <typeparam name="TMessage">The key to identify observers.</typeparam>
     /// <returns></returns>
     public IDisposable Subscribe<TMessage>(IObserver<TMessage> observer)
         where TMessage : notnull
-        => GetSubjectContainer<TMessage>().Subscribe(observer);
+        => new DisposableSubscription(this, observer, GetSubjectContainer<TMessage>().Subscribe(observer));
 
     /// <summary>
-    /// 
+    /// Subscribe to messages of a specific type with action group.
     /// </summary>
     /// <param name="onNext">Action to handle the message.</param>
     /// <param name="onError">Action to handle the error.</param>
@@ -153,20 +154,28 @@ public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
     /// </summary>
     /// <param name="subscription"></param>
     public void Unsubscribe(IDisposable subscription)
-        => subscription.Dispose();
-    
+    {
+        if (subscription is not DisposableSubscription ds)
+            return;
+
+        if (ds.Observable != this)
+            return;
+
+        ds.InternalSubscription?.Dispose();
+    }
+
     /// <summary>
     /// Send a message to the router. The message will only be broadcasted.
     /// </summary>
     void IObserver<object>.OnNext(object value)
     {
         _broadcastSubject.OnNext(value);
-        
+
         var type = value.GetType();
-        if (!_subjects.TryGetValue(type, out var subjectContainer))
+        if (!_subjects.TryGetValue(type, out var subjectWrapper))
             return;
-        
-        subjectContainer.OnNext(value);
+
+        subjectWrapper.OnNext(value);
     }
 
     /// <summary>
@@ -176,9 +185,9 @@ public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
     void IObserver<object>.OnCompleted()
     {
         _broadcastSubject.OnCompleted();
-        
-        foreach (var subjectContainer in _subjects.Values)
-            subjectContainer.OnCompleted();
+
+        foreach (var subjectWrapper in _subjects.Values)
+            subjectWrapper.OnCompleted();
     }
 
     /// <summary>
@@ -188,9 +197,9 @@ public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
     void IObserver<object>.OnError(Exception error)
     {
         _broadcastSubject.OnError(error);
-        
-        foreach (var subjectContainer in _subjects.Values)
-            subjectContainer.OnError(error);
+
+        foreach (var subjectWrapper in _subjects.Values)
+            subjectWrapper.OnError(error);
     }
 
     /// <summary>
@@ -210,21 +219,21 @@ public class MessageRouter : IObservable<object>, IObserver<object>, IDisposable
         if (Interlocked.Exchange(ref _isDisposed, 1) == 1)
             return;
 
-        foreach (var subjectContainer in _subjects.Values)
+        foreach (var subjectWrapper in _subjects.Values)
         {
             try
             {
-                subjectContainer.OnCompleted();
-                subjectContainer.Dispose();
+                subjectWrapper.OnCompleted();
+                subjectWrapper.Dispose();
             }
             catch
             {
                 // ignored
             }
         }
-        
+
         _subjects.Clear();
-        
+
         _broadcastSubject.Dispose();
     }
 }

@@ -1,5 +1,4 @@
-﻿using Flow.Automation.Messaging;
-using Flow.Shared.Models;
+﻿using Flow.Shared.Models;
 using JetBrains.Annotations;
 
 namespace Flow.UnitTests.SharedTests.Models;

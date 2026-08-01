@@ -1,7 +1,8 @@
-﻿using Flow.Automation.Services.Listeners;
+﻿using Flow.Automation.Messaging.Messages;
+using Flow.Automation.Services.Listeners;
 using Timer = System.Timers.Timer;
 
-namespace Flow.Automation.Messaging;
+namespace Flow.Automation.Messaging.Components;
 
 /// <summary>
 /// PollingMessageBus based on a timer that checks a list of triggers at specified intervals

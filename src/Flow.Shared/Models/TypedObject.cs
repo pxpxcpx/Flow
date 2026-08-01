@@ -3,6 +3,13 @@ using Flow.Shared.Results;
 
 namespace Flow.Shared.Models;
 
+//
+// If you have reached this point,
+// then perhaps you have also realized that this class or this "wrapper pattern"
+// does not seem like a long-term solution to the problem of generic types.
+// ¯\_(ツ)_/¯
+//
+
 /// <summary>
 /// A non-generic container template for a generic object.
 /// Property <see cref="Type"/> will internally always stay related to the <see cref="Object"/>.
@@ -16,7 +23,7 @@ public abstract class TypedObject : ITypedObject
 
     public Type Type => _type;
 
-    public object Object
+    public virtual object Object
     {
         get => _object;
         set => SetObject(value);

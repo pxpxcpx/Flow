@@ -121,7 +121,7 @@ public readonly struct VoidResult : IResult<bool, Exception>
     }
 
     /// <summary>
-    /// Converting <see cref="VoidResult"/> to common <see cref="Result"/> object.
+    /// Converting <see cref="VoidResult"/> to common <see cref="IResult{T, T}"/> object.
     /// </summary>
     /// <param name="result"></param>
     /// <returns></returns>
@@ -131,7 +131,7 @@ public readonly struct VoidResult : IResult<bool, Exception>
             : Result<bool, Exception>.Err(result.Error);
 
     /// <summary>
-    /// Converting specific <see cref="Result"/> which T is bool and E is Exception
+    /// Converting specific <see cref="IResult{T, T}"/> which T is bool and E is Exception
     /// to <see cref="VoidResult"/>. 
     /// </summary>
     /// <param name="result"></param>

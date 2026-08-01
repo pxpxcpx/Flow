@@ -1,8 +1,8 @@
 ﻿using Flow.Shared.Abstractions;
 
-namespace Flow.Automation.Messaging;
+namespace Flow.Automation.Messaging.Abstractions;
 
-public interface ISubjectContainer : ITypedObject
+public interface ISubjectWrapper : ITypedObject
 {
     void OnNext(object value);
     

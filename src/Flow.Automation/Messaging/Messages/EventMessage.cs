@@ -1,4 +1,4 @@
-﻿namespace Flow.Automation.Messaging;
+﻿namespace Flow.Automation.Messaging.Messages;
 
 /// <summary>
 /// Represents a container for an event's sender and arguments.
@@ -36,5 +36,5 @@ public record EventMessage(object? Sender, EventArgs EventArgs)
     /// <summary>
     /// Indicates an empty event message with no sender and empty event arguments.
     /// </summary>
-    public static readonly EventMessage Empty = new EventMessage(null, EventArgs.Empty);
+    public static readonly EventMessage Empty = new(null, EventArgs.Empty);
 }

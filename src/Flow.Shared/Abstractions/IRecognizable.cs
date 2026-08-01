@@ -7,12 +7,12 @@
 public interface IRecognizable
 {
     /// <summary>
-    /// Name to the IRecognizable object
+    /// Name of the IRecognizable object
     /// </summary>
     string Name { get; set; }
     
     /// <summary>
-    /// Description to the IRecognizable object
+    /// Description of the IRecognizable object
     /// </summary>
     string Description { get; set; }
 }

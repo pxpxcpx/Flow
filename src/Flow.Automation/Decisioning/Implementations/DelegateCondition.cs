@@ -1,6 +1,4 @@
-﻿using Flow.Automation.Decisioning.Abstractions;
-
-namespace Flow.Automation.Decisioning.Implementations;
+﻿namespace Flow.Automation.Decisioning.Implementations;
 
 /// <summary>
 /// Accept a <see cref="Predicate">delegate</see> as a condition of judgment.

@@ -1,7 +1,7 @@
 ﻿using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
-namespace Flow.Automation.Messaging;
+namespace Flow.Automation.Messaging.Components;
 
 /// <summary>
 /// Message bus implementation using <see cref="System.Reactive.Subjects.Subject"/> (Rx.NET).
