@@ -1,19 +1,21 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Flow.Core.Models.Context;
+﻿using Flow.Core.Models.Context;
+using Flow.Core.Runtime;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
+using JetBrains.Annotations;
 
 namespace Flow.UnitTests.CoreTests.Runtime;
 
 [TestClass]
+[TestSubject(typeof(Executor))]
 public class SimpleFuncExecutorTests
 {
     public TestContext TestContext { get; set; }
 
-    [NotNull] private Function? _function = null!;
-    [NotNull] private TestSyncNode? _syncNode1 = null!;
-    [NotNull] private TestSyncNode? _syncNode2 = null!;
-    [NotNull] private TestAsyncNode? _asyncNode1 = null!;
+    [System.Diagnostics.CodeAnalysis.NotNull] private Function? _function = null!;
+    [System.Diagnostics.CodeAnalysis.NotNull] private TestSyncNode? _syncNode1 = null!;
+    [System.Diagnostics.CodeAnalysis.NotNull] private TestSyncNode? _syncNode2 = null!;
+    [System.Diagnostics.CodeAnalysis.NotNull] private TestAsyncNode? _asyncNode1 = null!;
 
     private static readonly NodeMetadata FunctionMetadata = new()
     {
@@ -173,10 +175,10 @@ public class ComplexFuncExecutorTests
 {
     public TestContext TestContext { get; set; }
 
-    [NotNull] private Function? _function = null!;
-    [NotNull] private TestSyncNode? _syncNode1 = null!;
-    [NotNull] private TestSyncNode? _syncNode2 = null!;
-    [NotNull] private TestAsyncNode? _asyncNode1 = null!;
+    [System.Diagnostics.CodeAnalysis.NotNull] private Function? _function = null!;
+    [System.Diagnostics.CodeAnalysis.NotNull] private TestSyncNode? _syncNode1 = null!;
+    [System.Diagnostics.CodeAnalysis.NotNull] private TestSyncNode? _syncNode2 = null!;
+    [System.Diagnostics.CodeAnalysis.NotNull] private TestAsyncNode? _asyncNode1 = null!;
 
     private static readonly NodeMetadata FunctionMetadata = new()
     {

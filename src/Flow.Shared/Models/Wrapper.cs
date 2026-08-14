@@ -15,7 +15,7 @@ namespace Flow.Shared.Models;
 /// Property <see cref="Type"/> will internally always stay related to the <see cref="Object"/>.
 /// Can implement the specific methods of the corresponding type internally.
 /// </summary>
-public abstract class TypedObject : ITypedObject
+public abstract class Wrapper : IWrapper
 {
     private readonly Type _type;
 
@@ -29,13 +29,13 @@ public abstract class TypedObject : ITypedObject
         set => SetObject(value);
     }
 
-    public TypedObject(object obj)
+    public Wrapper(object obj)
     {
         _type = obj.GetType();
         _object = obj;
     }
 
-    public TypedObject(Type type, object obj)
+    public Wrapper(Type type, object obj)
     {
         if (!obj.GetType().IsAssignableFrom(type))
             throw new InvalidCastException();

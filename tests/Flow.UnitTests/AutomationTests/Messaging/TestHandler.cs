@@ -1,8 +1,6 @@
-﻿using Flow.Automation.Messaging;
+﻿namespace Flow.UnitTests.AutomationTests.Messaging;
 
-namespace Flow.UnitTests.AutomationTests.Messaging;
-
-internal class TestHandler : IObserver<ListenerEventMessage>
+internal class TestHandler
 {
     public void OnCompleted()
     {
@@ -14,8 +12,9 @@ internal class TestHandler : IObserver<ListenerEventMessage>
         throw new NotImplementedException();
     }
 
-    public void OnNext(ListenerEventMessage value)
-    {
-        throw new NotImplementedException();
-    }
+    // TODO
+    // public void OnNext(ListenerEventMessage value)
+    // {
+    //     throw new NotImplementedException();
+    // }
 }

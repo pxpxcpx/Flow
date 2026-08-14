@@ -5,7 +5,7 @@ using Flow.Automation.Messaging.Abstractions;
 namespace Flow.Automation.Messaging.Components;
 
 /// <summary>
-/// Dispatch the message to handler.
+/// Dispatches messages to handler by the message type.
 /// </summary>
 public class MessageRouter : IObservable<object>, IObserver<object>, ISubscriptionManaged, IDisposable
 {
@@ -13,10 +13,13 @@ public class MessageRouter : IObservable<object>, IObserver<object>, ISubscripti
 
     private readonly Subject<object> _broadcastSubject;
 
-    private ConcurrentDictionary<Type, ISubjectWrapper> _subjects;
+    private readonly ConcurrentDictionary<Type, ISubjectWrapper> _subjects;
+
+    private readonly ConcurrentDictionary<Type, (object, object)> _typedRoutersCache;
 
     public MessageRouter()
     {
+        _typedRoutersCache = new();
         _isDisposed = 0;
         _broadcastSubject = new Subject<object>();
         _subjects = new ConcurrentDictionary<Type, ISubjectWrapper>();
@@ -78,6 +81,14 @@ public class MessageRouter : IObservable<object>, IObserver<object>, ISubscripti
         return _subjects.TryRemove(messageType, out _);
     }
 
+    private ISubjectWrapper GetSubjectWrapper(Type messageType)
+    {
+        if (!_subjects.TryGetValue(messageType, out var s))
+            throw new KeyNotFoundException();
+
+        return s;
+    }
+
     /// <summary>
     /// Get subject from the container by using the key.
     /// </summary>
@@ -85,17 +96,92 @@ public class MessageRouter : IObservable<object>, IObserver<object>, ISubscripti
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException">Message type not registered.</exception>
     /// <exception cref="InvalidOperationException">Internal error, the type of the subject doesn't match.</exception>
-    private Subject<TMessage> GetSubjectContainer<TMessage>()
+    private Subject<TMessage> GetSubject<TMessage>()
     {
-        var type = typeof(TMessage);
-
-        if (!_subjects.TryGetValue(type, out var s))
-            throw new KeyNotFoundException();
-
-        if (s.Object is not Subject<TMessage> subject)
+        if (GetSubjectWrapper(typeof(TMessage)).Object is not Subject<TMessage> subject)
             throw new InvalidOperationException();
 
         return subject;
+    }
+
+    private void AddRouterHandles<T>() 
+        where T : notnull
+    {
+        var observer = new ObserverRouter<T>(this);
+        var observable = new ObservableRouter<T>(this);
+        _typedRoutersCache.TryAdd(typeof(T), (observable, observer));
+    }
+
+    /// <summary>
+    /// Gets a handle implements <see cref="IObservable{T}"/> of a message router.
+    /// </summary>
+    /// <typeparam name="T">Type of the message.</typeparam>
+    private sealed class ObservableRouter<T> : IObservable<T> where T : notnull
+    {
+        private readonly MessageRouter _router;
+
+        internal ObservableRouter(MessageRouter router)
+        {
+            _router = router;
+        }
+
+        public IDisposable Subscribe(IObserver<T> observer)
+            => _router.Subscribe(observer);
+    }
+
+    /// <summary>
+    /// Gets a handle implements <see cref="IObservable{T}"/> of a message router.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public IObservable<T> AsObservable<T>() 
+        where T : notnull
+    {
+        var t = typeof(T);
+        
+        if (!_typedRoutersCache.TryGetValue(t, out var pairs))
+            AddRouterHandles<T>();
+        
+        return (ObservableRouter<T>)pairs.Item1;
+    }
+
+    /// <summary>
+    /// Handle implements <see cref="IObserver{T}"/> of a message router.
+    /// </summary>
+    /// <typeparam name="T">Type of the message.</typeparam>
+    private sealed class ObserverRouter<T> : IObserver<T> where T : notnull
+    {
+        private readonly MessageRouter _router;
+
+        internal ObserverRouter(MessageRouter router)
+        {
+            _router = router;
+        }
+
+        public void OnCompleted()
+            => _router.OnCompleted<T>();
+
+        public void OnError(Exception error)
+            => _router.OnError<T>(error);
+
+        public void OnNext(T value)
+            => _router.OnNext(value);
+    }
+
+    /// <summary>
+    /// Gets a handle implements <see cref="IObserver{T}"/> of a message router.
+    /// </summary>
+    /// <typeparam name="T">Type of the message.</typeparam>
+    /// <returns>Converting result.</returns>
+    public IObserver<T> AsObserver<T>() 
+        where T : notnull
+    {
+        var t = typeof(T);
+        
+        if (!_typedRoutersCache.TryGetValue(t, out var pairs))
+            AddRouterHandles<T>();
+        
+        return (ObserverRouter<T>)pairs.Item2;
     }
 
     /// <summary>
@@ -107,7 +193,7 @@ public class MessageRouter : IObservable<object>, IObserver<object>, ISubscripti
         where TMessage : notnull
     {
         _broadcastSubject.OnNext(message);
-        GetSubjectContainer<TMessage>().OnNext(message);
+        GetSubject<TMessage>().OnNext(message);
     }
 
     /// <summary>
@@ -116,7 +202,7 @@ public class MessageRouter : IObservable<object>, IObserver<object>, ISubscripti
     /// <typeparam name="TMessage">The key to identify observers.</typeparam>
     public void OnCompleted<TMessage>()
         where TMessage : notnull
-        => GetSubjectContainer<TMessage>().OnCompleted();
+        => GetSubject<TMessage>().OnCompleted();
 
     /// <summary>
     /// Use the specified type of message to notify the corresponding subject to handle the error.
@@ -125,7 +211,7 @@ public class MessageRouter : IObservable<object>, IObserver<object>, ISubscripti
     /// <typeparam name="TMessage">The key to identify observers.</typeparam>
     public void OnError<TMessage>(Exception err)
         where TMessage : notnull
-        => GetSubjectContainer<TMessage>().OnError(err);
+        => GetSubject<TMessage>().OnError(err);
 
     /// <summary>
     /// Subscribe to messages of a specific type.
@@ -135,7 +221,7 @@ public class MessageRouter : IObservable<object>, IObserver<object>, ISubscripti
     /// <returns></returns>
     public IDisposable Subscribe<TMessage>(IObserver<TMessage> observer)
         where TMessage : notnull
-        => new DisposableSubscription(this, observer, GetSubjectContainer<TMessage>().Subscribe(observer));
+        => new DisposableSubscription(this, observer, GetSubject<TMessage>().Subscribe(observer));
 
     /// <summary>
     /// Subscribe to messages of a specific type with action group.
@@ -147,7 +233,7 @@ public class MessageRouter : IObservable<object>, IObserver<object>, ISubscripti
     /// <returns></returns>
     public IDisposable Subscribe<TMessage>(Action<TMessage> onNext, Action<Exception> onError, Action onCompleted)
         where TMessage : notnull
-        => GetSubjectContainer<TMessage>().Subscribe(onNext, onError, onCompleted);
+        => GetSubject<TMessage>().Subscribe(onNext, onError, onCompleted);
 
     /// <summary>
     /// Disconnect the subscription.

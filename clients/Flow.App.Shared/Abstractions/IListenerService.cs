@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 
-namespace Flow.Automation.Services;
+namespace Flow.App.Shared.Abstractions;
 
 public interface IListenerService : IDisposable, IHostedService;

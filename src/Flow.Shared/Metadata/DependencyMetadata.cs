@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Flow.Shared.Abstractions;
+﻿using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Models;
 

@@ -1,6 +1,6 @@
 ﻿namespace Flow.Shared.Abstractions;
 
-public interface ITypedObject
+public interface IWrapper
 {
     Type Type { get; }
     

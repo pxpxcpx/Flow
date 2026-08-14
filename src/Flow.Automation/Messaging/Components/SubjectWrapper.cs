@@ -4,7 +4,7 @@ using Flow.Shared.Models;
 
 namespace Flow.Automation.Messaging.Components;
 
-public sealed class SubjectWrapper<TMessage> : TypedObject, ISubjectWrapper
+public sealed class SubjectWrapper<TMessage> : Wrapper, ISubjectWrapper
 {
     private Subject<TMessage> _subject;
 

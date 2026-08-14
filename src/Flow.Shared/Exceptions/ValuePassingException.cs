@@ -8,13 +8,13 @@ public class ValuePassingException : Exception
 
     public readonly int Step;
 
-    public readonly TypedObject? Detail;
+    public readonly Wrapper? Detail;
 
     public ValuePassingException()
     {
     }
 
-    public ValuePassingException(string message, int scriptId = 0, int step = 0, TypedObject? detail = null)
+    public ValuePassingException(string message, int scriptId = 0, int step = 0, Wrapper? detail = null)
         : base(message)
     {
         ScriptId = scriptId;

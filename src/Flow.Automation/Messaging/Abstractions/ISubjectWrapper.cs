@@ -2,7 +2,7 @@
 
 namespace Flow.Automation.Messaging.Abstractions;
 
-public interface ISubjectWrapper : ITypedObject
+public interface ISubjectWrapper : IWrapper
 {
     void OnNext(object value);
     

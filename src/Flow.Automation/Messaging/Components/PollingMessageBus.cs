@@ -1,5 +1,5 @@
 ﻿using Flow.Automation.Messaging.Messages;
-using Flow.Automation.Services.Listeners;
+using Flow.Automation.Services.Abstractions;
 using Timer = System.Timers.Timer;
 
 namespace Flow.Automation.Messaging.Components;

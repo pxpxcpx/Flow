@@ -8,7 +8,13 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Flow.Automation\Flow.Automation.csproj" />
+      <ProjectReference Include="..\..\src\Flow.Core\Flow.Core.csproj" />
       <ProjectReference Include="..\..\src\Flow.Shared\Flow.Shared.csproj" />
+      <ProjectReference Include="..\Flow.App.Shared\Flow.App.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\" />
     </ItemGroup>
 
 </Project>

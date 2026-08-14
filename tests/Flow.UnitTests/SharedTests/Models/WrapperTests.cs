@@ -4,8 +4,8 @@ using JetBrains.Annotations;
 namespace Flow.UnitTests.SharedTests.Models;
 
 [TestClass]
-[TestSubject(typeof(TypedObject))]
-public class TypedObjectTests
+[TestSubject(typeof(Wrapper))]
+public class WrapperTests
 {
     [TestInitialize]
     public void TestInitialize()

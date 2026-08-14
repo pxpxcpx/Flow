@@ -1,4 +1,4 @@
-﻿using Flow.Automation.Messaging;
+﻿using Flow.Automation.Messaging.Messages;
 
 namespace Flow.UnitTests.AutomationTests.Messaging;
 

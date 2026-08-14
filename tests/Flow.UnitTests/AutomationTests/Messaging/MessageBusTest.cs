@@ -1,4 +1,5 @@
-﻿using Flow.Automation.Messaging;
+﻿using Flow.Automation.Messaging.Components;
+using Flow.Automation.Messaging.Messages;
 using JetBrains.Annotations;
 
 namespace Flow.UnitTests.AutomationTests.Messaging;
