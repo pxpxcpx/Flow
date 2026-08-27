@@ -39,7 +39,7 @@ public sealed class ListenerService : BackgroundService, IListenerService
         
         await _cts.CancelAsync();
         await base.StopAsync(cancellationToken);
-        
+         
         ((IObserver<object>)_router).OnCompleted();
     }
     
