@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using Flow.Core.Abstractions;
+using Flow.Core.Abstractions.Interfaces;
 using Flow.Core.Models.Nodes;
 using Flow.Core.Models.Positioning;
 using Flow.Shared.Abstractions;

@@ -1,8 +1,8 @@
-﻿using Flow.Core.Models.Positioning;
+﻿using Flow.Core.Models.Context;
+using Flow.Core.Models.Positioning;
 using Flow.Shared.Abstractions;
-using Flow.Core.Models.Context;
 
-namespace Flow.Core.Abstractions;
+namespace Flow.Core.Abstractions.Interfaces;
 
 public interface IFunction : INode
 {

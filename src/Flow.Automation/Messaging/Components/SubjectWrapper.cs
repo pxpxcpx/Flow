@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Subjects;
 using Flow.Automation.Messaging.Abstractions;
-using Flow.Shared.Models;
+using Flow.Shared.Infrastructures;
 
 namespace Flow.Automation.Messaging.Components;
 

@@ -1,22 +1,26 @@
 <Solution>
   <Folder Name="/app/">
+    <Project Path="clients/Flow.App.Core/Flow.App.Core.csproj" />
     <Project Path="clients/Flow.App.Shared/Flow.App.Shared.csproj" />
-    <Project Path="src/Flow.Automation/Flow.Automation.csproj" />
   </Folder>
-  <Folder Name="/engine/">
+  <Folder Name="/core/">
+    <Project Path="src/Flow.Automation/Flow.Automation.csproj" />
     <Project Path="src/Flow.Core/Flow.Core.csproj" />
   </Folder>
+  <Folder Name="/demos/">
+    <Project Path="demos/Flow.Demos.AutomationDemo/Flow.Demos.AutomationDemo.csproj" />
+  </Folder>
   <Folder Name="/plugins/" />
-  <Folder Name="/plugins/AppPlugins/" />
-  <Folder Name="/plugins/Dependencies/">
+  <Folder Name="/plugins/app-plugins/" />
+  <Folder Name="/plugins/dependencies/">
     <Project Path="plugins/Flow.BuiltIn/Flow.BuiltIn.csproj" />
     <Project Path="plugins/Flow.Extensions/Flow.Extensions.csproj" />
   </Folder>
   <Folder Name="/sdk/" />
-  <Folder Name="/sdk/App/">
+  <Folder Name="/sdk/app/">
     <Project Path="sdk/Flow.SDK.App/Flow.SDK.App.csproj" />
   </Folder>
-  <Folder Name="/sdk/Engine/">
+  <Folder Name="/sdk/engine/">
     <Project Path="sdk/Flow.SDK.Generators/Flow.SDK.Generators.csproj" />
     <Project Path="sdk/Flow.SDK/Flow.SDK.csproj" />
   </Folder>

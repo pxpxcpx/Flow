@@ -1,4 +1,4 @@
-﻿using Flow.Shared.Models;
+﻿using Flow.Shared.Infrastructures;
 using JetBrains.Annotations;
 
 namespace Flow.UnitTests.SharedTests.Models;

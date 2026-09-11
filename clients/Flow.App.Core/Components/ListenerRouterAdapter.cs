@@ -2,7 +2,7 @@
 using Flow.Automation.Messaging.Components;
 using Flow.Automation.Services.Abstractions;
 using Flow.Automation.Services.Listeners;
-using Flow.Shared.Models;
+using Flow.Shared.Infrastructures;
 
 namespace Flow.App.Core.Components;
 

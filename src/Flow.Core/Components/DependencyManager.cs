@@ -1,11 +1,11 @@
-﻿using Flow.SDK.Attributes;
-using Flow.Shared.Metadata;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
+using Flow.SDK.Attributes;
 using Flow.Shared.Abstractions;
+using Flow.Shared.Metadata;
 
-namespace Flow.Core.Services;
+namespace Flow.Core.Components;
 
 /// <summary>
 /// Singleton manager of dependencies.

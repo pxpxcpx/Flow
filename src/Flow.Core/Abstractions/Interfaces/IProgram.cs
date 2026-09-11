@@ -1,4 +1,4 @@
-﻿namespace Flow.Core.Abstractions;
+﻿namespace Flow.Core.Abstractions.Interfaces;
 
 public interface IProgram
 {

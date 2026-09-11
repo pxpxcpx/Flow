@@ -1,4 +1,4 @@
-﻿using Flow.Shared.Models;
+﻿using Flow.Shared.Infrastructures;
 
 namespace Flow.Shared.Exceptions;
 

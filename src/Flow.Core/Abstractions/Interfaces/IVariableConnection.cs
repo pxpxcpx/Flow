@@ -1,6 +1,6 @@
 ﻿using Flow.Core.Models.Positioning;
 
-namespace Flow.Core.Abstractions;
+namespace Flow.Core.Abstractions.Interfaces;
 
 public interface IVariableConnection
 {

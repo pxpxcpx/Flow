@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Flow.Shared.Abstractions;
 
-namespace Flow.Core.Services;
+namespace Flow.Core.RuntimeServices;
 
 /// <summary>
 /// Provides a service to output a value to the debug io stream.

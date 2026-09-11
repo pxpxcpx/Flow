@@ -1,4 +1,4 @@
-﻿using Flow.Core.Abstractions;
+﻿using Flow.Core.Abstractions.Interfaces;
 
 namespace Flow.Core.Models.Positioning;
 

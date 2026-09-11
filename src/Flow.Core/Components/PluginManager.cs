@@ -1,13 +1,13 @@
-﻿using Flow.Shared.Metadata;
-using Flow.Shared.Models;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
+using Flow.Shared.Metadata;
+using Flow.Shared.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Flow.Core.Services;
+namespace Flow.Core.Components;
 
 // TODO: IFactory
 public sealed class PluginManager : IDisposable

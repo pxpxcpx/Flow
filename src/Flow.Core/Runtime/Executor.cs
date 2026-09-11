@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Flow.Core.Abstractions;
+using Flow.Core.Abstractions.Interfaces;
 using Flow.Core.Models.Context;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;

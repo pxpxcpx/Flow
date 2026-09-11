@@ -1,4 +1,4 @@
-﻿using Flow.Core.Abstractions;
+﻿using Flow.Core.Abstractions.Interfaces;
 using Flow.Shared.Models;
 
 namespace Flow.Core.Models.Context;

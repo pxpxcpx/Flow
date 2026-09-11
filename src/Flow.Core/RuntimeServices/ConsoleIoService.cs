@@ -1,6 +1,6 @@
 ﻿using Flow.Shared.Abstractions;
 
-namespace Flow.Core.Services;
+namespace Flow.Core.RuntimeServices;
 
 /// <summary>
 /// Provides an io service of the runtime console.

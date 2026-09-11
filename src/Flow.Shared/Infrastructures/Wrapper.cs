@@ -1,7 +1,7 @@
 ﻿using Flow.Shared.Abstractions;
 using Flow.Shared.Results;
 
-namespace Flow.Shared.Models;
+namespace Flow.Shared.Infrastructures;
 
 //
 // If you have reached this point,
