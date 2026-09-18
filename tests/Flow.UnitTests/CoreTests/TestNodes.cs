@@ -65,12 +65,12 @@ internal class TestAsyncNode : Node, IAsyncExecutableNode
 
     private Random _random = new();
 
-    public async Task ExecuteAsync()
+    public Task ExecuteAsync()
     {
-        await Task.Delay(50);
         Console.WriteLine("{0} async node executed.", RuntimeId);
         Executed = true;
         Status |= NodeStatus.Completed;
+        return Task.CompletedTask;
     }
 }
 

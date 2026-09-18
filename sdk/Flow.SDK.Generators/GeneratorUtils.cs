@@ -84,57 +84,60 @@ internal static class GeneratorUtils
         return new Guid(hash).ToString();
     }
 
-    internal static string AlignWithIndent(this string rawString, int indent)
+    extension(string rawString)
     {
-        var intent = new string(' ', indent);
-
-        return string
-            .Join("\n", rawString
-                .Split(["\r\n", "\n"], StringSplitOptions.None)
-                .Select(line => intent + line));
-    }
-    
-    public static string NormalizeIndent(this string code, int indent)
-    {
-        if (string.IsNullOrEmpty(code))
-            return code;
-
-        var desiredIndent = new string(' ', indent);
-        var lines = code.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-        
-        int minLeadingSpaces = int.MaxValue;
-        foreach (var line in lines)
+        internal string AlignWithIndent(int indent)
         {
-            if (string.IsNullOrWhiteSpace(line))
-                continue;
-            
-            var match = Regex.Match(line, @"^[ \t]+");
-            if (match.Success)
-            {
-                int leadingLength = match.Length;
-                if (leadingLength < minLeadingSpaces)
-                    minLeadingSpaces = leadingLength;
-            }
-            else
-            {
-                minLeadingSpaces = 0;
-                break;
-            }
+            var intent = new string(' ', indent);
+
+            return string
+                .Join("\n", rawString
+                    .Split(["\r\n", "\n"], StringSplitOptions.None)
+                    .Select(line => intent + line));
         }
 
-        if (minLeadingSpaces == int.MaxValue)
-            minLeadingSpaces = 0;
-        
-        var normalizedLines = lines.Select(line =>
+        public string NormalizeIndent(int indent)
         {
-            if (string.IsNullOrWhiteSpace(line))
-                return line;
+            if (string.IsNullOrEmpty(rawString))
+                return rawString;
 
-            if (line.Length >= minLeadingSpaces)
-                line = line.Substring(minLeadingSpaces);
-            return desiredIndent + line;
-        });
+            var desiredIndent = new string(' ', indent);
+            var lines = rawString.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+        
+            var minLeadingSpaces = int.MaxValue;
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+            
+                var match = Regex.Match(line, @"^[ \t]+");
+                if (match.Success)
+                {
+                    var leadingLength = match.Length;
+                    if (leadingLength < minLeadingSpaces)
+                        minLeadingSpaces = leadingLength;
+                }
+                else
+                {
+                    minLeadingSpaces = 0;
+                    break;
+                }
+            }
 
-        return string.Join("\r\n", normalizedLines);
+            if (minLeadingSpaces == int.MaxValue)
+                minLeadingSpaces = 0;
+        
+            var normalizedLines = lines.Select(line =>
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    return line;
+
+                if (line.Length >= minLeadingSpaces)
+                    line = line.Substring(minLeadingSpaces);
+                return desiredIndent + line;
+            });
+
+            return string.Join("\r\n", normalizedLines);
+        }
     }
 }

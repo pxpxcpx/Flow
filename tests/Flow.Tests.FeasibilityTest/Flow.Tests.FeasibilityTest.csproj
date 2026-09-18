@@ -13,4 +13,10 @@
     <ProjectReference Include="..\..\src\Flow.Shared\Flow.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Update="MSTest.TestAdapter" Version="4.4.1" />
+    <PackageReference Update="MSTest.TestFramework" Version="4.4.1" />
+  </ItemGroup>
+
 </Project>

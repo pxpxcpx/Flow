@@ -12,10 +12,10 @@ public class SimpleFuncExecutorTests
 {
     public TestContext TestContext { get; set; }
 
-    [System.Diagnostics.CodeAnalysis.NotNull] private Function? _function = null!;
-    [System.Diagnostics.CodeAnalysis.NotNull] private TestSyncNode? _syncNode1 = null!;
-    [System.Diagnostics.CodeAnalysis.NotNull] private TestSyncNode? _syncNode2 = null!;
-    [System.Diagnostics.CodeAnalysis.NotNull] private TestAsyncNode? _asyncNode1 = null!;
+    private Function _function = null!;
+    private TestSyncNode _syncNode1 = null!;
+    private TestSyncNode _syncNode2 = null!;
+    private TestAsyncNode _asyncNode1 = null!;
 
     private static readonly NodeMetadata FunctionMetadata = new()
     {
@@ -52,7 +52,7 @@ public class SimpleFuncExecutorTests
     public void Constructor_ShouldInitializeProperties()
     {
         // Arrange & Act
-        var executor = new Core.Runtime.Executor(_function);
+        var executor = new Executor(_function);
 
         // Assert
         Assert.AreEqual(ProcessorStatus.Ready, executor.Status);
@@ -63,7 +63,7 @@ public class SimpleFuncExecutorTests
     public async Task Execute_WithSyncNode_ShouldExecuteNodeAndMarkCompleted()
     {
         // Arrange
-        var executor = new Core.Runtime.Executor(_function);
+        var executor = new Executor(_function);
 
         // Act
         await executor.Execute();
@@ -83,14 +83,14 @@ public class SimpleFuncExecutorTests
         _function.AddProcessConnection(_syncNode2, asyncNode);
         _function.AddProcessConnection(asyncNode, _function.Exit);
 
-        var executor = new Core.Runtime.Executor(_function);
+        var executor = new Executor(_function);
 
         // Act
         await executor.Execute();
 
         // Assert
         // Wait 100ms cause it is fire and forget.
-        await Task.Delay(50, TestContext.CancellationToken);
+        // await Task.Delay(50, TestContext.CancellationToken);
         Assert.IsTrue(asyncNode.Executed);
         Assert.IsTrue(asyncNode.Status.HasFlag(NodeStatus.Completed));
     }
@@ -99,7 +99,7 @@ public class SimpleFuncExecutorTests
     public async Task Execute_WhenExitReached_ShouldCompleteWithoutError()
     {
         // Arrange
-        var executor = new Core.Runtime.Executor(_function);
+        var executor = new Executor(_function);
 
         // Act
         await executor.Execute();
@@ -160,7 +160,7 @@ public class SimpleFuncExecutorTests
     public void Dispose_ShouldReleaseResources()
     {
         // Arrange
-        var executor = new Core.Runtime.Executor(_function);
+        var executor = new Executor(_function);
 
         // Act
         executor.Dispose();
@@ -175,10 +175,10 @@ public class ComplexFuncExecutorTests
 {
     public TestContext TestContext { get; set; }
 
-    [System.Diagnostics.CodeAnalysis.NotNull] private Function? _function = null!;
-    [System.Diagnostics.CodeAnalysis.NotNull] private TestSyncNode? _syncNode1 = null!;
-    [System.Diagnostics.CodeAnalysis.NotNull] private TestSyncNode? _syncNode2 = null!;
-    [System.Diagnostics.CodeAnalysis.NotNull] private TestAsyncNode? _asyncNode1 = null!;
+    private Function? _function;
+    private TestSyncNode? _syncNode1;
+    private TestSyncNode? _syncNode2;
+    private TestAsyncNode? _asyncNode1;
 
     private static readonly NodeMetadata FunctionMetadata = new()
     {

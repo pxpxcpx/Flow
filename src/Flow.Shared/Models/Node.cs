@@ -31,6 +31,13 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine
     /// <inheritdoc />
     public NodeStates PreviousState { get; private set; }
 
+    public bool IsCompleted => State.ExtractFieldIn(NodeStates.LifecycleMask) == (int)NodeStates.Finished;
+
+    public bool IsCompletedSuccessfully =>
+        IsCompleted && State.ExtractFieldIn(NodeStates.ResultMask) == (int)NodeStates.Successful;
+    
+    public bool IsInitialized => State.ExtractFieldIn(NodeStates.LifecycleMask) != (int)NodeStates.Idle;
+
     /// <summary>
     /// Services required.
     /// </summary>
@@ -99,6 +106,23 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine
 
         return true;
     }
+    
+    /// <summary>
+    /// Find the state by related binary/int code.
+    /// </summary>
+    private static NodeStates ExtractState(int code)
+        => code switch
+        {
+            1 => NodeStates.Idle,
+            2 => NodeStates.Ready,
+            4 => NodeStates.Running,
+            8 => NodeStates.Suspended,
+            16 => NodeStates.Finished,
+            32 => NodeStates.Unspecified,
+            64 => NodeStates.Faulted,
+            128 => NodeStates.Successful,
+            _ => NodeStates.None
+        };
 
     /// <summary>
     /// Find the event by related binary/int code.
@@ -120,23 +144,6 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine
             _ => NodeEvents.None
         };
 
-    /// <summary>
-    /// Find the state by related binary/int code.
-    /// </summary>
-    private static NodeStates ExtractState(int code)
-        => code switch
-        {
-            1 => NodeStates.Idle,
-            2 => NodeStates.Ready,
-            4 => NodeStates.Running,
-            8 => NodeStates.Suspended,
-            16 => NodeStates.Finished,
-            32 => NodeStates.Unspecified,
-            64 => NodeStates.Faulted,
-            128 => NodeStates.Successful,
-            _ => NodeStates.None
-        };
-
     /// <inheritdoc />
     public bool Fire(NodeEvents @event)
     {
@@ -150,8 +157,8 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine
         if (lifeCycleEvent == NodeEvents.Reset)
         {
             State = lifecycleState.HasFlag(NodeStates.Idle)
-                ? NodeStates.Idle | NodeStates.Unspecified
-                : NodeStates.Ready | NodeStates.Unspecified;
+                ? NodeStates.Idle | NodeStates.Unspecified   // Not initialized yet
+                : NodeStates.Ready | NodeStates.Unspecified; // Already initialized
             return true;
         }
 

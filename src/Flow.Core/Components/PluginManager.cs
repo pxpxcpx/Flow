@@ -101,11 +101,9 @@ public sealed class PluginManager : IDisposable
 
             // Main assembly of the plugin
             var a = GetAssembly(metadata.AssemblyPath);
-            if (a is not { } assembly)
-                return;
 
             // Get the plugin main class
-            var pluginType = assembly.GetType(metadata.ClassType.ToString());
+            var pluginType = a?.GetType(metadata.ClassType.ToString());
             if (pluginType is null || !typeof(Plugin).IsAssignableFrom(pluginType))
                 return;
 

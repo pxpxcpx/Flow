@@ -10,6 +10,7 @@
   <Folder Name="/demos/">
     <Project Path="demos/Flow.Demos.AutomationDemo/Flow.Demos.AutomationDemo.csproj" />
   </Folder>
+  <Folder Name="/libs/" />
   <Folder Name="/plugins/" />
   <Folder Name="/plugins/app-plugins/" />
   <Folder Name="/plugins/dependencies/">
@@ -24,6 +25,9 @@
     <Project Path="sdk/Flow.SDK.Generators/Flow.SDK.Generators.csproj" />
     <Project Path="sdk/Flow.SDK/Flow.SDK.csproj" />
   </Folder>
+  <Folder Name="/shared/">
+    <Project Path="src/Flow.Shared/Flow.Shared.csproj" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
     <File Path="global.json" />
@@ -35,5 +39,4 @@
     <Project Path="tests/Flow.Tests.GeneratingTest/Flow.Tests.GenerationTest.csproj" />
     <Project Path="tests/Flow.UnitTests/Flow.UnitTests.csproj" />
   </Folder>
-  <Project Path="src/Flow.Shared/Flow.Shared.csproj" />
 </Solution>

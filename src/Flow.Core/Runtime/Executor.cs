@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Flow.Core.Abstractions.Enums;
 using Flow.Core.Abstractions.Interfaces;
 using Flow.Core.Models.Context;
 using Flow.Shared.Abstractions;
@@ -10,7 +11,10 @@ using Flow.Shared.Utils;
 
 namespace Flow.Core.Runtime;
 
-public class Executor : IDisposable
+/// <summary>
+/// The executor of the <see cref="Function"/>.
+/// </summary>
+public class Executor : IDisposable, IStateMachine<ExecutorStates, ExecutorEvents>, IProcessControllable
 {
     private bool _completed;
 
@@ -18,7 +22,8 @@ public class Executor : IDisposable
 
     private Function _function;
 
-    [NotNull] private Queue<INode>? _currentPendingNodes;
+    [NotNull] 
+    private Queue<INode>? _currentPendingNodes;
 
     // To solve the problem of exiting directly before asynchronous nodes have been executed.
     private int _executingNodesCount;
@@ -30,7 +35,12 @@ public class Executor : IDisposable
     // TODO: Context manager? How it works???
     private readonly InstanceManager<Guid> _instanceManager;
 
+    [Obsolete("Remove soon", error: false)]
     public ProcessorStatus Status { get; private set; }
+
+    public ExecutorStates State { get; private set; }
+
+    public ExecutorStates PreviousState { get; private set; }
 
     public VoidResult? Result { get; private set; }
 
@@ -44,7 +54,7 @@ public class Executor : IDisposable
 
         Status = ProcessorStatus.Ready;
     }
-    
+
     /// <summary>
     /// Check if this is the exit.
     /// </summary>
@@ -64,7 +74,7 @@ public class Executor : IDisposable
     /// Invoke a node and its subsequent nodes iteratively.
     /// </summary>
     /// <param name="node"></param>
-    private async Task Execute(INode node)
+    private async Task<VoidResult> Execute(INode node)
     {
         _current = node;
         _currentPendingNodes.Enqueue(node);
@@ -75,9 +85,10 @@ public class Executor : IDisposable
 
             if (_completed)
                 break;
-
-            if (Status.HasFlag(ProcessorStatus.Paused) || Status.HasFlag(ProcessorStatus.Cancelled))
-                return;
+            
+            var lfs = State.ExtractFieldIn(ExecutorStates.LifecycleMask, ExtractState);
+            if (lfs is ExecutorStates.Suspended or ExecutorStates.Finished)
+                return VoidResult.Completed();
 
             var n = _currentPendingNodes.Dequeue();
 
@@ -87,7 +98,7 @@ public class Executor : IDisposable
                 _semaphoreSlim.Release(1);
                 continue;
             }
-
+            
             await ExecuteSingle(n);
             _current = n;
 
@@ -99,16 +110,18 @@ public class Executor : IDisposable
             // Enqueue subsequent nodes.
             EnqueueNodes(nextIds);
         }
+
+        return VoidResult.Completed();
     }
 
     /// <summary>
     /// Pass the arguments and invoke a single node.
     /// </summary>
     /// <param name="node">Single node to be invoked.</param>
-    private ValueTask ExecuteSingle(INode node)
+    private Task ExecuteSingle(INode node)
     {
         if (!node.IsEnabled)
-            return ValueTask.CompletedTask;
+            return Task.CompletedTask;
 
         // If the node has unfilled values:
         if (node.GetUnfilledRequiredValues().Any())
@@ -116,7 +129,7 @@ public class Executor : IDisposable
             if (!TryGetValueFromSource(node))
             {
                 node.MarkAs(NodeStatus.Waiting);
-                return ValueTask.CompletedTask;
+                return Task.CompletedTask;
             }
         }
 
@@ -126,7 +139,7 @@ public class Executor : IDisposable
             if (!TryPassContextToNode(node))
             {
                 node.MarkAs(NodeStatus.Waiting);
-                return ValueTask.CompletedTask;
+                return Task.CompletedTask;
             }
         }
 
@@ -151,6 +164,7 @@ public class Executor : IDisposable
                     success = false;
                     OnNodeError(ex, en);
                 }
+
                 OnNodeCompleted(en);
                 break;
             }
@@ -165,10 +179,7 @@ public class Executor : IDisposable
                             success = false;
                             OnNodeError(ex, aen);
                         },
-                        () =>
-                        {
-                            OnNodeCompleted(aen);
-                        });
+                        () => { OnNodeCompleted(aen); });
                 break;
             }
 
@@ -180,7 +191,7 @@ public class Executor : IDisposable
             }
 
             default:
-                return ValueTask.CompletedTask;
+                return Task.CompletedTask;
         }
 
         if (success)
@@ -192,7 +203,7 @@ public class Executor : IDisposable
         if (!PassResults(node))
             Result = VoidResult.Err(new ValuePassingException());
 
-        return ValueTask.CompletedTask;
+        return Task.CompletedTask;
     }
 
     private void OnNodeError(Exception ex, INode node)
@@ -384,8 +395,6 @@ public class Executor : IDisposable
     /// Try to get a context from the InstanceManager, and pass it to the node.
     /// <remarks>The node must implements <see cref="IInstanceRequired"/>.</remarks>
     /// </summary>
-    /// <param name="node"></param>
-    /// <returns></returns>
     private bool TryPassContextToNode(INode node)
     {
         if (_function.GetRuntimeGuid(node) is not { } rt) return false;
@@ -406,16 +415,13 @@ public class Executor : IDisposable
     /// Resend one node's inputs to the other one.
     /// </summary>
     /// <remarks>Ensure two nodes' input metadata can be match.</remarks>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
     private bool ResendInputs(INode source, INode target)
     {
         // Match two nodes' metadata
-        if (source.InputVariableMetadata is null || target.InputVariableMetadata is null
-                                                 || source.Inputs is null || target.Inputs is null
-                                                 || source.InputVariableMetadata.Length !=
-                                                 target.InputVariableMetadata.Length)
+        if (source.InputVariableMetadata is null
+            || target.InputVariableMetadata is null
+            || source.Inputs is null || target.Inputs is null
+            || source.InputVariableMetadata.Length != target.InputVariableMetadata.Length)
             return false;
 
         for (var i = 0; i < source.Inputs.Length; i++)
@@ -424,12 +430,100 @@ public class Executor : IDisposable
         return true;
     }
 
-    private void Pause()
+    /// <summary>
+    /// Find the state by related binary/int code.
+    /// </summary>
+    private static ExecutorStates ExtractState(int code)
+        => code switch
+        {
+            1 => ExecutorStates.Idle,
+            2 => ExecutorStates.Ready,
+            4 => ExecutorStates.Running,
+            8 => ExecutorStates.Suspended,
+            16 => ExecutorStates.Finished,
+            32 => ExecutorStates.Unspecified,
+            64 => ExecutorStates.Faulted,
+            128 => ExecutorStates.Successful,
+            _ => ExecutorStates.None
+        };
+
+    /// <summary>
+    /// Find the event by related binary/int code.
+    /// </summary>
+    private static ExecutorEvents ExtractEvent(int code)
+        => code switch
+        {
+            1 => ExecutorEvents.Initialize,
+            2 => ExecutorEvents.Start,
+            3 => ExecutorEvents.Suspend,
+            4 => ExecutorEvents.Pause,
+            5 => ExecutorEvents.Resume,
+            6 => ExecutorEvents.Cancel,
+            7 => ExecutorEvents.Complete,
+            8 => ExecutorEvents.Reset,
+            16 => ExecutorEvents.Unspecified,
+            32 => ExecutorEvents.Success,
+            48 => ExecutorEvents.Fail,
+            _ => ExecutorEvents.None
+        };
+
+    /// <inheritdoc />
+    public bool Fire(ExecutorEvents @event)
+    {
+        PreviousState = State;
+        var pr = State;
+        
+        var lifeCycleEvent = @event.ExtractFieldIn(ExecutorEvents.LifecycleMask, ExtractEvent);
+        var procEvent = @event.ExtractFieldIn(ExecutorEvents.ResultMask, ExtractEvent);
+        var lifecycleState = pr.ExtractFieldIn(ExecutorStates.LifecycleMask, ExtractState);
+        
+        if (lifeCycleEvent == ExecutorEvents.Reset)
+        {
+            State = lifecycleState.HasFlag(ExecutorStates.Idle)
+                ? ExecutorStates.Idle | ExecutorStates.Unspecified   // Not initialized yet
+                : ExecutorStates.Ready | ExecutorStates.Unspecified; // Already initialized
+            return true;
+        }
+        
+        ExecutorStates? l = (lifecycleState, lifeCycleEvent) switch
+        {
+            // * --None--> *
+            (_, ExecutorEvents.None) => pr,
+            // Idle -> *
+            (ExecutorStates.Idle, ExecutorEvents.Initialize) => ExecutorStates.Ready,
+            // Ready -> *
+            (ExecutorStates.Ready, ExecutorEvents.Start) => ExecutorStates.Running,
+            (ExecutorStates.Ready, ExecutorEvents.Suspend) => ExecutorStates.Suspended,
+            // Running -> *
+            (ExecutorStates.Running, ExecutorEvents.Pause) => ExecutorStates.Suspended,
+            (ExecutorStates.Running, ExecutorEvents.Suspend) => ExecutorStates.Suspended,
+            (ExecutorStates.Running, ExecutorEvents.Cancel) => ExecutorStates.Finished,
+            (ExecutorStates.Running, ExecutorEvents.Complete) => ExecutorStates.Finished,
+            // Suspended -> *
+            (ExecutorStates.Suspended, ExecutorEvents.Resume) => ExecutorStates.Running,
+            (ExecutorStates.Suspended, ExecutorEvents.Cancel) => ExecutorStates.Finished,
+            _ => null
+        };
+
+        var r = procEvent switch
+        {
+            ExecutorEvents.Unspecified => ExecutorStates.Unspecified,
+            ExecutorEvents.Success => ExecutorStates.Successful,
+            ExecutorEvents.Fail => ExecutorStates.Faulted,
+            _ => ExecutorStates.Unspecified
+        };
+
+        if (l is null) return false;
+        State = l.Value | r;
+        return true;
+    }
+
+    public void Pause()
     {
         Status |= ProcessorStatus.Paused;
     }
 
-    private void Resume()
+    public void Resume()
     {
         Status |= ProcessorStatus.Running;
         if (_current is null)
@@ -441,8 +535,14 @@ public class Executor : IDisposable
         Execute(_current).Await();
     }
 
+    public void Cancel()
+    {
+        Fire(ExecutorEvents.Cancel);
+    }
+
     private void Stop()
     {
+        Fire(ExecutorEvents.Cancel);
         Status |= ProcessorStatus.Cancelled;
         _completed = true;
         Dispose();

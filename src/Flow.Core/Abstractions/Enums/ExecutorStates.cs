@@ -1,22 +1,7 @@
-﻿namespace Flow.Shared.Enums;
+﻿namespace Flow.Core.Abstractions.Enums;
 
 [Flags]
-public enum NodeStatus
-{
-    Ready      = 0b_0000_0000,
-    Running    = 0b_0000_0001,
-    Waiting    = 0b_0000_0010,
-    Completed  = 0b_0000_0100,
-    Failed     = 0b_0000_1000,
-    Skipped    = 0b_0001_0000,
-    Cancelled  = 0b_0010_0000,
-}
-
-/// <summary>
-/// States of a node.
-/// </summary>
-[Flags]
-public enum NodeStates
+public enum ExecutorStates
 {
     None          = 0b_0000_0000,
     
@@ -27,22 +12,22 @@ public enum NodeStates
     LifecycleMask = 0b_0001_1111,
     
     /// <summary>
-    /// Initialized state, node had just been activated.
+    /// Initialized state, executor had just been activated.
     /// </summary>
     Idle          = 0b_0000_0001,
     
     /// <summary>
-    /// Node is ready to run. All services, requirements are ready.
+    /// Executor is ready to run. All services, requirements are ready.
     /// </summary>
     Ready         = 0b_0000_0010,
     
     /// <summary>
-    /// Node is being executed.
+    /// Executor is being executed.
     /// </summary>
     Running       = 0b_0000_0100,
     
     /// <summary>
-    /// Node has suspended due to unexpected conditions, like params are not ready, etc.
+    /// Executor has suspended due to unexpected conditions, like params are not ready, etc.
     /// </summary>
     Suspended     = 0b_0000_1000,
     

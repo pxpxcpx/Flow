@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\clients\Flow.App.Core\Flow.App.Core.csproj" />
+      <ProjectReference Include="..\..\clients\Flow.App.Shared\Flow.App.Shared.csproj" />
+      <ProjectReference Include="..\..\src\Flow.Automation\Flow.Automation.csproj" />
+      <ProjectReference Include="..\..\src\Flow.Shared\Flow.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+    </ItemGroup>
+
+</Project>
