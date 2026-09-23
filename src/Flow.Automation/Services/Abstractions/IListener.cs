@@ -4,7 +4,7 @@ using Flow.Shared.Enums;
 
 namespace Flow.Automation.Services.Abstractions;
 
-public interface IListener<out TMessage> : IObservable<TMessage>, IRecognizable, ISubscriptionManaged
+public interface IListener<out TMessage> : IObservable<TMessage>, IDescribable, ISubscriptionManaged
 {
     /// <summary>
     /// Initial the listener.

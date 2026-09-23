@@ -5,7 +5,7 @@ namespace Flow.Shared.Metadata;
 /// <summary>
 /// Represents a node's metadata.
 /// </summary>
-public record NodeMetadata : IRecognizable
+public record NodeMetadata : IDescribable
 {
     /// <summary>
     /// ID of the node itself.
@@ -16,7 +16,7 @@ public record NodeMetadata : IRecognizable
     /// <summary>
     /// Name of the node.
     /// </summary>
-    public required string Name { get; set; }
+    public required string Identifier { get; set; }
 
     /// <summary>
     /// Description of the node.
@@ -31,7 +31,7 @@ public record NodeMetadata : IRecognizable
     public static NodeMetadata Empty => new NodeMetadata()
     {
         Id = Guid.Empty,
-        Name = string.Empty,
+        Identifier = string.Empty,
         Description = string.Empty,
     };
 }

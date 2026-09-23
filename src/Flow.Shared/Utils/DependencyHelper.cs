@@ -28,7 +28,7 @@ public static class DependencyHelper
         var isSatisfied = false;
         
         if (conditionType.HasFlag(PluggableConditionType.Name))
-            isSatisfied |= metadata.Name == target.Name;
+            isSatisfied |= metadata.Identifier == target.Identifier;
         if (conditionType.HasFlag(PluggableConditionType.Guid))
             isSatisfied |= metadata.Guid == target.Guid;
         if (conditionType.HasFlag(PluggableConditionType.Version))

@@ -15,7 +15,7 @@ public abstract class Listener<TMessage> : IListener<TMessage>
     private readonly List<IObserver<TMessage>> _registeredObservers = [];
     
     /// <inheritdoc />
-    public abstract string Name { get; set; }
+    public abstract string Identifier { get; set; }
 
     /// <inheritdoc />
     public abstract string Description { get; set; }

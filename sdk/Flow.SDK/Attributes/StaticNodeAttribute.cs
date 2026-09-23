@@ -6,4 +6,4 @@
 /// <param name="name"></param>
 /// <param name="description"></param>
 [AttributeUsage(AttributeTargets.Method)]
-public sealed class StaticNodeAttribute(string name, string description) : RecognizableAttribute(name, description);
+public sealed class StaticNodeAttribute(string name, string description) : DescribableAttribute(name, description);

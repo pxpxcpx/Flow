@@ -21,7 +21,7 @@ public enum PluggableConditionType
     All       = 0b_0000_1111,
     
     /// <summary>
-    /// Plugin's <see cref="DependencyMetadata.Name"/>.
+    /// Plugin's <see cref="DependencyMetadata.Identifier"/>.
     /// </summary>
     Name      = 0b_0000_0001,
     

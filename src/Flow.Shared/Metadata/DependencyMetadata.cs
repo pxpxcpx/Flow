@@ -31,7 +31,7 @@ namespace Flow.Shared.Metadata;
 /// {
 ///     Guid = Guid.Parse("Your GUID here");
 ///     Version = new Version(0,0,0,0);
-///     Name = "Your plugin name";
+///     Identifier = "Your plugin name";
 ///     Description = "Description to the plugin";
 ///     Nodes = dict;
 ///     Author = "Flow";
@@ -43,7 +43,7 @@ namespace Flow.Shared.Metadata;
 /// 3. Parse this metadata into JSON and save it as "Plugin.json" in the root directory.
 /// </example>
 [Serializable]
-public record DependencyMetadata : IRecognizable
+public record DependencyMetadata : IDescribable
 {
     /// <summary>
     /// ID of the plugin.
@@ -59,7 +59,7 @@ public record DependencyMetadata : IRecognizable
     /// <summary>
     /// Name of the plugin.
     /// </summary>
-    public required string Name { get; set; }
+    public required string Identifier { get; set; }
     
     /// <summary>
     /// Description of the plugin.

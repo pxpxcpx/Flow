@@ -80,16 +80,16 @@ public class I18NHelper
 
     public void TranslateAndModifyRecognizableObject<TRecognizable>(ref TRecognizable recognizableObj,
         string? targetCulture = null)
-        where TRecognizable : IRecognizable
+        where TRecognizable : IDescribable
     {
-        recognizableObj.Name = Translate(recognizableObj.Name, targetCulture);
+        recognizableObj.Identifier = Translate(recognizableObj.Identifier, targetCulture);
         recognizableObj.Description = Translate(recognizableObj.Description, targetCulture);
     }
 
     public void TranslateAndModifyRecognizableObjects<TRecognizable>(
         ref TRecognizable[] recognizableObjs, // To avoid the value object
         string? targetCulture = null)
-        where TRecognizable : IRecognizable
+        where TRecognizable : IDescribable
     {
         for (var i = 0; i < recognizableObjs.Length; i++)
         {

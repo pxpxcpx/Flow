@@ -12,7 +12,7 @@ public partial class StaticNodeExampleV2
         private static readonly NodeMetadata NodeMetadata = new()
         {
             Id = new Guid(g: "D838E6F8-A8E4-4FDE-A91F-E56747E98B82"), // Replaceable, generated once for the same method.
-            Name = "Add",
+            Identifier = "Add",
             Description = "Return the sum of two numbers."
         };
         
@@ -21,15 +21,13 @@ public partial class StaticNodeExampleV2
         public Guid RuntimeId { get; init; }
         
         public bool IsEnabled { get; }
-
-        public NodeStatus Status { get; set; }
         
         private static readonly ParameterMetadata[]? InputMetadata =
         [
             new ParameterMetadata
             {
                 Index = 0,
-                Name = "Number A", 
+                Identifier = "Number A", 
                 Description = "First number to add.",
                 Type = typeof(int), 
                 IsRequired = true, 
@@ -38,7 +36,7 @@ public partial class StaticNodeExampleV2
             new ParameterMetadata
             {
                 Index = 1,
-                Name = "Number B",
+                Identifier = "Number B",
                 Description = "Second Number to add.",
                 Type = typeof(int), 
                 IsRequired = true,
@@ -53,7 +51,7 @@ public partial class StaticNodeExampleV2
             new ParameterMetadata
             {
                 Index = 0,
-                Name = "Sum",
+                Identifier = "Sum",
                 Description = "Sum of two numbers.",
                 Type = typeof(int),
                 IsRequired = true,
@@ -76,7 +74,14 @@ public partial class StaticNodeExampleV2
             }
         }
 
-        public INode? Clone()
+        public INode Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public NodeStates State { get; }
+        public NodeStates PreviousState { get; }
+        public bool Fire(NodeEvents @event)
         {
             throw new NotImplementedException();
         }

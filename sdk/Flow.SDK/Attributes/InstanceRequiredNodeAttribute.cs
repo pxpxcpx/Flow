@@ -29,7 +29,7 @@
 /// </example>
 [AttributeUsage(AttributeTargets.Method)]
 public class InstanceRequiredNodeAttribute(string name, string description, Type instanceType) 
-    : RecognizableAttribute(name, description)
+    : DescribableAttribute(name, description)
 {
     public Type InstanceType => instanceType;
 }

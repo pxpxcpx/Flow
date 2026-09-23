@@ -19,7 +19,7 @@ internal sealed class ListenerRouterAdapter<TMessage> : Wrapper, IListenerRouter
     }
 
     /// <inheritdoc />
-    public string Name { get; set; }
+    public string Identifier { get; set; }
 
     /// <inheritdoc />
     public string Description { get; set; }
@@ -30,7 +30,7 @@ internal sealed class ListenerRouterAdapter<TMessage> : Wrapper, IListenerRouter
             throw new ArgumentException($"{nameof(listener)} must be of type {nameof(IListener<TMessage>)}");
         
         _listener = (Listener<TMessage>)listener;
-        Name = _listener.Name;
+        Identifier = _listener.Identifier;
         Description = _listener.Description;
     }
 
@@ -40,7 +40,7 @@ internal sealed class ListenerRouterAdapter<TMessage> : Wrapper, IListenerRouter
             throw new ArgumentException($"{nameof(listener)} must be of type {nameof(IListener<TMessage>)}");
         
         _listener = (Listener<TMessage>)listener;
-        Name = _listener.Name;
+        Identifier = _listener.Identifier;
         Description = _listener.Description;
     }
 

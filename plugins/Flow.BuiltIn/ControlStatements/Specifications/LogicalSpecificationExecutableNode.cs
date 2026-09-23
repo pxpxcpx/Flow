@@ -14,7 +14,7 @@ public class LogicalSpecificationNode : IExecutableNode
     private static readonly NodeMetadata NodeMetadata = new()
     {
         Id = new Guid("6D59D8BB-5407-4B96-B901-D4437046A789"),
-        Name = "Logical operations",
+        Identifier = "Logical operations",
         Description = "Used for logical calculations between left and right values."
     };
 
@@ -32,9 +32,6 @@ public class LogicalSpecificationNode : IExecutableNode
     public bool IsEnabled { get; set; }
 
     /// <inheritdoc />
-    public NodeStatus Status { get; set; }
-
-    /// <inheritdoc />
     public VoidResult? Result { get; private set; }
 
     #endregion
@@ -46,7 +43,7 @@ public class LogicalSpecificationNode : IExecutableNode
         new ParameterMetadata
         {
             Index = 0,
-            Name = "Value 1",
+            Identifier = "Value 1",
             Description = "",
             Type = typeof(object),
             IsRequired = false,
@@ -55,7 +52,7 @@ public class LogicalSpecificationNode : IExecutableNode
         new ParameterMetadata
         {
             Index = 1,
-            Name = "Value 2",
+            Identifier = "Value 2",
             Description = "",
             Type = typeof(object),
             IsRequired = true,
@@ -64,7 +61,7 @@ public class LogicalSpecificationNode : IExecutableNode
         new ParameterMetadata
         {
             Index = 2,
-            Name = "Operator",
+            Identifier = "Operator",
             Description = "Calculation symbol used to compute the left and right values",
             Type = typeof(LogicalOperator),
             IsRequired = true,
@@ -83,7 +80,7 @@ public class LogicalSpecificationNode : IExecutableNode
         new ParameterMetadata
         {
             Index = 0,
-            Name = "Result",
+            Identifier = "Result",
             Description = "Result of the operation.",
             Type = typeof(bool),
             IsRequired = false
@@ -131,7 +128,15 @@ public class LogicalSpecificationNode : IExecutableNode
         Outputs![0] = result;
     }
 
+    // TODO
     public INode Clone()
+    {
+        throw new NotImplementedException();
+    }
+
+    public NodeStates State { get; }
+    public NodeStates PreviousState { get; }
+    public bool Fire(NodeEvents @event)
     {
         throw new NotImplementedException();
     }

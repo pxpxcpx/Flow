@@ -5,7 +5,7 @@ using Flow.SDK.Attributes;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Metadata;
 
-namespace Flow.Core.Components;
+namespace Flow.Core.Runtime;
 
 /// <summary>
 /// Singleton manager of dependencies.

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层_1" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400">
+  <!-- Generator: Adobe Illustrator 29.0.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 186)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: url(#_未命名的渐变_5);
+      }
+
+      .st1 {
+        fill: none;
+      }
+
+      .st2 {
+        display: none;
+        isolation: isolate;
+        opacity: .8;
+      }
+
+      .st3 {
+        fill: url(#_未命名的渐变_3);
+      }
+
+      .st4 {
+        fill: url(#_未命名的渐变);
+      }
+
+      .st5 {
+        fill: url(#_未命名的渐变_4);
+      }
+
+      .st6 {
+        clip-path: url(#clippath);
+      }
+
+      .st7 {
+        fill: url(#_未命名的渐变_2);
+      }
+    </style>
+    <linearGradient id="_未命名的渐变" data-name="未命名的渐变" x1="100" y1="262.2" x2="300" y2="262.2" gradientTransform="translate(0 400) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5b9fea"/>
+      <stop offset="1" stop-color="#68d6e3"/>
+    </linearGradient>
+    <linearGradient id="_未命名的渐变_2" data-name="未命名的渐变 2" x1="100" y1="216.2" x2="200" y2="216.2" gradientTransform="translate(0 400) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5b9fea"/>
+      <stop offset="1" stop-color="#4a84dc"/>
+    </linearGradient>
+    <linearGradient id="_未命名的渐变_3" data-name="未命名的渐变 3" x1="370.3" y1="298.3" x2="29.7" y2="101.7" gradientTransform="translate(0 400) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#63a7e6"/>
+      <stop offset=".2" stop-color="#5e9ee3"/>
+      <stop offset=".5" stop-color="#5186da"/>
+      <stop offset="1" stop-color="#3c5ecd"/>
+      <stop offset="1" stop-color="#3b5ccc"/>
+    </linearGradient>
+    <clipPath id="clippath">
+      <polygon class="st1" points="319.9 323.5 200 284.5 200 150 150.2 134.5 200 123.7 319.9 162.8 319.9 323.5"/>
+    </clipPath>
+    <linearGradient id="_未命名的渐变_4" data-name="未命名的渐变 4" x1="200" y1="183.8" x2="300" y2="183.8" gradientTransform="translate(0 400) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4a84dc"/>
+      <stop offset="1" stop-color="#3a6ace"/>
+    </linearGradient>
+    <linearGradient id="_未命名的渐变_5" data-name="未命名的渐变 5" x1="300" y1="137.8" x2="100" y2="137.8" gradientTransform="translate(0 400) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3a6ace"/>
+      <stop offset="1" stop-color="#404cab"/>
+    </linearGradient>
+  </defs>
+  <g id="_图层_4" data-name="图层_4">
+    <g>
+      <image class="st2" width="909" height="741" transform="translate(89.9 50) scale(.2)" xlink:href="8D332758.png"/>
+      <path class="st4" d="M289.6,155.9l-189.6,61.6v-100l180.4-58.6c9.7-3.1,19.6,4.1,19.6,14.3v68.5c0,6.5-4.2,12.3-10.4,14.3Z"/>
+    </g>
+    <g>
+      <image class="st2" width="493" height="626" transform="translate(89.8 109.4) scale(.2)" xlink:href="8D332759.png"/>
+      <polygon class="st7" points="200 250 100 217.5 100 117.5 200 150 200 250"/>
+    </g>
+    <g>
+      <image class="st2" width="1535" height="919" transform="translate(14.9 90.7) scale(.2)" xlink:href="8D33275F.png"/>
+      <path class="st3" d="M375,182.2c0,6.5-4.2,12.3-10.4,14.3l-164.6,53.5-155.4,50.5c-9.7,3.1-19.6-4.1-19.6-14.3v-68.5c0-6.5,4.2-12.3,10.4-14.3l164.6-53.5,155.4-50.5c9.7-3.1,19.6,4.1,19.6,14.3v68.5Z"/>
+    </g>
+    <g class="st6">
+      <g>
+        <image class="st2" width="493" height="629" transform="translate(189.9 142) scale(.2)" xlink:href="8D33275A.png"/>
+        <polygon class="st5" points="300 282.5 200 250 200 150 300 182.5 300 282.5"/>
+      </g>
+    </g>
+    <g>
+      <image class="st2" width="909" height="738" transform="translate(89.8 174.5) scale(.2)" xlink:href="8D33275B.png"/>
+      <path class="st0" d="M100,258.4v68.5c0,10.2,9.9,17.4,19.6,14.3l180.4-58.6v-100l-189.6,61.6c-6.2,2-10.4,7.8-10.4,14.3Z"/>
+    </g>
+  </g>
+</svg>

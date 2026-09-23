@@ -3,7 +3,7 @@ using Flow.Shared.Abstractions;
 
 namespace Flow.App.Shared.Abstractions;
 
-public interface IListenerRouterAdapter : IRecognizable, IWrapper
+public interface IListenerRouterAdapter : IDescribable, IWrapper
 {
     void Initialize();
     

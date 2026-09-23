@@ -16,7 +16,7 @@ internal class TestSyncNode : Node, IExecutableNode
         new()
         {
             Index = 0,
-            Name = null!,
+            Identifier = null!,
             Description = null!,
             Type = null!,
             IsRequired = false
@@ -28,7 +28,7 @@ internal class TestSyncNode : Node, IExecutableNode
         new()
         {
             Index = 0,
-            Name = null!,
+            Identifier = null!,
             Description = null!,
             Type = null!,
             IsRequired = false
@@ -36,7 +36,7 @@ internal class TestSyncNode : Node, IExecutableNode
         new()
         {
             Index = 0,
-            Name = null!,
+            Identifier = null!,
             Description = null!,
             Type = null!,
             IsRequired = false
@@ -44,7 +44,7 @@ internal class TestSyncNode : Node, IExecutableNode
         new()
         {
             Index = 0,
-            Name = null!,
+            Identifier = null!,
             Description = null!,
             Type = null!,
             IsRequired = false
@@ -55,7 +55,7 @@ internal class TestSyncNode : Node, IExecutableNode
     {
         Console.WriteLine("{0} node executed.", RuntimeId);
         Executed = true;
-        Status |= NodeStatus.Completed;
+        Fire(NodeEvents.Complete);
     }
 }
 
@@ -69,7 +69,7 @@ internal class TestAsyncNode : Node, IAsyncExecutableNode
     {
         Console.WriteLine("{0} async node executed.", RuntimeId);
         Executed = true;
-        Status |= NodeStatus.Completed;
+        Fire(NodeEvents.Complete);
         return Task.CompletedTask;
     }
 }

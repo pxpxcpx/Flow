@@ -1,4 +1,4 @@
 ﻿namespace Flow.SDK.Attributes;
 
 [AttributeUsage(AttributeTargets.Parameter)]
-public class InputAttribute(string name, string description) : RecognizableAttribute(name, description);
+public class InputAttribute(string name, string description) : DescribableAttribute(name, description);

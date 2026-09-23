@@ -80,7 +80,7 @@ internal static class Constants
         new ParameterMetadata()
         {
             Index = $paramIndex, 
-            Name = "$paramName", 
+            Identifier = "$paramName", 
             Description = "$paramDescription", 
             Type = typeof($paramType), 
             IsRequired = true, 
@@ -93,7 +93,7 @@ internal static class Constants
         new ParameterMetadata
         {
             Index = 0, 
-            Name = "Result", 
+            Identifier = "Result", 
             Description = "Result of $paramName operation.", 
             Type = typeof($paramType), 
             IsRequired = true, 
@@ -139,7 +139,7 @@ internal static class Constants
                     internal static NodeMetadata NodeMetadata = new()
                     {
                         Id = new Guid("$nodeGuid"),
-                        Name = "$nodeName",
+                        Identifier = "$nodeName",
                         Description = "$nodeDescription"
                     };
                     
@@ -245,7 +245,7 @@ internal static class Constants
                     internal static NodeMetadata NodeMetadata = new()
                     {
                         Id = new Guid("$nodeGuid"),
-                        Name = "$nodeName",
+                        Identifier = "$nodeName",
                         Description = "$nodeDescription"
                     };
                     

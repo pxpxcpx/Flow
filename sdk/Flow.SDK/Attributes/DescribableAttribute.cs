@@ -6,15 +6,15 @@ namespace Flow.SDK.Attributes;
 /// The flag will have no effect. Do not apply it to any properties or fields.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public abstract class RecognizableAttribute : Attribute, IRecognizable
+public abstract class DescribableAttribute : Attribute, IDescribable
 {
-    public string Name { get; set; } = string.Empty;
+    public string Identifier { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
 
-    private RecognizableAttribute() { }
-    protected RecognizableAttribute(string name, string description)
+    private DescribableAttribute() { }
+    protected DescribableAttribute(string name, string description)
     {
-        Name = name;
+        Identifier = name;
         Description = description;
     }
 }

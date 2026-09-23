@@ -12,7 +12,7 @@ public class FunctionTest
     private static readonly NodeMetadata TestNodeMetadata = new NodeMetadata()
     {
         Id = Guid.NewGuid(),
-        Name = "Function",
+        Identifier = "Function",
         Description = "Function for test.",
     };
 

@@ -5,7 +5,7 @@ using Flow.Shared.Models;
 namespace Flow.Shared.Metadata;
 
 [Serializable]
-public record struct PluginMetadata : IRecognizable
+public record struct PluginMetadata : IDescribable
 {
     public PluginMetadata()
     {
@@ -25,7 +25,7 @@ public record struct PluginMetadata : IRecognizable
     /// <summary>
     /// Name of the plugin.
     /// </summary>
-    public required string Name { get; set; }
+    public required string Identifier { get; set; }
     
     /// <summary>
     /// Description of the plugin.
