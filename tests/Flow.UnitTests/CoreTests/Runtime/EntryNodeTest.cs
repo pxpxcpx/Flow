@@ -11,7 +11,7 @@ public class EntryNodeTest
 {
     private static NodeMetadata _nodeMetadata = new()
     {
-        Name = "TestNode",
+        Identifier = "TestNode",
         Description = "TestNode",
         Id = Guid.Parse("F43D5F2F-61E4-4814-8E68-8A218DF30740"),
     };

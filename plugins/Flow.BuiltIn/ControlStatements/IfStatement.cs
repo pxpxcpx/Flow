@@ -2,6 +2,7 @@
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
+using Flow.Shared.Utils;
 
 namespace Flow.BuiltIn.ControlStatements;
 
@@ -13,10 +14,10 @@ public class IfStatement : IExecutableNode, IControlStatement
     private static readonly NodeMetadata NodeMetadata = new()
     {
         Id = new Guid("7AE6EB1F-5B2C-4495-99D1-855CCF8B6FD0"),
-        Name = "If statement",
+        Identifier = "If statement",
         Description = "Used as a conditional statement node."
     };
-    
+
     /// <inheritdoc />
     public NodeMetadata Metadata => NodeMetadata;
 
@@ -25,19 +26,22 @@ public class IfStatement : IExecutableNode, IControlStatement
 
     /// <inheritdoc />
     public bool IsEnabled { get; set; }
-
-    /// <inheritdoc />
-    public NodeStatus Status { get; set; }
     
     /// <inheritdoc />
     public VoidResult? Result { get; private set; }
+    
+    /// <inheritdoc />
+    public NodeStates State { get; private set; }
+    
+    /// <inheritdoc />
+    public NodeStates PreviousState { get; private set; }
 
     private static readonly ParameterMetadata[]? InputMetadata =
     [
         new ParameterMetadata
         {
             Index = 0,
-            Name = "Bool Value",
+            Identifier = "Bool Value",
             Description = "True or False",
             Type = typeof(bool),
             IsRequired = true,
@@ -57,9 +61,12 @@ public class IfStatement : IExecutableNode, IControlStatement
     /// <inheritdoc />
     public object?[]? Outputs { get; init; } = null;
 
+    public IfStatement()
+    {
+    }
+    
     private IfStatement(IfStatement old)
     {
-
     }
 
     /// <inheritdoc />
@@ -92,8 +99,17 @@ public class IfStatement : IExecutableNode, IControlStatement
         ReturnedPort = boolValue ? 0 : 1;
     }
 
+    // TODO
     public INode Clone()
     {
         throw new NotImplementedException();
+    }
+    
+    // TODO: (Possible) special logical for if statement node state transition.
+    public bool Fire(NodeEvents @event)
+    {
+        PreviousState = State;
+        State = NodeExtensions.DefaultStateTransform(PreviousState, @event);
+        return true;
     }
 }

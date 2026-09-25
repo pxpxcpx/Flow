@@ -4,6 +4,7 @@ using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
+using Flow.Shared.Utils;
 
 namespace Flow.Core.Models.Nodes;
 
@@ -16,7 +17,7 @@ internal sealed class ExitNode : IExecutableNode
 
     private static readonly NodeMetadata Meta = new NodeMetadata()
     {
-        Name = "Entry Node",
+        Identifier = "Entry Node",
         Description = "As an entry point of a function, usually there can only be one within each function.",
         Id = Guid.Parse("ACCE82DB-F41E-4F4C-8F02-4302A047DA3E"),
     };
@@ -26,9 +27,6 @@ internal sealed class ExitNode : IExecutableNode
 
     /// <inheritdoc/>
     public bool IsEnabled => true;
-
-    /// <inheritdoc />
-    public NodeStatus Status { get; set; }
 
     /// <inheritdoc />
     public ParameterMetadata[]? InputVariableMetadata => Function.InputVariableMetadata;
@@ -43,6 +41,12 @@ internal sealed class ExitNode : IExecutableNode
     public object?[] Outputs => _outputs.ToArray();
 
     private readonly List<object?> _outputs;
+    
+    /// <inheritdoc />
+    public NodeStates State { get; private set; }
+    
+    /// <inheritdoc />
+    public NodeStates PreviousState { get; private set; }
     
     /// <inheritdoc />
     public VoidResult? Result { get; private set; }
@@ -80,4 +84,12 @@ internal sealed class ExitNode : IExecutableNode
 
     public INode Clone()
         => new ExitNode(this);
+    
+    /// <inheritdoc />
+    public bool Fire(NodeEvents @event)
+    {
+        PreviousState = State;
+        State = NodeExtensions.DefaultStateTransform(PreviousState, @event);
+        return true;
+    }
 }

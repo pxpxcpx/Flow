@@ -23,9 +23,6 @@ public class Function : IFunction, IDisposable
     public bool IsEnabled { get; set; }
 
     /// <inheritdoc />
-    public NodeStatus Status { get; set; }
-
-    /// <inheritdoc />
     public IExecutableNode Entry => _entry; // TODO
 
     private readonly EntryNode _entry;
@@ -477,6 +474,14 @@ public class Function : IFunction, IDisposable
         _disposed = true;
     }
 
-    public virtual INode? Clone()
+    // TODO
+    public virtual INode Clone()
         => new Function(this);
+
+    public NodeStates State { get; }
+    public NodeStates PreviousState { get; }
+    public bool Fire(NodeEvents @event)
+    {
+        throw new NotImplementedException();
+    }
 }

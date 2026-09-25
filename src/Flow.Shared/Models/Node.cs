@@ -11,7 +11,7 @@ namespace Flow.Shared.Models;
 /// Base class for common implementations of <see cref="INode"/>.
 /// Also provides node utils.
 /// </summary>
-public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine<NodeStates, NodeEvents>
+public abstract class Node : INode, IEquatable<INode>, ICloneable
 {
     /// <inheritdoc />
     public NodeMetadata Metadata { get; init; }
@@ -23,19 +23,16 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine
     public bool IsEnabled { get; set; }
 
     /// <inheritdoc />
-    public NodeStatus Status { get; set; }
+    public NodeStates State { get; internal set; }
 
     /// <inheritdoc />
-    public NodeStates State { get; private set; }
-
-    /// <inheritdoc />
-    public NodeStates PreviousState { get; private set; }
+    public NodeStates PreviousState { get; internal set; }
 
     public bool IsCompleted => State.ExtractFieldIn(NodeStates.LifecycleMask) == (int)NodeStates.Finished;
 
     public bool IsCompletedSuccessfully =>
         IsCompleted && State.ExtractFieldIn(NodeStates.ResultMask) == (int)NodeStates.Successful;
-    
+
     public bool IsInitialized => State.ExtractFieldIn(NodeStates.LifecycleMask) != (int)NodeStates.Idle;
 
     /// <summary>
@@ -67,7 +64,7 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine
     {
         IsEnabled = true;
         RuntimeId = Guid.NewGuid();
-        Status = NodeStatus.Ready;
+        Fire(NodeEvents.Initialize);
 
         Metadata = metadata;
         InputVariableMetadata = inputVariableMetadata;
@@ -77,6 +74,7 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine
     internal static bool IsNullOrIndexOutOfRange<T>(T?[]? array, int index)
         => array == null || index < 0 || index >= array.Length;
 
+    // TODO: Resolve the services before initializing.
     /// <summary>
     /// Attempts to resolve and assign all required services from the specified service provider.
     /// </summary>
@@ -106,92 +104,14 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine
 
         return true;
     }
-    
-    /// <summary>
-    /// Find the state by related binary/int code.
-    /// </summary>
-    private static NodeStates ExtractState(int code)
-        => code switch
-        {
-            1 => NodeStates.Idle,
-            2 => NodeStates.Ready,
-            4 => NodeStates.Running,
-            8 => NodeStates.Suspended,
-            16 => NodeStates.Finished,
-            32 => NodeStates.Unspecified,
-            64 => NodeStates.Faulted,
-            128 => NodeStates.Successful,
-            _ => NodeStates.None
-        };
-
-    /// <summary>
-    /// Find the event by related binary/int code.
-    /// </summary>
-    private static NodeEvents ExtractEvent(int code)
-        => code switch
-        {
-            1 => NodeEvents.Initialize,
-            2 => NodeEvents.Start,
-            3 => NodeEvents.Suspend,
-            4 => NodeEvents.Pause,
-            5 => NodeEvents.Resume,
-            6 => NodeEvents.Cancel,
-            7 => NodeEvents.Complete,
-            8 => NodeEvents.Reset,
-            16 => NodeEvents.Unspecified,
-            32 => NodeEvents.Success,
-            48 => NodeEvents.Fail,
-            _ => NodeEvents.None
-        };
 
     /// <inheritdoc />
     public bool Fire(NodeEvents @event)
     {
         PreviousState = State;
         var pr = State;
-
-        var lifeCycleEvent = @event.ExtractFieldIn(NodeEvents.LifecycleMask, ExtractEvent);
-        var procEvent = @event.ExtractFieldIn(NodeEvents.ResultMask, ExtractEvent);
-        var lifecycleState = pr.ExtractFieldIn(NodeStates.LifecycleMask, ExtractState);
-
-        if (lifeCycleEvent == NodeEvents.Reset)
-        {
-            State = lifecycleState.HasFlag(NodeStates.Idle)
-                ? NodeStates.Idle | NodeStates.Unspecified   // Not initialized yet
-                : NodeStates.Ready | NodeStates.Unspecified; // Already initialized
-            return true;
-        }
-
-        NodeStates? l = (lifecycleState, lifeCycleEvent) switch
-        {
-            // * --None--> *
-            (_, NodeEvents.None) => pr,
-            // Idle -> *
-            (NodeStates.Idle, NodeEvents.Initialize) => NodeStates.Ready,
-            // Ready -> *
-            (NodeStates.Ready, NodeEvents.Start) => NodeStates.Running,
-            (NodeStates.Ready, NodeEvents.Suspend) => NodeStates.Suspended,
-            // Running -> *
-            (NodeStates.Running, NodeEvents.Pause) => NodeStates.Suspended,
-            (NodeStates.Running, NodeEvents.Suspend) => NodeStates.Suspended,
-            (NodeStates.Running, NodeEvents.Cancel) => NodeStates.Finished,
-            (NodeStates.Running, NodeEvents.Complete) => NodeStates.Finished,
-            // Suspended -> *
-            (NodeStates.Suspended, NodeEvents.Resume) => NodeStates.Running,
-            (NodeStates.Suspended, NodeEvents.Cancel) => NodeStates.Finished,
-            _ => null
-        };
-
-        var r = procEvent switch
-        {
-            NodeEvents.Unspecified => NodeStates.Unspecified,
-            NodeEvents.Success => NodeStates.Successful,
-            NodeEvents.Fail => NodeStates.Faulted,
-            _ => NodeStates.Unspecified
-        };
-
-        if (l is null) return false;
-        State = l.Value | r;
+        // TODO
+        State = NodeExtensions.DefaultStateTransform(pr, @event);
         return true;
     }
 
@@ -223,6 +143,7 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable, IStateMachine
     /// <see cref="Node"/> is an abstract class, throws when calling without overriding.
     /// </exception>
     public virtual INode Clone()
+        // Not a todo:
         => throw new NotImplementedException("The base class did not implement the Clone() method.");
 
     object ICloneable.Clone()

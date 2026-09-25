@@ -2,6 +2,7 @@
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
+using Flow.Shared.Utils;
 
 namespace Flow.Tests.FeasibilityTest.StaticNodeV2;
 
@@ -21,6 +22,12 @@ public partial class StaticNodeExampleV2
         public Guid RuntimeId { get; init; }
         
         public bool IsEnabled { get; }
+        
+        /// <inheritdoc />
+        public NodeStates State { get; private set; }
+    
+        /// <inheritdoc />
+        public NodeStates PreviousState { get; private set; }
         
         private static readonly ParameterMetadata[]? InputMetadata =
         [
@@ -78,12 +85,13 @@ public partial class StaticNodeExampleV2
         {
             throw new NotImplementedException();
         }
-
-        public NodeStates State { get; }
-        public NodeStates PreviousState { get; }
+        
+        /// <inheritdoc />
         public bool Fire(NodeEvents @event)
         {
-            throw new NotImplementedException();
+            PreviousState = State;
+            State = NodeExtensions.DefaultStateTransform(PreviousState, @event);
+            return true;
         }
     }
 }

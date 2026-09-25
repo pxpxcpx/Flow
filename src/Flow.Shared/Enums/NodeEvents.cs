@@ -3,6 +3,7 @@
 /// <summary>
 /// Events of a node.
 /// </summary>
+[Flags]
 public enum NodeEvents
 {
     /// <summary>

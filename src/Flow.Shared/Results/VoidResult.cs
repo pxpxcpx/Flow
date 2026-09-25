@@ -14,7 +14,7 @@ namespace Flow.Shared.Results;
 /// <code>var err = VoidResult.Error(...);</code>
 /// </example>
 /// </summary>
-public readonly struct VoidResult : IResult<bool, Exception>
+public record VoidResult : IResult<bool, Exception>
 {
     private readonly bool _isCompleted = false;
 
@@ -23,7 +23,7 @@ public readonly struct VoidResult : IResult<bool, Exception>
     private readonly Exception? _err = null;
 
     /// <inheritdoc/>
-    [Obsolete("Use property IsCompleted instead.", false)]
+    [Obsolete("Use property IsCompleted instead.", true)]
     public bool IsOk => _isCompleted;
     
     /// <summary>
@@ -142,7 +142,7 @@ public readonly struct VoidResult : IResult<bool, Exception>
             : Completed(result.Value); // no error, means result is completed, and the value is the success status.
 
     /// <inheritdoc/>
-    public IResult<bool, Exception> Clone()
+    IResult<bool, Exception> ICloneable<IResult<bool, Exception>>.Clone()
         => _isOk switch
         {
             true => Ok(),

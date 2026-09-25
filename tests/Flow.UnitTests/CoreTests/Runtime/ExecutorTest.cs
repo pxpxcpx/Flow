@@ -1,7 +1,9 @@
-﻿using Flow.Core.Models.Context;
+﻿using Flow.Core.Abstractions.Enums;
+using Flow.Core.Models.Context;
 using Flow.Core.Runtime;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
+using Flow.Shared.Utils;
 using JetBrains.Annotations;
 
 namespace Flow.UnitTests.CoreTests.Runtime;
@@ -21,7 +23,7 @@ public class SimpleFuncExecutorTests
     {
         Description = "Function for executor unit tests.",
         Id = Guid.Parse("97F542A5-8542-4572-B255-90E90E182E49"),
-        Name = "Function",
+        Identifier = "Function",
     };
 
     [TestInitialize]
@@ -55,7 +57,7 @@ public class SimpleFuncExecutorTests
         var executor = new Executor(_function);
 
         // Assert
-        Assert.AreEqual(ProcessorStatus.Ready, executor.Status);
+        Assert.AreEqual((int)ExecutorStates.Ready, executor.State.ExtractFieldIn(ExecutorStates.LifecycleMask));
         Assert.IsNull(executor.Result);
     }
 
@@ -70,7 +72,7 @@ public class SimpleFuncExecutorTests
 
         // Assert
         Assert.IsTrue(_syncNode1.Executed);
-        Assert.IsTrue(_syncNode1.Status.HasFlag(NodeStatus.Completed));
+        Assert.AreEqual((int)NodeStates.Finished, _syncNode1.State.ExtractFieldIn(NodeStates.LifecycleMask));
     }
 
     [TestMethod]
@@ -92,7 +94,7 @@ public class SimpleFuncExecutorTests
         // Wait 100ms cause it is fire and forget.
         // await Task.Delay(50, TestContext.CancellationToken);
         Assert.IsTrue(asyncNode.Executed);
-        Assert.IsTrue(asyncNode.Status.HasFlag(NodeStatus.Completed));
+        Assert.AreEqual((int)NodeStates.Finished, _asyncNode1.State.ExtractFieldIn(NodeStates.LifecycleMask));
     }
 
     [TestMethod]
@@ -184,7 +186,7 @@ public class ComplexFuncExecutorTests
     {
         Description = "Function for executor unit tests.",
         Id = Guid.Parse("E5919D30-5279-4BF7-94D1-9718F91E35E3"),
-        Name = "Function",
+        Identifier = "Function",
     };
 
     [TestInitialize]

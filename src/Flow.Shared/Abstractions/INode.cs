@@ -10,7 +10,7 @@ namespace Flow.Shared.Abstractions;
 /// To implement the node, simply inherit from <see cref="IExecutableNode"/> / <see cref="IAsyncExecutableNode"/>.
 /// </remarks>
 /// </summary>
-public interface INode : ICloneable<INode>
+public interface INode : ICloneable<INode>, IStateMachine<NodeStates, NodeEvents>
 {
     /// <summary>
     /// Metadata of the node. Includes name, description, GUID of this node. 
@@ -27,11 +27,6 @@ public interface INode : ICloneable<INode>
     /// Indicates whether the node is enabled.
     /// </summary>
     bool IsEnabled { get; }
-    
-    /// <summary>
-    /// Node status during the runtime.
-    /// </summary>
-    NodeStatus Status { get; set; }
     
     /// <summary>
     /// Metadata of the input variables.

@@ -7,7 +7,7 @@ using Flow.Shared.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Flow.Core.Components;
+namespace Flow.Core.Runtime;
 
 // TODO: IFactory
 public sealed class PluginManager : IDisposable
