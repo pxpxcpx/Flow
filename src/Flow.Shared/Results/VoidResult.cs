@@ -89,21 +89,21 @@ public record VoidResult : IResult<bool, Exception>
     }
 
     /// <inheritdoc/>
-    public Result<TResult, Exception> Map<TResult>(Func<bool, TResult> map)
+    public IResult<TResult, Exception> Map<TResult>(Func<bool, TResult> map)
         where TResult : notnull
         => IsCompleted
             ? Result<TResult, Exception>.Ok(map(_isOk))
             : Result<TResult, Exception>.Err(_err);
 
     /// <inheritdoc/>
-    public Result<bool, F> MapErr<F>(Func<Exception, F> map)
+    public IResult<bool, F> MapErr<F>(Func<Exception, F> map)
         where F : notnull
         => IsErr
             ? Result<bool, F>.Err(map(_err!))
             : Result<bool, F>.Ok(_isOk);
 
     /// <inheritdoc/>
-    public void Match(Action<Result<bool, Exception>> ok, Action<Result<bool, Exception>> err)
+    public void Match(Action<IResult<bool, Exception>> ok, Action<IResult<bool, Exception>> err)
     {
         if(IsCompleted)
             ok(this);

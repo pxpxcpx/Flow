@@ -1,6 +1,4 @@
-﻿using Flow.Shared.Results;
-
-namespace Flow.Shared.Abstractions;
+﻿namespace Flow.Shared.Abstractions;
 
 // This class was inspired by project "RustSharp",
 // Learn more: https://github.com/SlimeNull/RustSharp
@@ -53,7 +51,7 @@ public interface IResult<T, E> : ICloneable<IResult<T, E>>
     /// <param name="map"></param>
     /// <typeparam name="TResult"></typeparam>
     /// <returns></returns>
-    Result<TResult, E> Map<TResult>(Func<T, TResult> map)
+    IResult<TResult, E> Map<TResult>(Func<T, TResult> map)
         where TResult : notnull;
 
     /// <summary>
@@ -62,7 +60,7 @@ public interface IResult<T, E> : ICloneable<IResult<T, E>>
     /// <param name="map"></param>
     /// <typeparam name="F"></typeparam>
     /// <returns></returns>
-    Result<T, F> MapErr<F>(Func<E, F> map)
+    IResult<T, F> MapErr<F>(Func<E, F> map)
         where F : notnull;
 
     /// <summary>
@@ -71,5 +69,5 @@ public interface IResult<T, E> : ICloneable<IResult<T, E>>
     /// </summary>
     /// <param name="ok"></param>
     /// <param name="err"></param>
-    void Match(Action<Result<T, E>> ok, Action<Result<T, E>> err);
+    void Match(Action<IResult<T, E>> ok, Action<IResult<T, E>> err);
 }

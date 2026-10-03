@@ -7,70 +7,84 @@ namespace Flow.Shared.Results;
 /// </summary>
 /// <typeparam name="T">Type of <see cref="Value"/></typeparam>
 /// <typeparam name="E">Type of <see cref="Error"/></typeparam>
-public readonly struct Result<T, E> : IResult<T, E>
+public record Result<T, E> : IResult<T, E>
     where T : notnull
     where E : notnull
 {
-    private readonly bool _isOk = false;
-
-    private readonly T? _value = default;
-
-    private readonly E? _err = default;
+    /// <inheritdoc/>
+    public bool IsOk { get; }
 
     /// <inheritdoc/>
-    public bool IsOk => _isOk;
+    public bool IsErr => !IsOk;
 
     /// <inheritdoc/>
-    public bool IsErr => !_isOk;
+    public T? Value { get; }
 
     /// <inheritdoc/>
-    public T? Value => _value;
+    public E? Error { get; }
 
-    /// <inheritdoc/>
-    public E? Error => _err;
-
+    protected Result()
+    {
+    }
+    
     private Result(T? value)
     {
-        _value = value;
-        _err = default;
-        _isOk = true;
+        Value = value;
+        Error = default;
+        IsOk = true;
     }
 
     private Result(E? err)
     {
-        _value = default;
-        _err = err;
-        _isOk = false;
+        Value = default;
+        Error = err;
+        IsOk = false;
+    }
+
+    // Use those classes with pattern matching.
+    
+    public record Success : Result<T, E>
+    {
+        internal Success(T? value) : base(value)
+        {
+        }
+    }
+
+    public record Failure : Result<T, E>
+    {
+        internal Failure(E? err) : base(err)
+        {
+        }
     }
 
     public static Result<T, E> Ok(T? value)
-        => new(value);
+        => new Success(value);
 
     public static Result<T, E> Err(E? err)
-        => new(err);
+        => new Failure(err);
 
     /// <inheritdoc/>
     public T? Unwrap()
-    {
-        if (!_isOk)
-            throw new InvalidOperationException("Called Unwrap on Err");
-        return _value;
-    }
+        => !IsOk
+            ? throw new InvalidOperationException("Called Unwrap on Err")
+            : Value;
 
     /// <inheritdoc/>
     public E? UnwrapErr()
-    {
-        if (_isOk)
-            throw new InvalidOperationException("Called UnwrapErr on Ok");
-        return _err;
-    }
+        => IsOk
+            ? throw new InvalidOperationException("Called UnwrapErr on Ok")
+            : Error;
 
+    // Members named "Clone" are disallowed in records.
     /// <inheritdoc/>
-    public IResult<T, E> Clone()
+    IResult<T, E> ICloneable<IResult<T, E>>.Clone()
     {
+        if (IsErr)
+            return Err(Error);
+        
         T newValue;
 
-        switch (_value)
+        switch (Value)
         {
             case ICloneable c:
                 newValue = (T)c.Clone();
@@ -86,21 +100,21 @@ public readonly struct Result<T, E> : IResult<T, E>
     }
 
     /// <inheritdoc/>
-    public Result<TResult, E> Map<TResult>(Func<T, TResult> map)
+    public IResult<TResult, E> Map<TResult>(Func<T, TResult> map)
         where TResult : notnull
         => IsOk
-            ? Result<TResult, E>.Ok(map(_value!))
-            : Result<TResult, E>.Err(_err!);
+            ? Result<TResult, E>.Ok(map(Value!))
+            : Result<TResult, E>.Err(Error!);
 
     /// <inheritdoc/>
-    public Result<T, F> MapErr<F>(Func<E, F> map)
+    public IResult<T, F> MapErr<F>(Func<E, F> map)
         where F : notnull
         => IsErr
-            ? Result<T, F>.Err(map(_err!))
-            : Result<T, F>.Ok(_value);
+            ? Result<T, F>.Err(map(Error!))
+            : Result<T, F>.Ok(Value);
 
     /// <inheritdoc/>
-    public void Match(Action<Result<T, E>> ok, Action<Result<T, E>> err)
+    public void Match(Action<IResult<T, E>> ok, Action<IResult<T, E>> err)
     {
         if (IsOk)
             ok(this);
