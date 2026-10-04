@@ -8,7 +8,7 @@
     <Project Path="src/Flow.Core/Flow.Core.csproj" />
   </Folder>
   <Folder Name="/demos/">
-    <Project Path="demos/Flow.Demos.AutomationDemo/Flow.Demos.AutomationDemo.csproj" />
+    <!--Project Path="demos/Flow.Demos.AutomationDemo/Flow.Demos.AutomationDemo.csproj" /-->
   </Folder>
   <Folder Name="/libs/" />
   <Folder Name="/plugins/" />
