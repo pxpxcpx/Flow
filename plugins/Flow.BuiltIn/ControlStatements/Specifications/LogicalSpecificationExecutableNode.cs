@@ -3,7 +3,9 @@ using Flow.Automation.Decisioning.Implementations;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
+using Flow.Shared.Models;
 using Flow.Shared.Results;
+using Flow.Shared.Utils;
 
 namespace Flow.BuiltIn.ControlStatements.Specifications;
 
@@ -30,6 +32,12 @@ public class LogicalSpecificationNode : IExecutableNode
 
     /// <inheritdoc />
     public bool IsEnabled { get; set; }
+    
+    /// <inheritdoc />
+    public NodeStates State { get; private set; }
+    
+    /// <inheritdoc />
+    public NodeStates PreviousState { get; private set; }
 
     /// <inheritdoc />
     public VoidResult? Result { get; private set; }
@@ -128,15 +136,21 @@ public class LogicalSpecificationNode : IExecutableNode
         Outputs![0] = result;
     }
 
+    public bool Fire(NodeEvents @event)
+    {
+        var pr = State;
+        Node.DefaultStateTransform(pr, @event, out var l, out var r);
+
+        if (l is null || r is null)
+            return false;
+
+        State = l.Value | r.Value;
+        PreviousState = State;
+        return true;
+    }
+    
     // TODO
     public INode Clone()
-    {
-        throw new NotImplementedException();
-    }
-
-    public NodeStates State { get; }
-    public NodeStates PreviousState { get; }
-    public bool Fire(NodeEvents @event)
     {
         throw new NotImplementedException();
     }

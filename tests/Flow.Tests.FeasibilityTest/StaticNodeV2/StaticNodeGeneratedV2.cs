@@ -1,6 +1,7 @@
 ﻿using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
+using Flow.Shared.Models;
 using Flow.Shared.Results;
 using Flow.Shared.Utils;
 
@@ -89,8 +90,14 @@ public partial class StaticNodeExampleV2
         /// <inheritdoc />
         public bool Fire(NodeEvents @event)
         {
+            var pr = State;
+            Node.DefaultStateTransform(pr, @event, out var l, out var r);
+
+            if (l is null || r is null)
+                return false;
+
+            State = l.Value | r.Value;
             PreviousState = State;
-            State = NodeExtensions.DefaultStateTransform(PreviousState, @event);
             return true;
         }
     }

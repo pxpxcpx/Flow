@@ -1,4 +1,5 @@
-﻿using Flow.Shared.Abstractions;
+﻿using System.Diagnostics;
+using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
 using Flow.Shared.Results;
@@ -11,6 +12,7 @@ namespace Flow.Shared.Models;
 /// Base class for common implementations of <see cref="INode"/>.
 /// Also provides node utils.
 /// </summary>
+[DebuggerDisplay("{ToString()}")]
 public abstract class Node : INode, IEquatable<INode>, ICloneable
 {
     /// <inheritdoc />
@@ -33,7 +35,7 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable
     public bool IsCompletedSuccessfully =>
         IsCompleted && State.ExtractFieldIn(NodeStates.ResultMask) == (int)NodeStates.Successful;
 
-    public bool IsInitialized => State.ExtractFieldIn(NodeStates.LifecycleMask) != (int)NodeStates.Idle;
+    public bool IsInitialized => State.ExtractFieldIn(NodeStates.LifecycleMask) != (int)NodeStates.Ready;
 
     /// <summary>
     /// Services required.
@@ -105,18 +107,114 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable
         return true;
     }
 
+    /// <summary>
+    /// Find the state by related binary/int code.
+    /// </summary>
+    public static NodeStates ExtractNodeState(int code)
+        => code switch
+        {
+            2 => NodeStates.Ready,
+            4 => NodeStates.Running,
+            8 => NodeStates.Suspended,
+            16 => NodeStates.Finished,
+            32 => NodeStates.Unspecified,
+            64 => NodeStates.Faulted,
+            128 => NodeStates.Successful,
+            _ => NodeStates.None
+        };
+
+    /// <summary>
+    /// Find the event by related binary/int code.
+    /// </summary>
+    public static NodeEvents ExtractNodeEvent(int code)
+        => code switch
+        {
+            1 => NodeEvents.Initialize,
+            2 => NodeEvents.Start,
+            3 => NodeEvents.Suspend,
+            4 => NodeEvents.Pause,
+            5 => NodeEvents.Resume,
+            6 => NodeEvents.Cancel,
+            7 => NodeEvents.Complete,
+            8 => NodeEvents.Reset,
+            16 => NodeEvents.Unspecified,
+            32 => NodeEvents.Success,
+            48 => NodeEvents.Fail,
+            _ => NodeEvents.None
+        };
+
+    /// <summary>
+    /// Default state transition of common nodes.
+    /// </summary>
+    /// <param name="pr">Current state(before the transition).</param>
+    /// <param name="event">Event received.</param>
+    /// <param name="newLifecycleState">New state of node lifecycle.</param>
+    /// <param name="newResultState">New state of processing result.</param>
+    /// <returns></returns>
+    public static void DefaultStateTransform(
+        NodeStates pr, NodeEvents @event, out NodeStates? newLifecycleState, out NodeStates? newResultState)
+    {
+        var lifeCycleEvent = @event.ExtractFieldIn(NodeEvents.LifecycleMask, ExtractNodeEvent);
+        var procEvent = @event.ExtractFieldIn(NodeEvents.ResultMask, ExtractNodeEvent);
+        var preLifecycleState = pr.ExtractFieldIn(NodeStates.LifecycleMask, ExtractNodeState);
+        var preProcState = pr.ExtractFieldIn(NodeStates.ResultMask, ExtractNodeState);
+
+        if (lifeCycleEvent == NodeEvents.Reset)
+        {
+            newLifecycleState = NodeStates.Ready;
+            newResultState = NodeStates.Unspecified;
+            return;
+        }
+
+        NodeStates? l = (preLifecycleState, lifeCycleEvent) switch
+        {
+            // * --None--> *
+            (_, NodeEvents.None) => preLifecycleState, // no modification on lifecycle state
+            // Idle -> *
+            (NodeStates.None, NodeEvents.Initialize) => NodeStates.Ready,
+            // Ready -> *
+            (NodeStates.Ready, NodeEvents.Start) => NodeStates.Running,
+            (NodeStates.Ready, NodeEvents.Suspend) => NodeStates.Suspended,
+            // Running -> *
+            (NodeStates.Running, NodeEvents.Pause) => NodeStates.Suspended,
+            (NodeStates.Running, NodeEvents.Suspend) => NodeStates.Suspended,
+            (NodeStates.Running, NodeEvents.Cancel) => NodeStates.Finished,
+            (NodeStates.Running, NodeEvents.Complete) => NodeStates.Finished,
+            // Suspended -> *
+            (NodeStates.Suspended, NodeEvents.Resume) => NodeStates.Running,
+            (NodeStates.Suspended, NodeEvents.Cancel) => NodeStates.Finished,
+            _ => null
+        };
+
+        NodeStates? r = procEvent switch
+        {
+            NodeEvents.None => preProcState, // no modification on process result state
+            NodeEvents.Unspecified => NodeStates.Unspecified,
+            NodeEvents.Success => NodeStates.Successful,
+            NodeEvents.Fail => NodeStates.Faulted,
+            _ => null
+        };
+
+        newLifecycleState = l;
+        newResultState = r;
+    }
+
     /// <inheritdoc />
     public bool Fire(NodeEvents @event)
     {
-        PreviousState = State;
         var pr = State;
-        // TODO
-        State = NodeExtensions.DefaultStateTransform(pr, @event);
+        DefaultStateTransform(pr, @event, out var l, out var r);
+
+        if (l is null || r is null)
+            return false;
+
+        State = l.Value | r.Value;
+        PreviousState = State;
         return true;
     }
 
     public override string ToString()
-        => $"Type: {GetType().Name}, RuntimeId: {RuntimeId}, Metadata:{Metadata}";
+        => $"Type = {GetType().Name}, RuntimeId = {RuntimeId}, Name = {Metadata.Identifier}";
 
     private static bool Equals(Node node, INode? other)
     {
@@ -143,7 +241,7 @@ public abstract class Node : INode, IEquatable<INode>, ICloneable
     /// <see cref="Node"/> is an abstract class, throws when calling without overriding.
     /// </exception>
     public virtual INode Clone()
-        // Not a todo:
+        // Not a to-do:
         => throw new NotImplementedException("The base class did not implement the Clone() method.");
 
     object ICloneable.Clone()

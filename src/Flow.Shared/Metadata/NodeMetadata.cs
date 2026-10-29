@@ -1,10 +1,12 @@
-﻿using Flow.Shared.Abstractions;
+﻿using System.Diagnostics;
+using Flow.Shared.Abstractions;
 
 namespace Flow.Shared.Metadata;
 
 /// <summary>
 /// Represents a node's metadata.
 /// </summary>
+[DebuggerDisplay("{ToString()}")]
 public record NodeMetadata : IDescribable
 {
     /// <summary>
@@ -34,4 +36,7 @@ public record NodeMetadata : IDescribable
         Identifier = string.Empty,
         Description = string.Empty,
     };
+
+    public override string ToString()
+        => $"Id = {Id}, Identifier = {Identifier}, Description = {Description}";
 }

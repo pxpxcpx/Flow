@@ -1,5 +1,5 @@
 ﻿using Flow.Core.Models.Context;
-using Flow.Core.Models.Nodes;
+using Flow.Core.Models.NodeImpls;
 using Flow.Shared.Metadata;
 using JetBrains.Annotations;
 

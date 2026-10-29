@@ -15,11 +15,6 @@ public enum NodeStates
     LifecycleMask = 0b_0001_1111,
     
     /// <summary>
-    /// Initialized state, node had just been activated.
-    /// </summary>
-    Idle          = 0b_0000_0001,
-    
-    /// <summary>
     /// Node is ready to run. All services, requirements are ready.
     /// </summary>
     Ready         = 0b_0000_0010,

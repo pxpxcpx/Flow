@@ -1,6 +1,4 @@
-﻿using Flow.Core.Runtime;
-
-namespace Flow.Core.Models.Context;
+﻿namespace Flow.Core.Models.Context;
 
 /// <summary>
 /// Storages an instance in a domain.
@@ -37,7 +35,7 @@ public sealed record ContextItem
     public object Value { get; set; }
     
     /// <summary>
-    /// An item in the <see cref="ExecutionContext{TKey}"/>.
+    /// An item in the <see cref="ExecutionContext"/>.
     /// </summary>
     /// <param name="type">type of the <see cref="Value"/></param>
     /// <param name="value">Data of the item</param>

@@ -55,7 +55,6 @@ internal class TestSyncNode : Node, IExecutableNode
     {
         Console.WriteLine("{0} node executed.", RuntimeId);
         Executed = true;
-        Fire(NodeEvents.Complete);
     }
 }
 
@@ -67,10 +66,16 @@ internal class TestAsyncNode : Node, IAsyncExecutableNode
 
     public Task ExecuteAsync()
     {
-        Console.WriteLine("{0} async node executed.", RuntimeId);
-        Executed = true;
-        Fire(NodeEvents.Complete);
-        return Task.CompletedTask;
+        try
+        {
+            Console.WriteLine("{0} async node executed.", RuntimeId);
+            Executed = true;
+            return Task.CompletedTask;
+        }
+        catch (Exception exception)
+        {
+            return Task.FromException(exception);
+        }
     }
 }
 

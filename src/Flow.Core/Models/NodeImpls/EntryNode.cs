@@ -3,10 +3,11 @@ using Flow.Core.Models.Context;
 using Flow.Shared.Abstractions;
 using Flow.Shared.Enums;
 using Flow.Shared.Metadata;
+using Flow.Shared.Models;
 using Flow.Shared.Results;
 using Flow.Shared.Utils;
 
-namespace Flow.Core.Models.Nodes;
+namespace Flow.Core.Models.NodeImpls;
 
 internal sealed class EntryNode : IExecutableNode
 {
@@ -67,8 +68,14 @@ internal sealed class EntryNode : IExecutableNode
     
     public bool Fire(NodeEvents @event)
     {
+        var pr = State;
+        Node.DefaultStateTransform(pr, @event, out var l, out var r);
+
+        if (l is null || r is null)
+            return false;
+
+        State = l.Value | r.Value;
         PreviousState = State;
-        State = NodeExtensions.DefaultStateTransform(PreviousState, @event);
         return true;
     }
 

@@ -436,7 +436,6 @@ public class Executor : IDisposable, IStateMachine<ExecutorStates, ExecutorEvent
     private static ExecutorStates ExtractState(int code)
         => code switch
         {
-            1 => ExecutorStates.Idle,
             2 => ExecutorStates.Ready,
             4 => ExecutorStates.Running,
             8 => ExecutorStates.Suspended,
@@ -472,25 +471,23 @@ public class Executor : IDisposable, IStateMachine<ExecutorStates, ExecutorEvent
     {
         PreviousState = State;
         var pr = State;
-        
+
         var lifeCycleEvent = @event.ExtractFieldIn(ExecutorEvents.LifecycleMask, ExtractEvent);
         var procEvent = @event.ExtractFieldIn(ExecutorEvents.ResultMask, ExtractEvent);
         var lifecycleState = pr.ExtractFieldIn(ExecutorStates.LifecycleMask, ExtractState);
-        
+
         if (lifeCycleEvent == ExecutorEvents.Reset)
         {
-            State = lifecycleState.HasFlag(ExecutorStates.Idle)
-                ? ExecutorStates.Idle | ExecutorStates.Unspecified   // Not initialized yet
-                : ExecutorStates.Ready | ExecutorStates.Unspecified; // Already initialized
+            State = ExecutorStates.Ready | ExecutorStates.Unspecified;
             return true;
         }
-        
+
         ExecutorStates? l = (lifecycleState, lifeCycleEvent) switch
         {
             // * --None--> *
             (_, ExecutorEvents.None) => pr,
             // Idle -> *
-            (ExecutorStates.Idle, ExecutorEvents.Initialize) => ExecutorStates.Ready,
+            (ExecutorStates.None, ExecutorEvents.Initialize) => ExecutorStates.Ready,
             // Ready -> *
             (ExecutorStates.Ready, ExecutorEvents.Start) => ExecutorStates.Running,
             (ExecutorStates.Ready, ExecutorEvents.Suspend) => ExecutorStates.Suspended,
